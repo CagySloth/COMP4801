@@ -1,0 +1,13 @@
+{
+  "num_variants": 100,
+  "num_reads": 50,
+  "error_rate": 0.01,
+  "missing_rate": 0.05,
+  "homozygous_rate_param": 0.6,
+  "hom_alt_prob_param": 0.5,
+  "seed": 42,
+  "observed_missing_fraction_over_all_bases": 0.0496,
+  "observed_error_rate_over_non_missing": 0.011574074074074073,
+  "haplotype_homozygous_sites": 60,
+  "haplotype_heterozygous_sites": 40
+}

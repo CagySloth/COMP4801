@@ -1,0 +1,18 @@
+{
+  "ploidy": 2,
+  "num_variants": 1000,
+  "num_reads": 20000,
+  "read_length": 25,
+  "error_rate": 0.01,
+  "missing_rate": 0.05,
+  "maf_alpha": 0.4,
+  "maf_beta": 0.4,
+  "ensure_polymorphic": true,
+  "seed": null,
+  "expected_coverage": 500.0,
+  "mean_coverage": 500.0,
+  "min_coverage": 17,
+  "max_coverage": 573,
+  "observed_error_rate_over_non_missing": 0.009731812057931964,
+  "observed_missing_fraction_over_all_bases": 0.04992
+}
