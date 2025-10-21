@@ -1,10 +1,6 @@
 # COMP4801
 source .venv/bin/activate
 
-Certainly! Below is the full **Section 3: Scripts Documentation** written in clean **Markdown format**, suitable for direct pasting into your `README.md`. It includes all scripts from the `algorithms/` and `dataset/` directories, with detailed descriptions, parameters, usage examples, and suggested values.
-
----
-
 ## 📜 Scripts Documentation
 
 This section describes the command-line tools included in this project. These scripts allow you to simulate haplotype sequencing data, convert TSV files to NumPy formats, and run various phasing algorithms.
@@ -231,6 +227,44 @@ python algorithms/polyploid_em_cluster.py -i demo_reads.npz -k 3 -o output/em3
 * `<prefix>.assignments.tsv`
 * `<prefix>.summary.json`
 
----
+### 📊 `accuracy.py` – Evaluate Phasing Accuracy
 
-Let me know if you'd like this content as a `.md` file download or want to auto-generate usage info from your argparse definitions.
+**Location:** `benchmarking/accuracy.py`
+
+Compares predicted haplotypes to ground truth, computes best label alignment, and reports overall accuracy.
+
+#### **Usage**
+
+```bash
+python benchmarking/accuracy.py --truth truth.haplotypes.tsv --pred predicted.haplotypes.tsv [--output accuracy.json]
+```
+
+#### **Example**
+
+```bash
+python benchmarking/accuracy.py \
+  --truth dataset/1/sim.haplotypes.tsv \
+  --pred results/em_phase_1.haplotypes.tsv \
+  --output results/em_phase_1.accuracy.json
+```
+
+#### **Parameters**
+
+| Flag       | Type | Required   | Description                                    |
+| ---------- | ---- | ---------- | ---------------------------------------------- |
+| `--truth`  | str  | ✅ Yes      | Path to ground truth haplotypes `.tsv` file    |
+| `--pred`   | str  | ✅ Yes      | Path to predicted haplotypes `.tsv` file       |
+| `--output` | str  | ❌ Optional | Path to save evaluation results in JSON format |
+
+#### **Output**
+
+* **Console:** Prints best possible accuracy (after matching labels) and the optimal permutation of haplotypes.
+* **Optional JSON:** If `--output` is specified, writes a report like:
+
+```json
+{
+  "accuracy": 0.975,
+  "label_permutation": [1, 0],
+  "truth_shape": [2, 1000]
+}
+```
