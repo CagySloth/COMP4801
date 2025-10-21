@@ -128,30 +128,37 @@ def main():
     data = load_reads(args.input)
     alleles = data.alleles
     rng = np.random.default_rng(args.seed)
+    if data.R == 0:
+        # No reads: output two haplotypes (all 0s) and empty assignments
+        H = np.zeros((2, data.N), dtype=np.uint8)
+        assign = np.zeros(0, dtype=np.int32)
+        mec, per_read = 0, np.zeros(0, dtype=np.int64)
+        acc_info = None
+        # Proceed to output generation
+    else:
+        # Initialize haplotypes
+        H = init_haplotypes_kpp(alleles, rng)
 
-    # Initialize haplotypes
-    H = init_haplotypes_kpp(alleles, rng)
+        prev_assign = None
+        stable_count = 0
 
-    prev_assign = None
-    stable_count = 0
+        for it in range(1, args.max_iters + 1):
+            assign, _ = assign_reads(alleles, H)
+            if prev_assign is not None and np.array_equal(assign, prev_assign):
+                stable_count += 1
+            else:
+                stable_count = 0
+            prev_assign = assign.copy()
 
-    for it in range(1, args.max_iters + 1):
-        assign, _ = assign_reads(alleles, H)
-        if prev_assign is not None and np.array_equal(assign, prev_assign):
-            stable_count += 1
-        else:
-            stable_count = 0
-        prev_assign = assign.copy()
+            H_new = update_haplotypes(alleles, assign, H)
+            H = H_new
 
-        H_new = update_haplotypes(alleles, assign, H)
-        H = H_new
+            if stable_count >= args.tol_iters:
+                break
 
-        if stable_count >= args.tol_iters:
-            break
-
-    # Final evaluation
-    mec, per_read = compute_mec(alleles, H, prev_assign)
-    acc_info = hap_truth_accuracy(data.hap_truth, prev_assign)
+        # Final evaluation
+        mec, per_read = compute_mec(alleles, H, prev_assign)
+        acc_info = hap_truth_accuracy(data.hap_truth, prev_assign)
 
     # Outputs
     outdir = os.path.dirname(os.path.abspath(args.output_prefix))
