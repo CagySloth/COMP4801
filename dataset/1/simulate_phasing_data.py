@@ -28,11 +28,14 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
+import sys, os
 from dataclasses import dataclass, asdict
 from typing import Tuple
 
 import numpy as np
+
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "algorithms"))
+from phase_io import write_haplotypes_tsv
 
 
 @dataclass
@@ -214,17 +217,6 @@ def simulate_reads(
     missing_count = int(np.sum(missing_mask))
 
     return hap_ids, starts, lengths, positions, alleles_obs, error_count, missing_count
-
-
-def write_haplotypes_tsv(H: np.ndarray, path: str) -> None:
-    P, N = H.shape
-    with open(path, "w", encoding="utf-8") as f:
-        f.write(f"# haplotypes\t{P}\n")
-        f.write(f"# variants\t{N}\n")
-        f.write("# format: hap_id<TAB>alleles_as_0_1_string\n")
-        for h in range(P):
-            bitstr = "".join("1" if x else "0" for x in H[h])
-            f.write(f"h{h}\t{bitstr}\n")
 
 
 def write_haplotypes_npz(H: np.ndarray, path: str) -> None:
