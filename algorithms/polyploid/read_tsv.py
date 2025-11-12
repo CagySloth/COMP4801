@@ -29,11 +29,6 @@ The script:
 - Optionally converts sparse -> dense and saves with --to-dense-npz.
 
 Dependencies: numpy
-
-Examples:
-python read_tsv.py -i dataset/0\ -\ diploid\ only/demo.reads.tsv
-python read_tsv.py -i dataset/0\ -\ diploid\ only/demo.reads.tsv --to-npz demo.npz
-python read_tsv.py -i dataset/0\ -\ diploid\ only/demo.reads.tsv --to-dense-npz demo_dense.npz --num-variants 1000
 """
 
 from __future__ import annotations

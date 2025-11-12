@@ -268,3 +268,158 @@ python benchmarking/accuracy.py \
   "truth_shape": [2, 1000]
 }
 ```
+
+## 🧪 Benchmarking Pipeline
+
+The benchmarking tool automates simulation, execution, and evaluation of phasing algorithms under different conditions. It enables reproducible experiments to assess how accuracy and runtime vary with input parameters like number of reads, error rate, or ploidy.
+
+### 📌 Script
+
+```bash
+benchmarking/benchmark_runner.py
+```
+
+### ✅ Features
+
+* Automatically selects the appropriate simulation script for diploid vs polyploid
+* Supports multiple runs with different seeds
+* Collects runtime, accuracy, and algorithm metadata
+* Supports parameter sweeping (e.g. vary number of reads or error rate)
+* Outputs results in a structured JSON file (`benchmark_summary.json`)
+
+---
+
+### 🔧 Usage
+
+```bash
+python benchmarking/benchmark_runner.py \
+  --algorithms diploid-em diploid-mst \
+  --ploidy 2 \
+  --num-reads 5000 \
+  --error-rate 0.01 \
+  --num-runs 3 \
+  --outdir results/benchmark_test
+```
+
+This will:
+
+* Simulate 3 diploid datasets with 5000 reads and 1% error
+* Run both `diploid-em` and `diploid-mst` on each
+* Save outputs and accuracy reports
+* Aggregate results into `results/benchmark_test/benchmark_summary.json`
+
+---
+
+### 🔁 Parameter Sweeping
+
+To benchmark an algorithm under varying conditions:
+
+```bash
+python benchmarking/benchmark_runner.py \
+  --algorithms diploid-em \
+  --ploidy 2 \
+  --error-rate 0.01 \
+  --num-runs 3 \
+  --vary num_reads \
+  --vary-values 1000 5000 10000 20000 \
+  --outdir results/sweep_reads
+```
+
+This will:
+
+* Sweep over number of reads (1000, 5000, etc.)
+* For each value, simulate and benchmark 3 runs
+* Run `diploid-em` and evaluate accuracy
+
+---
+
+### 📁 Output
+
+Each run produces:
+
+* `.reads.sparse.tsv` + `.reads.npz` (simulated reads)
+* `.haplotypes.tsv` (ground truth + predicted)
+* `.assignments.tsv` (read-to-haplotype map)
+* `.accuracy.json` (accuracy + label permutation)
+* `benchmark_summary.json` (full aggregated log for plotting)
+
+
+## 🚀 Unified Phasing CLI
+
+The repository provides a unified command-line interface for running all supported haplotype phasing algorithms. Each algorithm is accessible via a subcommand.
+
+### 📄 Script
+
+```bash
+python -m algorithms.cli.phase <algorithm> [options]
+```
+
+---
+
+### 🧩 Supported Algorithms
+
+| Subcommand           | Description                                 |
+| -------------------- | ------------------------------------------- |
+| `diploid-em`         | Diploid phasing using hard EM               |
+| `diploid-mst`        | Diploid phasing using MST heuristic         |
+| `polyploid-em`       | Polyploid phasing using hard EM             |
+| `polyploid-spectral` | Polyploid phasing using spectral clustering |
+
+---
+
+### 🧪 Examples
+
+**Diploid EM**
+
+```bash
+python -m algorithms.cli.phase diploid-em \
+  -i data/sample.reads.npz \
+  -o results/sample_em \
+  --max-iters 30 \
+  --tol-iters 2 \
+  --seed 42
+```
+
+**Polyploid EM**
+
+```bash
+python -m algorithms.cli.phase polyploid-em \
+  -i data/sample.reads.npz \
+  -k 4 \
+  -o results/poly_em \
+  --max-iters 40 \
+  --tol-iters 3
+```
+
+**Diploid MST**
+
+```bash
+python -m algorithms.cli.phase diploid-mst \
+  -i data/sample.reads.npz \
+  -o results/sample_mst \
+  --min-overlap 3
+```
+
+**Polyploid Spectral**
+
+```bash
+python -m algorithms.cli.phase polyploid-spectral \
+  -i data/sample.reads.npz \
+  -k 4 \
+  -o results/poly_spectral \
+  --min-overlap 5
+```
+
+---
+
+### 🧵 Common Parameters
+
+| Flag            | Description                                  |
+| --------------- | -------------------------------------------- |
+| `-i, --input`   | Input `.npz` file (required)                 |
+| `-o, --output`  | Output prefix (required)                     |
+| `-k, --ploidy`  | Ploidy (required for polyploid algorithms)   |
+| `--max-iters`   | Max EM iterations (default varies by method) |
+| `--tol-iters`   | Early stopping threshold                     |
+| `--min-overlap` | Minimum variant overlap to join fragments    |
+| `--seed`        | Random seed for reproducibility              |
