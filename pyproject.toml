@@ -1,0 +1,23 @@
+[project]
+name = "phasing_benchmarker"
+version = "0.1.0"
+description = "A benchmarking framework for haplotype phasing algorithms."
+authors = [
+  { name = "Ng Ching Lap", email = "ngcl1013@gmail.com" }
+]
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+  "numpy",
+  "scipy",
+  "networkx",
+  "pandas"
+]
+
+[project.scripts]
+phase = "algorithms.cli.phase:main"
+convert = "algorithms.cli.convert:main"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
