@@ -27,15 +27,7 @@ from typing import List, Tuple
 
 import numpy as np
 
-from phase_io import (
-    load_reads,
-    write_haplotypes_tsv,
-    write_assignments_tsv,
-    write_summary_json,
-    compute_mec,
-    hap_truth_accuracy,
-    global_majority,
-)
+from algorithms.io import parser, writer
 
 
 class DSU:

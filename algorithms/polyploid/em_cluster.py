@@ -24,15 +24,7 @@ from typing import Tuple
 
 import numpy as np
 
-from phase_io import (
-    load_reads,
-    write_haplotypes_tsv,
-    write_assignments_tsv,
-    write_summary_json,
-    compute_mec,
-    hap_truth_accuracy,
-    global_majority,
-)
+from algorithms.io import parser, writer
 
 
 def dist_reads_to_hap(alleles: np.ndarray, hap: np.ndarray) -> np.ndarray:

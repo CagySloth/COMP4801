@@ -24,15 +24,7 @@ from typing import Tuple
 
 import numpy as np
 
-from phase_io import (
-    load_reads,
-    write_haplotypes_tsv,
-    write_assignments_tsv,
-    write_summary_json,
-    global_majority,
-    compute_mec,
-    hap_truth_accuracy,
-)
+from algorithms.io import parser, writer
 
 
 def init_haplotypes_kpp(alleles: np.ndarray, rng: np.random.Generator) -> np.ndarray:

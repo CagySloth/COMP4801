@@ -26,14 +26,7 @@ from typing import Tuple
 
 import numpy as np
 
-from phase_io import (
-    load_reads,
-    write_haplotypes_tsv,
-    write_assignments_tsv,
-    write_summary_json,
-    compute_mec,
-    hap_truth_accuracy,
-)
+from algorithms.io import parser, writer
 
 
 def build_agreement_matrix(A: np.ndarray, min_overlap: int) -> np.ndarray:
