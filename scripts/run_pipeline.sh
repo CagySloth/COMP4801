@@ -19,7 +19,7 @@ echo "Converting to .npz..."
 python -m algorithms.cli.convert "$PREFIX.reads.sparse.tsv" --output "$PREFIX.reads.npz"
 
 echo "Running phasing algorithm..."
-python -m algorithms.cli.phase "$PREFIX.reads.npz" --algorithm "$ALGO" --ploidy "$PLOIDY" --output "$PREFIX.$ALGO"
+python -m algorithms.cli.phase "$algo" -i "$reads_npz" -o "$output_prefix"
 
 echo "Evaluating..."
 python benchmarking/benchmark_accuracy.py \

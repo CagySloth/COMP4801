@@ -24,7 +24,10 @@ from typing import Tuple
 
 import numpy as np
 
-from algorithms.io import parser, writer
+from algorithms.io.parser import parse_sparse_tsv, load_reads
+from algorithms.io.writer import write_haplotypes_tsv, write_summary_json, write_assignments_tsv
+from algorithms.io.reads_data import ReadsData
+from algorithms.eval.metrics import compute_mec, hap_truth_accuracy
 
 
 def init_haplotypes_kpp(alleles: np.ndarray, rng: np.random.Generator) -> np.ndarray:
@@ -158,7 +161,7 @@ def main():
     hap_path = f"{args.output_prefix}.haplotypes.tsv"
     asg_path = f"{args.output_prefix}.assignments.tsv"
     sum_path = f"{args.output_prefix}.summary.json"
-    write_haplotypes_tsv(H, hap_path)
+    write_haplotypes_tsv(hap_path, H)
     write_assignments_tsv(data.read_ids, prev_assign, asg_path)
 
     summary = {
