@@ -2,9 +2,7 @@ from .parser import (
     parse_sparse_tsv,
     parse_dense_tsv,
     load_reads,
-    global_majority,
-    compute_mec,
-    hap_truth_accuracy,
+    is_sparse_tsv,
 )
 
 from .writer import (

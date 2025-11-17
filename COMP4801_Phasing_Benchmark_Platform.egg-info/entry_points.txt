@@ -1,0 +1,6 @@
+[console_scripts]
+accuracy = benchmarking.benchmark_accuracy:main
+benchmark = benchmarking.benchmark_runner:main
+convert = algorithms.cli.convert:main
+phase = algorithms.cli.phase:main
+simulate = dataset.simulate:main

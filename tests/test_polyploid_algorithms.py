@@ -2,7 +2,7 @@
 
 import numpy as np
 import os, json
-from algorithms.polyploid import em_cluster as poly_em, spectral_cluster as poly_spec
+from algorithms.polyploid import em as poly_em, spectral as poly_spec
 
 def test_polyploid_em_trivial(tmp_path):
     """Polyploid EM: Test on a trivial 3-ploidy case where each read is exactly one haplotype."""

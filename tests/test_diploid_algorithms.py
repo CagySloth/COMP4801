@@ -3,7 +3,7 @@
 import numpy as np
 import os, json
 import tempfile
-from algorithms.diploid import em_cluster, mst_phase
+from algorithms.diploid import em, mst
 
 def _write_npz(tempdir, reads_matrix, filename="input.npz"):
     """Helper to write a reads matrix to NPZ in a temp directory."""
