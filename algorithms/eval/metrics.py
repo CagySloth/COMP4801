@@ -1,6 +1,6 @@
 import numpy as np
 import itertools
-
+from typing import Tuple
 
 def global_majority(reads: np.ndarray) -> np.ndarray:
     # Return consensus across reads, ignoring -1 (missing)
@@ -16,13 +16,15 @@ def global_majority(reads: np.ndarray) -> np.ndarray:
     return np.array(consensus)
 
 
-def compute_mec(reads: np.ndarray, haplotypes: np.ndarray, assignments: np.ndarray) -> int:
-    mec = 0
-    for i, read in enumerate(reads):
-        hap = haplotypes[assignments[i]]
-        mismatches = (read != hap) & (read != -1)
-        mec += np.sum(mismatches)
-    return int(mec)
+def compute_mec(alleles: np.ndarray, haps: np.ndarray, assign: np.ndarray) -> Tuple[int, np.ndarray]:
+    R, N = alleles.shape
+    per_read = np.zeros(R, dtype=int)
+    for r in range(R):
+        hap = haps[assign[r]]
+        mismatches = (alleles[r] != hap) & (alleles[r] != -1)
+        per_read[r] = mismatches.sum()
+    mec = per_read.sum()
+    return mec, per_read
 
 
 def hap_truth_accuracy(pred_haps: np.ndarray, true_haps: np.ndarray) -> float:

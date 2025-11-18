@@ -39,7 +39,7 @@ def load_reads(path: str | Path) -> ReadsData:
         return ReadsData(
             reads=data["reads"],
             positions=data.get("positions", None),
-            weights=data.get("weights", None),
+            num_variants=data.get("num_variants", None)
         )
     elif path.suffix == ".tsv":
         if is_sparse_tsv(path):

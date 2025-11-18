@@ -30,7 +30,7 @@ import numpy as np
 from algorithms.io.parser import parse_sparse_tsv, load_reads
 from algorithms.io.writer import write_haplotypes_tsv, write_summary_json, write_assignments_tsv
 from algorithms.io.reads_data import ReadsData
-from algorithms.eval.metrics import compute_mec, hap_truth_accuracy
+from algorithms.eval.metrics import compute_mec, hap_truth_accuracy, global_majority
 
 
 class DSU:

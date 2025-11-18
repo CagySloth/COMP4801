@@ -1,3 +1,4 @@
+# algorithms/io/reads_data.py
 from dataclasses import dataclass
 import numpy as np
 
@@ -6,6 +7,18 @@ class ReadsData:
     reads: np.ndarray                # shape (num_reads, read_length)
     positions: np.ndarray            # shape (num_reads, read_length)
     num_variants: int
+    
+    @property
+    def alleles(self):
+        return self.reads
+    
+    @property
+    def R(self):
+        return self.reads.shape[0]
+
+    @property
+    def N(self):
+        return self.reads.shape[1]
 
     @staticmethod
     def from_fragments(fragments: list[dict]) -> "ReadsData":
@@ -14,22 +27,18 @@ class ReadsData:
         Each fragment must have keys: 'id', 'indices', 'values'
         """
         num_reads = len(fragments)
-        max_length = max(len(frag["indices"]) for frag in fragments)
-        all_positions = np.full((num_reads, max_length), -1, dtype=int)
-        all_reads = np.full((num_reads, max_length), -1, dtype=int)
+        max_index = max(idx for f in fragments for idx in f["indices"])
+        num_variants = max_index + 1
 
-        all_variant_indices = []
+        reads = np.full((num_reads, num_variants), -1, dtype=int)
+        positions = np.full((num_reads, num_variants), -1, dtype=int)
 
         for i, frag in enumerate(fragments):
-            indices = frag["indices"]
-            values = frag["values"]
-            all_positions[i, :len(indices)] = indices
-            all_reads[i, :len(values)] = values
-            all_variant_indices.extend(indices)
+            for j, (idx, val) in enumerate(zip(frag["indices"], frag["values"])):
+                reads[i, idx] = val
+                positions[i, j] = idx
 
-        num_variants = max(all_variant_indices) + 1 if all_variant_indices else 0
-
-        return ReadsData(reads=all_reads, positions=all_positions, num_variants=num_variants)
+        return ReadsData(reads=reads, positions=positions, num_variants=num_variants)
 
     @staticmethod
     def from_npz(path: str) -> "ReadsData":
@@ -51,17 +60,27 @@ class ReadsData:
                             reads=self.reads, 
                             positions=self.positions)
 
+    # def to_sparse_tsv(self, filepath: str):
+    #     fragments = []
+    #     for i in range(self.reads.shape[0]):
+    #         # Determine how many entries in this read (positions matrix may have padding -1 values)
+    #         pos_row = self.positions[i]
+    #         val_row = self.reads[i]
+    #         valid_mask = (pos_row != -1)
+    #         count = int(np.sum(valid_mask))
+    #         indices = pos_row[:count].tolist()
+    #         values = val_row[:count].tolist()
+    #         fragments.append({"id": i, "indices": indices, "values": values})
+    #     # Use the writer utility to output TSV
+    #     from algorithms.io.writer import write_reads_sparse_tsv
+    #     write_reads_sparse_tsv(filepath, fragments)
+    
     def to_sparse_tsv(self, filepath: str):
-        fragments = []
-        for i in range(self.reads.shape[0]):
-            # Determine how many entries in this read (positions matrix may have padding -1 values)
-            pos_row = self.positions[i]
-            val_row = self.reads[i]
-            valid_mask = (pos_row != -1)
-            count = int(np.sum(valid_mask))
-            indices = pos_row[:count].tolist()
-            values = val_row[:count].tolist()
-            fragments.append({"id": i, "indices": indices, "values": values})
-        # Use the writer utility to output TSV
-        from algorithms.io.writer import write_reads_sparse_tsv
-        write_reads_sparse_tsv(filepath, fragments)
+        with open(filepath, "w") as f:
+            for i in range(self.R):
+                row = []
+                for j in range(self.reads.shape[1]):
+                    val = self.reads[i, j]
+                    if val != -1:
+                        row.append(f"{j}:{val}")
+                f.write(f"{i}\t" + "\t".join(row) + "\n")
