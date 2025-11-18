@@ -10,7 +10,7 @@ from algorithms.io.writer import (
 from algorithms.io.reads_data import ReadsData
 
 
-def generate_diploid_data(num_variants, num_reads, read_length, error_rate, allow_monomorphic):
+def generate_diploid_data(num_variants, num_reads, read_length, error_rate, missing_rate, allow_monomorphic):
     hap1 = np.random.randint(0, 2, size=num_variants)
     hap2 = hap1.copy()
     switch_indices = np.random.rand(num_variants) < 0.1
@@ -29,6 +29,8 @@ def generate_diploid_data(num_variants, num_reads, read_length, error_rate, allo
 
         noise = np.random.rand(read_length) < error_rate
         segment[noise] ^= 1
+        missing = np.random.rand(read_length) < missing_rate
+        segment[missing] = -1
 
         indices = list(range(start, start + read_length))
         values = segment.tolist()
@@ -84,6 +86,7 @@ def main():
             args.num_reads,
             args.read_length,
             args.error_rate,
+            args.missing_rate,
             args.allow_monomorphic,
         )
     else:

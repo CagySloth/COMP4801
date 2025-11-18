@@ -7,7 +7,6 @@ class ReadsData:
     reads: np.ndarray                # shape (num_reads, read_length)
     positions: np.ndarray            # shape (num_reads, read_length)
     num_variants: int
-    hap_truth: Optional[np.ndarray] = None
     
     @property
     def alleles(self):
