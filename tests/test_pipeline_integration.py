@@ -35,7 +35,7 @@ def test_full_pipeline_end_to_end(tmp_path):
     # 3. Phase with diploid EM (for example)
     phase_cmd = [
         sys.executable, "-m", "algorithms.cli.phase", "diploid-em",
-        "-i", str(npz_file), "-o", str(outprefix) + ".phased"
+        "-i", str(npz_file), "--output-prefix", str(outprefix)+".phased"
     ]
     subprocess.run(phase_cmd, check=True)
     phased_hap = f"{outprefix}.phased.haplotypes.tsv"
@@ -44,7 +44,7 @@ def test_full_pipeline_end_to_end(tmp_path):
     # 4. Evaluate accuracy
     acc_json = f"{outprefix}.phased.accuracy.json"
     acc_cmd = [
-        sys.executable, "benchmark/accuracy.py",
+        sys.executable, "benchmark/benchmark_accuracy.py",
         "--truth", str(hap_file),
         "--pred", str(phased_hap),
         "--output", str(acc_json)

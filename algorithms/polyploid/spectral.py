@@ -138,7 +138,7 @@ def consensus_haplotypes(A: np.ndarray, assign: np.ndarray, K: int) -> np.ndarra
 
 
 def main(args=None):
-    parser = argparse.ArgumentParser(description="Your description here")
+    parser = argparse.ArgumentParser(description="Polyploid phasing using spectral clustering")
     parser.add_argument("-i", "--input", required=True, help="Input NPZ file")
     parser.add_argument("--output-prefix", required=True, help="Prefix for output files")
     parser.add_argument("--max-iters", type=int, default=20)
