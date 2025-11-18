@@ -236,7 +236,7 @@ def main(args=None):
     asg_path = f"{args.output_prefix}.assignments.tsv"
     sum_path = f"{args.output_prefix}.summary.json"
     write_haplotypes_tsv(hap_path, H)
-    write_assignments_tsv(data.read_ids, assign, asg_path)
+    write_assignments_tsv(asg_path, assign)
 
     summary = {
         "R": data.R,

@@ -1,7 +1,7 @@
 import numpy as np
 import json
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Any
 
 def write_haplotypes_tsv(path, haplotypes):
     with open(path, "w") as f:
@@ -24,9 +24,7 @@ def write_reads_sparse_tsv(path, fragments):
 def write_haplotypes_npz(path, haplotypes, assignments=None):
     np.savez_compressed(path, haplotypes=haplotypes, assignments=assignments)
 
-def write_summary_json(path, mec: int, time_sec: float, acc: Optional[float] = None):
-    summary = {"mec": mec, "time": time_sec}
-    if acc is not None:
-        summary["accuracy"] = acc
+def write_summary_json(summary_dict: dict[str, Any], path: str):
+    """Write a full summary dictionary to a JSON file."""
     with open(path, "w") as f:
-        json.dump(summary, f, indent=2)
+        json.dump(summary_dict, f, indent=2)
