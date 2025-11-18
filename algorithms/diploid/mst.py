@@ -152,13 +152,18 @@ def orient_component(adj: List[List[Tuple[int, int]]],
     return out
 
 
-def main():
-    ap = argparse.ArgumentParser(description="Diploid MST-based phasing.")
-    ap.add_argument("-i", "--input", required=True, help="NPZ from read_reads_tsv.py")
-    ap.add_argument("-o", "--output-prefix", required=True, help="Output prefix")
-    ap.add_argument("--min-overlap", type=int, default=3, help="Min overlapping reads for a pair (default: 3)")
-    ap.add_argument("--min-het-minor", type=int, default=1, help="Min minor count to call a site heterozygous (default: 1)")
-    args = ap.parse_args()
+def main(args=None):
+    parser = argparse.ArgumentParser(description="Your description here")
+    parser.add_argument("-i", "--input", required=True, help="Input NPZ file")
+    parser.add_argument("--output-prefix", required=True, help="Prefix for output files")
+    parser.add_argument("--max-iters", type=int, default=20)
+    parser.add_argument("--tol-iters", type=int, default=5)
+    parser.add_argument("--seed", type=int, default=1)
+    parser.add_argument("--min-overlap", type=int, default=1)
+    parser.add_argument("--min-het-minor", type=int, default=1)
+
+    if args is None:
+        args = parser.parse_args()
 
     data = load_reads(args.input)
     A = data.alleles

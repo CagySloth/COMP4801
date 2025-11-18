@@ -111,14 +111,16 @@ def update_haplotypes(alleles: np.ndarray, assignments: np.ndarray, H_prev: np.n
     return H
 
 
-def main():
-    ap = argparse.ArgumentParser(description="Diploid phasing via hard EM clustering.")
-    ap.add_argument("-i", "--input", required=True, help="NPZ from read_reads_tsv.py")
-    ap.add_argument("-o", "--output-prefix", required=True, help="Output prefix")
-    ap.add_argument("--max-iters", type=int, default=30, help="Max iterations (default: 30)")
-    ap.add_argument("--tol-iters", type=int, default=2, help="Stop if no assignment change for T iterations (default: 2)")
-    ap.add_argument("-s", "--seed", type=int, default=None, help="Random seed")
-    args = ap.parse_args()
+def main(args=None):
+    parser = argparse.ArgumentParser(description="Your description here")
+    parser.add_argument("-i", "--input", required=True, help="Input NPZ file")
+    parser.add_argument("--output-prefix", required=True, help="Prefix for output files")
+    parser.add_argument("--max-iters", type=int, default=20)
+    parser.add_argument("--tol-iters", type=int, default=5)
+    parser.add_argument("--seed", type=int, default=1)
+
+    if args is None:
+        args = parser.parse_args()
 
     data = load_reads(args.input)
     alleles = data.alleles

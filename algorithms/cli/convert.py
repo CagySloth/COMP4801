@@ -1,6 +1,5 @@
 import argparse
 from algorithms.io import parse_sparse_tsv, ReadsData
-import numpy as np
 
 def main():
     parser = argparse.ArgumentParser(description="Convert between sparse TSV and NPZ formats.")
@@ -9,8 +8,9 @@ def main():
     args = parser.parse_args()
 
     if args.input.endswith(".tsv") and args.output.endswith(".npz"):
-        reads = parse_sparse_tsv(args.input)
-        reads.to_npz(args.output)
+        fragments = parse_sparse_tsv(args.input)
+        reads_data = ReadsData.from_fragments(fragments)
+        reads_data.to_npz(args.output)
         print(f"Converted {args.input} → {args.output}")
     elif args.input.endswith(".npz") and args.output.endswith(".tsv"):
         reads = ReadsData.from_npz(args.input)

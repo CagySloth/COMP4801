@@ -104,15 +104,17 @@ def update_haplotypes(alleles: np.ndarray, assignments: np.ndarray, H_prev: np.n
     return H
 
 
-def main():
-    ap = argparse.ArgumentParser(description="Polyploid phasing via hard EM clustering (K haplotypes).")
-    ap.add_argument("-i", "--input", required=True, help="NPZ from read_reads_tsv.py")
-    ap.add_argument("-k", "--ploidy", type=int, required=True, help="Number of haplotypes (K)")
-    ap.add_argument("-o", "--output-prefix", required=True, help="Output prefix")
-    ap.add_argument("--max-iters", type=int, default=40, help="Max iterations (default: 40)")
-    ap.add_argument("--tol-iters", type=int, default=3, help="Stop if assignments unchanged for T iterations (default: 3)")
-    ap.add_argument("-s", "--seed", type=int, default=None, help="Random seed")
-    args = ap.parse_args()
+def main(args=None):
+    parser = argparse.ArgumentParser(description="Polyploid phasing via EM clustering")
+    parser.add_argument("-i", "--input", required=True, help="Input NPZ file")
+    parser.add_argument("--ploidy", type=int, required=True, help="Ploidy (number of haplotypes)")
+    parser.add_argument("--output-prefix", required=True, help="Prefix for output files")
+    parser.add_argument("--max-iters", type=int, default=20)
+    parser.add_argument("--tol-iters", type=int, default=5)
+    parser.add_argument("--seed", type=int, default=1)
+
+    if args is None:
+        args = parser.parse_args()
 
     data = load_reads(args.input)
     A = data.alleles

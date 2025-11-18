@@ -137,14 +137,17 @@ def consensus_haplotypes(A: np.ndarray, assign: np.ndarray, K: int) -> np.ndarra
     return H
 
 
-def main():
-    ap = argparse.ArgumentParser(description="Polyploid spectral clustering phasing.")
-    ap.add_argument("-i", "--input", required=True, help="NPZ from read_reads_tsv.py")
-    ap.add_argument("-k", "--ploidy", type=int, required=True, help="Number of haplotypes (K)")
-    ap.add_argument("-o", "--output-prefix", required=True, help="Output prefix")
-    ap.add_argument("--min-overlap", type=int, default=3, help="Min overlapping positions to connect reads (default: 3)")
-    ap.add_argument("-s", "--seed", type=int, default=None, help="Random seed")
-    args = ap.parse_args()
+def main(args=None):
+    parser = argparse.ArgumentParser(description="Your description here")
+    parser.add_argument("-i", "--input", required=True, help="Input NPZ file")
+    parser.add_argument("--output-prefix", required=True, help="Prefix for output files")
+    parser.add_argument("--max-iters", type=int, default=20)
+    parser.add_argument("--tol-iters", type=int, default=5)
+    parser.add_argument("--seed", type=int, default=1)
+    parser.add_argument("--min-overlap", type=int, default=1)
+    parser.add_argument("--ploidy", type=int, default=2)
+    if args is None:
+        args = parser.parse_args()
 
     data = load_reads(args.input)
     A = data.alleles

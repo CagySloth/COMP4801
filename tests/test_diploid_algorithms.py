@@ -35,7 +35,7 @@ def test_diploid_em_perfect_phase(tmp_path):
     args.max_iters = 10
     args.tol_iters = 2
     args.seed = 42
-    em_cluster.main(args)
+    em.main(args)
     # Check output files
     hap_file = out_prefix + ".haplotypes.tsv"
     assign_file = out_prefix + ".assignments.tsv"
@@ -77,7 +77,7 @@ def test_diploid_mst_basic(tmp_path):
     args.output_prefix = out_prefix
     args.min_overlap = 1  # since reads span all, any overlap >0 is fine
     args.min_het_minor = 1
-    mst_phase.main(args)
+    mst.main(args)
     # Load results
     hap_file = out_prefix + ".haplotypes.tsv"
     assign_file = out_prefix + ".assignments.tsv"

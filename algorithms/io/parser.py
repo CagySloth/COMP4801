@@ -46,8 +46,11 @@ def load_reads(path: str | Path) -> ReadsData:
             fragments = parse_sparse_tsv(path)
             return ReadsData.from_fragments(fragments)
         else:
-            reads = parse_dense_tsv(path)
-            return ReadsData(reads=reads)
+            reads = parse_dense_tsv(path)           # NumPy array of shape (R, N)
+            R, N = reads.shape
+            positions = np.tile(np.arange(N), (R, 1))
+            return ReadsData(reads=reads, positions=positions, num_variants=N)
+
     else:
         raise ValueError(f"Unsupported file format: {path}")
 
