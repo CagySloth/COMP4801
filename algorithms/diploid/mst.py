@@ -30,7 +30,7 @@ import numpy as np
 from algorithms.io.parser import parse_sparse_tsv, load_reads
 from algorithms.io.writer import write_haplotypes_tsv, write_summary_json, write_assignments_tsv
 from algorithms.io.reads_data import ReadsData
-from algorithms.eval.metrics import compute_mec, hap_truth_accuracy, global_majority
+from algorithms.eval.metrics import compute_mec, global_majority
 
 
 class DSU:
@@ -227,8 +227,6 @@ def main(args=None):
 
         mec, per_read = compute_mec(A, H, assign)
 
-    acc_info = hap_truth_accuracy(data.hap_truth, assign)
-
     # Outputs
     outdir = os.path.dirname(os.path.abspath(args.output_prefix))
     os.makedirs(outdir, exist_ok=True)
@@ -247,8 +245,6 @@ def main(args=None):
         "heterozygous_sites": int(M),
         "min_overlap": args.min_overlap,
         "cluster_sizes": {int(k): int(np.sum(assign == k)) for k in range(2)},
-        "assignment_accuracy": acc_info["accuracy"] if acc_info else None,
-        "label_mapping_pred_to_true": acc_info["mapping_pred_to_true"] if acc_info else None,
     }
     write_summary_json(summary, sum_path)
     print(f"Wrote:\n  {hap_path}\n  {asg_path}\n  {sum_path}")

@@ -29,7 +29,7 @@ import numpy as np
 from algorithms.io.parser import parse_sparse_tsv, load_reads
 from algorithms.io.writer import write_haplotypes_tsv, write_summary_json, write_assignments_tsv
 from algorithms.io.reads_data import ReadsData
-from algorithms.eval.metrics import compute_mec, hap_truth_accuracy
+from algorithms.eval.metrics import compute_mec
 
 
 def build_agreement_matrix(A: np.ndarray, min_overlap: int) -> np.ndarray:
@@ -162,7 +162,6 @@ def main(args=None):
     H = consensus_haplotypes(A, assign, K)
     # MEC
     mec, per_read = compute_mec(A, H, assign)
-    acc_info = hap_truth_accuracy(data.hap_truth, assign)
 
     # Outputs
     outdir = os.path.dirname(os.path.abspath(args.output_prefix))
@@ -182,8 +181,6 @@ def main(args=None):
         "MEC_total": int(mec),
         "MEC_mean_per_read": float(np.mean(per_read)) if per_read.size else 0.0,
         "cluster_sizes": {int(k): int(np.sum(assign == k)) for k in range(K)},
-        "assignment_accuracy": acc_info["accuracy"] if acc_info else None,
-        "label_mapping_pred_to_true": acc_info["mapping_pred_to_true"] if acc_info else None,
     }
     write_summary_json(summary, sum_path)
     print(f"Wrote:\n  {hap_path}\n  {asg_path}\n  {sum_path}")

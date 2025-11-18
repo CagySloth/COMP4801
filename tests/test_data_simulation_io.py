@@ -20,6 +20,7 @@ def test_generate_diploid_data_basic():
         num_reads=num_reads,
         read_length=read_length,
         error_rate=0.0,
+        missing_rate=0.0,
         allow_monomorphic=False
     )
     # Check output shapes

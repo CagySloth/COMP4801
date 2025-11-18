@@ -27,7 +27,7 @@ import numpy as np
 from algorithms.io.parser import parse_sparse_tsv, load_reads
 from algorithms.io.writer import write_haplotypes_tsv, write_summary_json, write_assignments_tsv
 from algorithms.io.reads_data import ReadsData
-from algorithms.eval.metrics import compute_mec, hap_truth_accuracy, global_majority
+from algorithms.eval.metrics import compute_mec, global_majority
 
 
 def init_haplotypes_kpp(alleles: np.ndarray, rng: np.random.Generator) -> np.ndarray:
@@ -130,7 +130,6 @@ def main(args=None):
         H = np.zeros((2, data.N), dtype=np.uint8)
         assign = np.zeros(0, dtype=np.int32)
         mec, per_read = 0, np.zeros(0, dtype=np.int64)
-        acc_info = None
         # Proceed to output generation
     else:
         # Initialize haplotypes
@@ -155,7 +154,6 @@ def main(args=None):
 
         # Final evaluation
         mec, per_read = compute_mec(alleles, H, prev_assign)
-        acc_info = hap_truth_accuracy(data.hap_truth, prev_assign)
 
     # Outputs
     outdir = os.path.dirname(os.path.abspath(args.output_prefix))
@@ -174,8 +172,6 @@ def main(args=None):
         "MEC_total": int(mec),
         "MEC_mean_per_read": float(np.mean(per_read)) if per_read.size else 0.0,
         "cluster_sizes": {int(k): int(np.sum(prev_assign == k)) for k in range(2)},
-        "assignment_accuracy": acc_info["accuracy"] if acc_info else None,
-        "label_mapping_pred_to_true": acc_info["mapping_pred_to_true"] if acc_info else None,
     }
     write_summary_json(summary, sum_path)
     print(f"Wrote:\n  {hap_path}\n  {asg_path}\n  {sum_path}")
