@@ -7,6 +7,7 @@ class ReadsData:
     reads: np.ndarray                # shape (num_reads, read_length)
     positions: np.ndarray            # shape (num_reads, read_length)
     num_variants: int
+    hap_truth: Optional[np.ndarray] = None
     
     @property
     def alleles(self):
@@ -59,21 +60,6 @@ class ReadsData:
         np.savez_compressed(filepath, 
                             reads=self.reads, 
                             positions=self.positions)
-
-    # def to_sparse_tsv(self, filepath: str):
-    #     fragments = []
-    #     for i in range(self.reads.shape[0]):
-    #         # Determine how many entries in this read (positions matrix may have padding -1 values)
-    #         pos_row = self.positions[i]
-    #         val_row = self.reads[i]
-    #         valid_mask = (pos_row != -1)
-    #         count = int(np.sum(valid_mask))
-    #         indices = pos_row[:count].tolist()
-    #         values = val_row[:count].tolist()
-    #         fragments.append({"id": i, "indices": indices, "values": values})
-    #     # Use the writer utility to output TSV
-    #     from algorithms.io.writer import write_reads_sparse_tsv
-    #     write_reads_sparse_tsv(filepath, fragments)
     
     def to_sparse_tsv(self, filepath: str):
         with open(filepath, "w") as f:
