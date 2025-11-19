@@ -5,8 +5,8 @@ from typing import Optional, Any
 
 def write_haplotypes_tsv(path, haplotypes):
     with open(path, "w") as f:
-        for row in haplotypes:
-            f.write("".join(str(x) for x in row) + "\n")
+        for i, row in enumerate(haplotypes):
+            f.write(f"{i}\t" + "".join(str(x) for x in row) + "\n")
 
 def write_assignments_tsv(path, assignments):
     with open(path, "w") as f:

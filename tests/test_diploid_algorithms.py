@@ -14,7 +14,11 @@ def _write_npz(tempdir, reads_matrix, filename="input.npz"):
 def _load_hap_file(path):
     """Helper to load haplotypes.tsv into list of strings."""
     with open(path, 'r') as f:
-        lines = [line.strip() for line in f if line.strip()]
+        lines = []
+        for line in f:
+            if line.strip():
+                parts = line.strip().split("\t")
+                lines.append(parts[1])
     return lines
 
 def test_diploid_em_perfect_phase(tmp_path):

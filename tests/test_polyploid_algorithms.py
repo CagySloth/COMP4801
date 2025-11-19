@@ -29,9 +29,9 @@ def test_polyploid_em_trivial(tmp_path):
     assert os.path.exists(hap_file), "Polyploid EM haplotypes output missing."
     haps_out = []
     with open(hap_file) as f:
-        for line in f:
-            seq = line.strip()
-            if seq:
+        for line in open(hap_file):
+            if line.strip():
+                seq = line.strip().split("\t")[1]
                 haps_out.append(seq)
     # Expect 3 haplotypes of length 2
     assert len(haps_out) == 3 and all(len(h) == 2 for h in haps_out), "Polyploid EM output format incorrect."
@@ -73,6 +73,13 @@ def test_polyploid_spectral_basic(tmp_path):
     assign_file = out_prefix + ".assignments.tsv"
     assert os.path.exists(hap_file), "Spectral haplotypes output missing."
     haps_out = [line.strip() for line in open(hap_file) if line.strip()]
+    # Parse haplotypes from TSV
+    haps_out = []
+    for line in open(hap_file):
+        if line.strip():
+            parts = line.strip().split("\t")
+            assert len(parts) == 2, f"Unexpected haplotype format: {line}"
+            haps_out.append(parts[1])
     # Expect 2 haplotypes of length 4
     assert len(haps_out) == 2 and all(len(h) == 4 for h in haps_out), "Spectral output format incorrect."
     # They should correspond to the two true haplotypes (or their complements, since consensus might pick the opposite allele for each cluster)
