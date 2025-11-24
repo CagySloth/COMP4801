@@ -17,6 +17,10 @@ def polyploid_em_main(args):
 def polyploid_spectral_main(args):
     from algorithms.polyploid import spectral
     spectral.main(args)
+    
+def diploid_whats_main(args):
+    from algorithms.diploid import whatshap_driver
+    whatshap_driver.main(args)
 
 def main():
     parser = argparse.ArgumentParser(description="Unified CLI for phasing algorithms")
@@ -62,6 +66,14 @@ def main():
     poly_spec.add_argument("--min-overlap", type=int, default=1)
     poly_spec.add_argument("--ploidy", type=int, default=2)
     poly_spec.set_defaults(func=polyploid_spectral_main)
+
+    # diploid-whatshap
+    dip_wh = subparsers.add_parser("diploid-whats", help="Diploid phasing using WhatsHap core")
+    dip_wh.add_argument("-i", "--input", required=True, help="Input NPZ file")
+    dip_wh.add_argument("--output-prefix", required=True, help="Prefix for output files")
+    dip_wh.add_argument("--max-coverage", type=int, default=15)
+    dip_wh.add_argument("--error-rate", type=float, default=0.01)
+    dip_wh.set_defaults(func=diploid_whats_main)
 
     args = parser.parse_args()
     args.func(args)
