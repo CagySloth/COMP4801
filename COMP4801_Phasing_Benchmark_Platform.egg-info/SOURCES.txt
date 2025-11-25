@@ -13,6 +13,8 @@ algorithms/cli/phase.py
 algorithms/diploid/__init__.py
 algorithms/diploid/em.py
 algorithms/diploid/mst.py
+algorithms/diploid/whatshap_adapter.py
+algorithms/diploid/whatshap_driver.py
 algorithms/eval/__init__.py
 algorithms/eval/metrics.py
 algorithms/io/__init__.py
