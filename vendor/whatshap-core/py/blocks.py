@@ -1,9 +1,10 @@
 # blocks.py (new, under vendor/whcore/py)
+import logging
 from typing import Sequence, Mapping, Optional, Set
 
 from .core import ReadSet, NumericSampleIds
 from .graph import ComponentFinder
-# from .utils import plural_s   # Will add utils next for logging similar to WhatsHap
+from .utils import plural_s
 
 def find_components(
     phased_positions: Sequence[int],
@@ -22,6 +23,7 @@ def find_components(
                               positions. Component building is then restricted to variants
                               at these positions. If None, all variants are used.
     """
+    logger = logging.getLogger(__name__)
     logger.debug("Finding connected components ...")
     assert phased_positions == sorted(phased_positions)
 

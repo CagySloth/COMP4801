@@ -1,6 +1,7 @@
 from setuptools import setup, Extension
 from distutils.sysconfig import customize_compiler
 from Cython.Build import cythonize
+from setuptools.command.build_ext import build_ext as _build_ext
 
 import os
 
@@ -67,7 +68,7 @@ extensions = [
 ]
 
 
-class BuildExt(cythonize.__self__.__class__):  # small trick to reuse Cython's build_ext
+class BuildExt(_build_ext):
     def build_extensions(self):
         customize_compiler(self.compiler)
         # Remove the C compiler flag that annoys C++ builds

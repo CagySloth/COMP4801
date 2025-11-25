@@ -28,8 +28,12 @@ benchmark/__init__.py
 benchmark/benchmark_accuracy.py
 benchmark/benchmark_runner.py
 dataset/__init__.py
+dataset/long_read_readset_simulator.py
 dataset/simulate.py
 tests/test_data_simulation_io.py
 tests/test_diploid_algorithms.py
+tests/test_diploid_whatshap.py
 tests/test_pipeline_integration.py
+tests/test_pipeline_whatshap_cli.py
 tests/test_polyploid_algorithms.py
+tests/test_whatshap_adapter.py

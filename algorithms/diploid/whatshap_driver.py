@@ -8,7 +8,7 @@ from algorithms.io.writer import (
     write_summary_json,
 )
 
-from algorithms.diploid.whats_adapter import build_readset_from_readsdata
+from algorithms.diploid.whatshap_adapter import build_readset_from_readsdata
 from vendor.whcore.py import core, readselect
 from vendor.whcore.py.blocks import compute_overall_components
 
@@ -53,6 +53,13 @@ def main(args=None):
     superreads = superreads_list[0]
     # superreads[0] = hap1-read, superreads[1] = hap2-read (by convention)
     # iterate through variants in each superread and fill hap1/hap2 arrays
+    hap_read0 = superreads[0]
+    hap_read1 = superreads[1]
+
+    for variant in hap_read0:
+        hap1[variant.position] = variant.allele
+    for variant in hap_read1:
+        hap2[variant.position] = variant.allele
 
     # 6) Optionally compute components/blocks via compute_overall_components
     #    (use accessible_positions = [0..N-1], homozygous_positions=[], etc.)
