@@ -1,0 +1,274 @@
+running build_ext
+building 'whatshap.core' extension
+creating build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src
+creating build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap
+x86_64-linux-gnu-g++ -fno-strict-overflow -Wsign-compare -DNDEBUG -g -O2 -Wall -fPIC -UNDEBUG -I/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src -I/home/cagysloth/Dev/github/COMP4801/.venv/include -I/usr/include/python3.12 -c /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/backwardcolumniterator.cpp -o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/backwardcolumniterator.o -std=c++11
+In file included from /usr/include/c++/13/cassert:44,
+                 from /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/backwardcolumniterator.cpp:1:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/backwardcolumniterator.cpp: In member function ‘void BackwardColumnIterator::jump_to_column(int)’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/backwardcolumniterator.cpp:121:18: warning: comparison of integer expressions of different signedness: ‘int’ and ‘std::vector<unsigned int>::size_type’ {aka ‘long unsigned int’} [-Wsign-compare]
+  121 |         assert(k < positions->size());
+      |                ~~^~~~~~~~~~~~~~~~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/backwardcolumniterator.cpp:140:53: warning: comparison of integer expressions of different signedness: ‘size_t’ {aka ‘long unsigned int’} and ‘int’ [-Wsign-compare]
+  140 |                                 assert(active_entry < read->getVariantCount());
+      |                                        ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~
+x86_64-linux-gnu-g++ -fno-strict-overflow -Wsign-compare -DNDEBUG -g -O2 -Wall -fPIC -UNDEBUG -I/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src -I/home/cagysloth/Dev/github/COMP4801/.venv/include -I/usr/include/python3.12 -c /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/binomial.cpp -o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/binomial.o -std=c++11
+x86_64-linux-gnu-g++ -fno-strict-overflow -Wsign-compare -DNDEBUG -g -O2 -Wall -fPIC -UNDEBUG -I/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src -I/home/cagysloth/Dev/github/COMP4801/.venv/include -I/usr/include/python3.12 -c /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/caller.cpp -o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/caller.o -std=c++11
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/caller.cpp: In member function ‘void Caller::enumerate_kmers(int, std::string&, int, std::vector<std::vector<int> >&)’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/caller.cpp:258:13: warning: unused variable ‘BAM_CPAD’ [-Wunused-variable]
+  258 |         int BAM_CPAD = 6 ;     // P
+      |             ^~~~~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/caller.cpp:261:13: warning: unused variable ‘BAM_CBACK’ [-Wunused-variable]
+  261 |         int BAM_CBACK = 9 ;     // B
+      |             ^~~~~~~~~
+x86_64-linux-gnu-g++ -fno-strict-overflow -Wsign-compare -DNDEBUG -g -O2 -Wall -fPIC -UNDEBUG -I/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src -I/home/cagysloth/Dev/github/COMP4801/.venv/include -I/usr/include/python3.12 -c /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/columnindexingiterator.cpp -o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/columnindexingiterator.o -std=c++11
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/columnindexingiterator.cpp: In member function ‘unsigned int ColumnIndexingIterator::index_forward_projection(unsigned int)’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/columnindexingiterator.cpp:90:23: warning: comparison of integer expressions of different signedness: ‘int’ and ‘std::vector<unsigned int>::size_type’ {aka ‘long unsigned int’} [-Wsign-compare]
+   90 |         for(int j=0; j< parent->read_ids.size(); ++j) {
+      |                      ~^~~~~~~~~~~~~~~~~~~~~~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/columnindexingiterator.cpp:92:22: warning: comparison of integer expressions of different signedness: ‘unsigned int’ and ‘int’ [-Wsign-compare]
+   92 |                 if(m != -1) {
+      |                    ~~^~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/columnindexingiterator.cpp:89:22: warning: unused variable ‘s’ [-Wunused-variable]
+   89 |         unsigned int s = 1;
+      |                      ^
+x86_64-linux-gnu-g++ -fno-strict-overflow -Wsign-compare -DNDEBUG -g -O2 -Wall -fPIC -UNDEBUG -I/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src -I/home/cagysloth/Dev/github/COMP4801/.venv/include -I/usr/include/python3.12 -c /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/columnindexingscheme.cpp -o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/columnindexingscheme.o -std=c++11
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/columnindexingscheme.cpp: In constructor ‘ColumnIndexingScheme::ColumnIndexingScheme(const ColumnIndexingScheme*, const std::vector<unsigned int>&)’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/columnindexingscheme.cpp:22:26: warning: comparison of integer expressions of different signedness: ‘int’ and ‘std::vector<unsigned int>::size_type’ {aka ‘long unsigned int’} [-Wsign-compare]
+   22 |                 while ((i<previous_column->read_ids.size()) && (j<read_ids.size())) {
+      |                         ~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/columnindexingscheme.cpp:22:66: warning: comparison of integer expressions of different signedness: ‘int’ and ‘std::vector<unsigned int>::size_type’ {aka ‘long unsigned int’} [-Wsign-compare]
+   22 |                 while ((i<previous_column->read_ids.size()) && (j<read_ids.size())) {
+      |                                                                 ~^~~~~~~~~~~~~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/columnindexingscheme.cpp: In member function ‘void ColumnIndexingScheme::set_next_column(const ColumnIndexingScheme*)’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/columnindexingscheme.cpp:71:18: warning: comparison of integer expressions of different signedness: ‘int’ and ‘std::vector<unsigned int>::size_type’ {aka ‘long unsigned int’} [-Wsign-compare]
+   71 |         while ((i<next_column->read_ids.size()) && (j<read_ids.size())) {
+      |                 ~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/columnindexingscheme.cpp:71:54: warning: comparison of integer expressions of different signedness: ‘int’ and ‘std::vector<unsigned int>::size_type’ {aka ‘long unsigned int’} [-Wsign-compare]
+   71 |         while ((i<next_column->read_ids.size()) && (j<read_ids.size())) {
+      |                                                     ~^~~~~~~~~~~~~~~~
+x86_64-linux-gnu-g++ -fno-strict-overflow -Wsign-compare -DNDEBUG -g -O2 -Wall -fPIC -UNDEBUG -I/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src -I/home/cagysloth/Dev/github/COMP4801/.venv/include -I/usr/include/python3.12 -c /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/columniterator.cpp -o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/columniterator.o -std=c++11
+In file included from /usr/include/c++/13/cassert:44,
+                 from /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/columniterator.cpp:1:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/columniterator.cpp: In member function ‘std::unique_ptr<std::vector<const Entry*> > ColumnIterator::get_next()’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/columniterator.cpp:105:54: warning: comparison of integer expressions of different signedness: ‘size_t’ {aka ‘long unsigned int’} and ‘int’ [-Wsign-compare]
+  105 |                         assert(list_it->active_entry < read->getVariantCount());
+      |                                ~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/columniterator.cpp: In member function ‘void ColumnIterator::jump_to_column(size_t)’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/columniterator.cpp:161:53: warning: comparison of integer expressions of different signedness: ‘size_t’ {aka ‘long unsigned int’} and ‘int’ [-Wsign-compare]
+  161 |                                 assert(active_entry < read->getVariantCount());
+      |                                        ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~
+x86_64-linux-gnu-g++ -fno-strict-overflow -Wsign-compare -DNDEBUG -g -O2 -Wall -fPIC -UNDEBUG -I/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src -I/home/cagysloth/Dev/github/COMP4801/.venv/include -I/usr/include/python3.12 -c /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/entry.cpp -o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/entry.o -std=c++11
+x86_64-linux-gnu-g++ -fno-strict-overflow -Wsign-compare -DNDEBUG -g -O2 -Wall -fPIC -UNDEBUG -I/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src -I/home/cagysloth/Dev/github/COMP4801/.venv/include -I/usr/include/python3.12 -c /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/genotype.cpp -o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/genotype.o -std=c++11
+x86_64-linux-gnu-g++ -fno-strict-overflow -Wsign-compare -DNDEBUG -g -O2 -Wall -fPIC -UNDEBUG -I/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src -I/home/cagysloth/Dev/github/COMP4801/.venv/include -I/usr/include/python3.12 -c /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/genotypecolumncostcomputer.cpp -o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/genotypecolumncostcomputer.o -std=c++11
+x86_64-linux-gnu-g++ -fno-strict-overflow -Wsign-compare -DNDEBUG -g -O2 -Wall -fPIC -UNDEBUG -I/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src -I/home/cagysloth/Dev/github/COMP4801/.venv/include -I/usr/include/python3.12 -c /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/genotypedistribution.cpp -o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/genotypedistribution.o -std=c++11
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/genotypedistribution.cpp: In member function ‘double GenotypeDistribution::errorProbability() const’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/genotypedistribution.cpp:55:23: warning: comparison of integer expressions of different signedness: ‘size_t’ {aka ‘long unsigned int’} and ‘int’ [-Wsign-compare]
+   55 |                 if (i == best_index) continue;
+      |                     ~~^~~~~~~~~~~~~
+x86_64-linux-gnu-g++ -fno-strict-overflow -Wsign-compare -DNDEBUG -g -O2 -Wall -fPIC -UNDEBUG -I/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src -I/home/cagysloth/Dev/github/COMP4801/.venv/include -I/usr/include/python3.12 -c /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/genotypedptable.cpp -o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/genotypedptable.o -std=c++11
+In file included from /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/genotypedptable.cpp:11:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/genotypedptable.h: In member function ‘void GenotypeDPTable::genotype_likelihood_t::divide_likelihoods_by(long double&)’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/genotypedptable.h:38:95: warning: ‘std::binder2nd<_Operation> std::bind2nd(const _Operation&, const _Tp&) [with _Operation = divides<long double>; _Tp = long double]’ is deprecated: use 'std::bind' instead [-Wdeprecated-declarations]
+   38 |       std::transform(likelihoods.begin(), likelihoods.end(), likelihoods.begin(), std::bind2nd(std::divides<long double>(), val));
+      |                                                                                   ~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/c++/13/bits/stl_function.h:1438,
+                 from /usr/include/c++/13/string:49,
+                 from /usr/include/c++/13/stdexcept:39,
+                 from /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/genotypedptable.cpp:1:
+/usr/include/c++/13/backward/binders.h:172:5: note: declared here
+  172 |     bind2nd(const _Operation& __fn, const _Tp& __x)
+      |     ^~~~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/genotypedptable.cpp: In member function ‘void GenotypeDPTable::clear_forward_table()’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/genotypedptable.cpp:61:12: warning: unused variable ‘column_count’ [-Wunused-variable]
+   61 |     size_t column_count = input_column_iterator.get_column_count();
+      |            ^~~~~~~~~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/genotypedptable.cpp: In member function ‘void GenotypeDPTable::compute_index()’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/genotypedptable.cpp:91:18: warning: unused variable ‘transmission_configurations’ [-Wunused-variable]
+   91 |     unsigned int transmission_configurations = pow(4, pedigree->triple_count());
+      |                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/genotypedptable.cpp: In member function ‘void GenotypeDPTable::compute_backward_prob()’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/genotypedptable.cpp:152:36: warning: comparison of integer expressions of different signedness: ‘int’ and ‘unsigned int’ [-Wsign-compare]
+  152 |         if ((k>1) && (column_index < column_count-1) && (((column_index+1)%k) != 0)) {
+      |                       ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/genotypedptable.cpp: In member function ‘void GenotypeDPTable::compute_forward_prob()’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/genotypedptable.cpp:178:12: warning: unused variable ‘k’ [-Wunused-variable]
+  178 |     size_t k = (size_t)sqrt(input_column_iterator.get_column_count());
+      |            ^
+In file included from /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/genotypedptable.h:15:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/vector2d.h: In instantiation of ‘void Vector2D<T>::divide_entries_by(T) [with T = long double]’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/genotypedptable.cpp:290:53:   required from here
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/vector2d.h:40:28: warning: ‘std::binder2nd<_Operation> std::bind2nd(const _Operation&, const _Tp&) [with _Operation = divides<long double>; _Tp = long double]’ is deprecated: use 'std::bind' instead [-Wdeprecated-declarations]
+   40 |                std::bind2nd(std::divides<T>(),val));
+      |                ~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/c++/13/backward/binders.h:172:5: note: declared here
+  172 |     bind2nd(const _Operation& __fn, const _Tp& __x)
+      |     ^~~~~~~
+x86_64-linux-gnu-g++ -fno-strict-overflow -Wsign-compare -DNDEBUG -g -O2 -Wall -fPIC -UNDEBUG -I/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src -I/home/cagysloth/Dev/github/COMP4801/.venv/include -I/usr/include/python3.12 -c /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/genotyper.cpp -o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/genotyper.o -std=c++11
+x86_64-linux-gnu-g++ -fno-strict-overflow -Wsign-compare -DNDEBUG -g -O2 -Wall -fPIC -UNDEBUG -I/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src -I/home/cagysloth/Dev/github/COMP4801/.venv/include -I/usr/include/python3.12 -c /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/graycodes.cpp -o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/graycodes.o -std=c++11
+x86_64-linux-gnu-g++ -fno-strict-overflow -Wsign-compare -DNDEBUG -g -O2 -Wall -fPIC -UNDEBUG -I/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src -I/home/cagysloth/Dev/github/COMP4801/.venv/include -I/usr/include/python3.12 -c /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/indexset.cpp -o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/indexset.o -std=c++11
+x86_64-linux-gnu-g++ -fno-strict-overflow -Wsign-compare -DNDEBUG -g -O2 -Wall -fPIC -UNDEBUG -I/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src -I/home/cagysloth/Dev/github/COMP4801/.venv/include -I/usr/include/python3.12 -c /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/multinomial.cpp -o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/multinomial.o -std=c++11
+x86_64-linux-gnu-g++ -fno-strict-overflow -Wsign-compare -DNDEBUG -g -O2 -Wall -fPIC -UNDEBUG -I/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src -I/home/cagysloth/Dev/github/COMP4801/.venv/include -I/usr/include/python3.12 -c /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/pedigree.cpp -o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/pedigree.o -std=c++11
+In file included from /usr/include/c++/13/cassert:44,
+                 from /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/pedigree.cpp:4:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/pedigree.cpp: In member function ‘void Pedigree::addIndividual(unsigned int, std::vector<Genotype*>, std::vector<PhredGenotypeLikelihoods*>)’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/pedigree.cpp:32:33: warning: comparison of integer expressions of different signedness: ‘std::vector<Genotype*>::size_type’ {aka ‘long unsigned int’} and ‘int’ [-Wsign-compare]
+   32 |         assert(genotypes.size() == variant_count);
+      |                ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/pedigree.cpp:33:44: warning: comparison of integer expressions of different signedness: ‘std::vector<PhredGenotypeLikelihoods*>::size_type’ {aka ‘long unsigned int’} and ‘int’ [-Wsign-compare]
+   33 |         assert(genotype_likelihoods.size() == variant_count);
+      |                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/pedigree.cpp: In member function ‘const Genotype* Pedigree::get_genotype_by_id(unsigned int, unsigned int) const’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/pedigree.cpp:70:30: warning: comparison of integer expressions of different signedness: ‘unsigned int’ and ‘const int’ [-Wsign-compare]
+   70 |         assert(variant_index < variant_count);
+      |                ~~~~~~~~~~~~~~^~~~~~~~~~~~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/pedigree.cpp: In member function ‘const PhredGenotypeLikelihoods* Pedigree::get_genotype_likelihoods_by_id(unsigned int, unsigned int) const’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/pedigree.cpp:81:30: warning: comparison of integer expressions of different signedness: ‘unsigned int’ and ‘const int’ [-Wsign-compare]
+   81 |         assert(variant_index < variant_count);
+      |                ~~~~~~~~~~~~~~^~~~~~~~~~~~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/pedigree.cpp: In member function ‘std::string Pedigree::toString() const’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/pedigree.cpp:112:35: warning: comparison of integer expressions of different signedness: ‘size_t’ {aka ‘long unsigned int’} and ‘const int’ [-Wsign-compare]
+  112 |                 for (size_t j=0; j<variant_count; ++j) {
+      |                                  ~^~~~~~~~~~~~~~
+x86_64-linux-gnu-g++ -fno-strict-overflow -Wsign-compare -DNDEBUG -g -O2 -Wall -fPIC -UNDEBUG -I/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src -I/home/cagysloth/Dev/github/COMP4801/.venv/include -I/usr/include/python3.12 -c /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/pedigreecolumncostcomputer.cpp -o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/pedigreecolumncostcomputer.o -std=c++11
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/pedigreecolumncostcomputer.cpp: In constructor ‘PedigreeColumnCostComputer::PedigreeColumnCostComputer(const std::vector<const Entry*>&, size_t, const std::vector<unsigned int>&, const Pedigree*, const PedigreePartitions&, bool)’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/pedigreecolumncostcomputer.cpp:25:36: warning: comparison of integer expressions of different signedness: ‘unsigned int’ and ‘int’ [-Wsign-compare]
+   25 |         for (unsigned int i = 0; i < (1<<pedigree_partitions.count()); ++i) {
+      |                                  ~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/pedigreecolumncostcomputer.cpp: In member function ‘std::vector<PedigreeColumnCostComputer::phased_variant_t> PedigreeColumnCostComputer::get_alleles()’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/pedigreecolumncostcomputer.cpp:119:22: warning: unused variable ‘second_best_cost’ [-Wunused-variable]
+  119 |         unsigned int second_best_cost = numeric_limits < unsigned int >::max();
+      |                      ^~~~~~~~~~~~~~~~
+x86_64-linux-gnu-g++ -fno-strict-overflow -Wsign-compare -DNDEBUG -g -O2 -Wall -fPIC -UNDEBUG -I/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src -I/home/cagysloth/Dev/github/COMP4801/.venv/include -I/usr/include/python3.12 -c /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/pedigreedptable.cpp -o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/pedigreedptable.o -std=c++11
+x86_64-linux-gnu-g++ -fno-strict-overflow -Wsign-compare -DNDEBUG -g -O2 -Wall -fPIC -UNDEBUG -I/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src -I/home/cagysloth/Dev/github/COMP4801/.venv/include -I/usr/include/python3.12 -c /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/pedigreepartitions.cpp -o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/pedigreepartitions.o -std=c++11
+x86_64-linux-gnu-g++ -fno-strict-overflow -Wsign-compare -DNDEBUG -g -O2 -Wall -fPIC -UNDEBUG -I/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src -I/home/cagysloth/Dev/github/COMP4801/.venv/include -I/usr/include/python3.12 -c /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/pedmecheuristic.cpp -o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/pedmecheuristic.o -std=c++11
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/pedmecheuristic.cpp: In member function ‘void PedMecHeuristic::solve()’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/pedmecheuristic.cpp:396:18: warning: unused variable ‘s’ [-Wunused-variable]
+  396 |         MecScore s = getOptPhasing(balances[p], optTrans[p], p, posPhasing, mut);
+      |                  ^
+x86_64-linux-gnu-g++ -fno-strict-overflow -Wsign-compare -DNDEBUG -g -O2 -Wall -fPIC -UNDEBUG -I/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src -I/home/cagysloth/Dev/github/COMP4801/.venv/include -I/usr/include/python3.12 -c /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/phredgenotypelikelihoods.cpp -o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/phredgenotypelikelihoods.o -std=c++11
+x86_64-linux-gnu-g++ -fno-strict-overflow -Wsign-compare -DNDEBUG -g -O2 -Wall -fPIC -UNDEBUG -I/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src -I/home/cagysloth/Dev/github/COMP4801/.venv/include -I/usr/include/python3.12 -c /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/read.cpp -o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/read.o -std=c++11
+x86_64-linux-gnu-g++ -fno-strict-overflow -Wsign-compare -DNDEBUG -g -O2 -Wall -fPIC -UNDEBUG -I/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src -I/home/cagysloth/Dev/github/COMP4801/.venv/include -I/usr/include/python3.12 -c /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/readset.cpp -o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/readset.o -std=c++11
+x86_64-linux-gnu-g++ -fno-strict-overflow -Wsign-compare -DNDEBUG -g -O2 -Wall -fPIC -UNDEBUG -I/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src -I/home/cagysloth/Dev/github/COMP4801/.venv/include -I/usr/include/python3.12 -c /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/transitionprobabilitycomputer.cpp -o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/transitionprobabilitycomputer.o -std=c++11
+x86_64-linux-gnu-g++ -fno-strict-overflow -Wsign-compare -DNDEBUG -g -O2 -Wall -fPIC -UNDEBUG -I/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src -I/home/cagysloth/Dev/github/COMP4801/.venv/include -I/usr/include/python3.12 -c /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/core.cpp -o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/core.o -std=c++11
+In file included from /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/core.cpp:841:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/genotypedptable.h: In member function ‘void GenotypeDPTable::genotype_likelihood_t::divide_likelihoods_by(long double&)’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/genotypedptable.h:38:95: warning: ‘std::binder2nd<_Operation> std::bind2nd(const _Operation&, const _Tp&) [with _Operation = divides<long double>; _Tp = long double]’ is deprecated: use 'std::bind' instead [-Wdeprecated-declarations]
+   38 |       std::transform(likelihoods.begin(), likelihoods.end(), likelihoods.begin(), std::bind2nd(std::divides<long double>(), val));
+      |                                                                                   ~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/c++/13/bits/stl_function.h:1438,
+                 from /usr/include/c++/13/string:49,
+                 from /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/core.cpp:813:
+/usr/include/c++/13/backward/binders.h:172:5: note: declared here
+  172 |     bind2nd(const _Operation& __fn, const _Tp& __x)
+      |     ^~~~~~~
+In file included from /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/core.cpp:845:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/hapchatcore.cpp: In member function ‘void HapChatCore::run_core()’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/hapchatcore.cpp:145:11: warning: variable ‘counter_columns’ set but not used [-Wunused-but-set-variable]
+  145 |   Counter counter_columns;
+      |           ^~~~~~~~~~~~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/hapchatcore.cpp: In member function ‘bool HapChatCore::check_end(HapChatColumnIterator, const std::vector<std::vector<Entry> >&, const Pointer&, const bool&)’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/hapchatcore.cpp:208:74: warning: comparison of integer expressions of different signedness: ‘unsigned int’ and ‘int’ [-Wsign-compare]
+  208 |   return (!re_run && (hap.is_ended() && (input[pointer][0].get_read_id() == -1)));
+      |                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/hapchatcore.cpp: In member function ‘void HapChatCore::dp(const constants_t&, std::vector<bool>&, std::vector<bool>&, Counter&, Cost&, Counter&, Counter&, Counter&, Counter&, HapChatColumnIterator)’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/hapchatcore.cpp:939:15: warning: unused variable ‘old_k’ [-Wunused-variable]
+  939 |           int old_k = k_j[input_pointer];
+      |               ^~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/hapchatcore.cpp: In member function ‘void HapChatCore::intersect(const Column&, const Column&, const Pointer&, std::vector<std::vector<int> >&, std::vector<std::vector<int> >&, std::vector<std::bitset<64> >&, std::vector<unsigned int>&, const bool&)’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/hapchatcore.cpp:1114:33: warning: comparison of integer expressions of different signedness: ‘unsigned int’ and ‘int’ [-Wsign-compare]
+ 1114 |          (colJ[j].get_read_id() != -1) &&
+      |           ~~~~~~~~~~~~~~~~~~~~~~^~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/hapchatcore.cpp:1115:33: warning: comparison of integer expressions of different signedness: ‘unsigned int’ and ‘int’ [-Wsign-compare]
+ 1115 |          (colQ[i].get_read_id() != -1)) {
+      |           ~~~~~~~~~~~~~~~~~~~~~~^~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/hapchatcore.cpp: In member function ‘void HapChatCore::represent_column(const Column&, BitColumn&, Counter&, BitColumn&, Counter&)’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/hapchatcore.cpp:1159:58: warning: comparison of integer expressions of different signedness: ‘unsigned int’ and ‘int’ [-Wsign-compare]
+ 1159 |   while(cov < column.size() && column[cov].get_read_id() != -1) {
+      |                                ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/hapchatcore.cpp: In member function ‘int HapChatCore::compute_active_common(const Column&, const Column&, unsigned int&)’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/hapchatcore.cpp:1294:33: warning: comparison of integer expressions of different signedness: ‘unsigned int’ and ‘int’ [-Wsign-compare]
+ 1294 |          (colJ[j].get_read_id() != -1) &&
+      |           ~~~~~~~~~~~~~~~~~~~~~~^~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/hapchatcore.cpp:1295:33: warning: comparison of integer expressions of different signedness: ‘unsigned int’ and ‘int’ [-Wsign-compare]
+ 1295 |          (colQ[i].get_read_id() != -1)) {
+      |           ~~~~~~~~~~~~~~~~~~~~~~^~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/hapchatcore.cpp: In member function ‘void HapChatCore::insert_col_and_update(std::vector<std::vector<Entry> >&, std::vector<unsigned int>&, std::vector<unsigned int>&, std::vector<Cost>&, const Pointer&, const Column&, std::vector<bool>&, const Counter&)’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/hapchatcore.cpp:1350:67: warning: comparison of integer expressions of different signedness: ‘unsigned int’ and ‘int’ [-Wsign-compare]
+ 1350 |   if(i < input[pointer].size() && input[pointer][i].get_read_id() != -1)
+      |                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/core.cpp: In function ‘PyObject* __pyx_pf_8whatshap_4core_15PedigreeDPTable_4get_super_reads(__pyx_obj_8whatshap_4core_PedigreeDPTable*)’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/core.cpp:10417:33: warning: comparison of integer expressions of different signedness: ‘std::vector<ReadSet*>::size_type’ {aka ‘long unsigned int’} and ‘Py_ssize_t’ {aka ‘long int’} [-Wsign-compare]
+10417 |   for (__pyx_t_5 = 0; __pyx_t_5 < __pyx_t_4; __pyx_t_5+=1) {
+      |                       ~~~~~~~~~~^~~~~~~~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/core.cpp: In function ‘PyObject* __pyx_pf_8whatshap_4core_11HapChatCore_6get_super_reads(__pyx_obj_8whatshap_4core_HapChatCore*)’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/core.cpp:16650:33: warning: comparison of integer expressions of different signedness: ‘std::vector<ReadSet*>::size_type’ {aka ‘long unsigned int’} and ‘int’ [-Wsign-compare]
+16650 |   for (__pyx_t_4 = 0; __pyx_t_4 < __pyx_t_3; __pyx_t_4+=1) {
+      |                       ~~~~~~~~~~^~~~~~~~~~~
+creating build/lib.linux-x86_64-cpython-312/whatshap
+x86_64-linux-gnu-g++ -fno-strict-overflow -Wsign-compare -DNDEBUG -g -O2 -Wall -shared -Wl,-O1 -Wl,-Bsymbolic-functions build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/backwardcolumniterator.o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/binomial.o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/caller.o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/columnindexingiterator.o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/columnindexingscheme.o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/columniterator.o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/entry.o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/genotype.o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/genotypecolumncostcomputer.o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/genotypedistribution.o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/genotypedptable.o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/genotyper.o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/graycodes.o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/indexset.o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/multinomial.o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/pedigree.o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/pedigreecolumncostcomputer.o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/pedigreedptable.o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/pedigreepartitions.o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/pedmecheuristic.o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/phredgenotypelikelihoods.o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/read.o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/readset.o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/transitionprobabilitycomputer.o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/core.o -L/usr/lib/x86_64-linux-gnu -o build/lib.linux-x86_64-cpython-312/whatshap/core.cpython-312-x86_64-linux-gnu.so
+building 'whatshap.readselect' extension
+x86_64-linux-gnu-g++ -fno-strict-overflow -Wsign-compare -DNDEBUG -g -O2 -Wall -fPIC -UNDEBUG -I/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src -I/home/cagysloth/Dev/github/COMP4801/.venv/include -I/usr/include/python3.12 -c /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/readselect.cpp -o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/readselect.o -std=c++11
+In file included from /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/readselect.cpp:818:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/genotypedptable.h: In member function ‘void GenotypeDPTable::genotype_likelihood_t::divide_likelihoods_by(long double&)’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/genotypedptable.h:38:95: warning: ‘std::binder2nd<_Operation> std::bind2nd(const _Operation&, const _Tp&) [with _Operation = divides<long double>; _Tp = long double]’ is deprecated: use 'std::bind' instead [-Wdeprecated-declarations]
+   38 |       std::transform(likelihoods.begin(), likelihoods.end(), likelihoods.begin(), std::bind2nd(std::divides<long double>(), val));
+      |                                                                                   ~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/c++/13/bits/stl_function.h:1438,
+                 from /usr/include/c++/13/string:49,
+                 from /usr/include/c++/13/bits/locale_classes.h:40,
+                 from /usr/include/c++/13/bits/ios_base.h:41,
+                 from /usr/include/c++/13/ios:44,
+                 from /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/readselect.cpp:787:
+/usr/include/c++/13/backward/binders.h:172:5: note: declared here
+  172 |     bind2nd(const _Operation& __fn, const _Tp& __x)
+      |     ^~~~~~~
+In file included from /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/readselect.cpp:822:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/hapchatcore.cpp: In member function ‘void HapChatCore::run_core()’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/hapchatcore.cpp:145:11: warning: variable ‘counter_columns’ set but not used [-Wunused-but-set-variable]
+  145 |   Counter counter_columns;
+      |           ^~~~~~~~~~~~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/hapchatcore.cpp: In member function ‘bool HapChatCore::check_end(HapChatColumnIterator, const std::vector<std::vector<Entry> >&, const Pointer&, const bool&)’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/hapchatcore.cpp:208:74: warning: comparison of integer expressions of different signedness: ‘unsigned int’ and ‘int’ [-Wsign-compare]
+  208 |   return (!re_run && (hap.is_ended() && (input[pointer][0].get_read_id() == -1)));
+      |                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/hapchatcore.cpp: In member function ‘void HapChatCore::dp(const constants_t&, std::vector<bool>&, std::vector<bool>&, Counter&, Cost&, Counter&, Counter&, Counter&, Counter&, HapChatColumnIterator)’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/hapchatcore.cpp:939:15: warning: unused variable ‘old_k’ [-Wunused-variable]
+  939 |           int old_k = k_j[input_pointer];
+      |               ^~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/hapchatcore.cpp: In member function ‘void HapChatCore::intersect(const Column&, const Column&, const Pointer&, std::vector<std::vector<int> >&, std::vector<std::vector<int> >&, std::vector<std::bitset<64> >&, std::vector<unsigned int>&, const bool&)’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/hapchatcore.cpp:1114:33: warning: comparison of integer expressions of different signedness: ‘unsigned int’ and ‘int’ [-Wsign-compare]
+ 1114 |          (colJ[j].get_read_id() != -1) &&
+      |           ~~~~~~~~~~~~~~~~~~~~~~^~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/hapchatcore.cpp:1115:33: warning: comparison of integer expressions of different signedness: ‘unsigned int’ and ‘int’ [-Wsign-compare]
+ 1115 |          (colQ[i].get_read_id() != -1)) {
+      |           ~~~~~~~~~~~~~~~~~~~~~~^~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/hapchatcore.cpp: In member function ‘void HapChatCore::represent_column(const Column&, BitColumn&, Counter&, BitColumn&, Counter&)’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/hapchatcore.cpp:1159:58: warning: comparison of integer expressions of different signedness: ‘unsigned int’ and ‘int’ [-Wsign-compare]
+ 1159 |   while(cov < column.size() && column[cov].get_read_id() != -1) {
+      |                                ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/hapchatcore.cpp: In member function ‘int HapChatCore::compute_active_common(const Column&, const Column&, unsigned int&)’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/hapchatcore.cpp:1294:33: warning: comparison of integer expressions of different signedness: ‘unsigned int’ and ‘int’ [-Wsign-compare]
+ 1294 |          (colJ[j].get_read_id() != -1) &&
+      |           ~~~~~~~~~~~~~~~~~~~~~~^~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/hapchatcore.cpp:1295:33: warning: comparison of integer expressions of different signedness: ‘unsigned int’ and ‘int’ [-Wsign-compare]
+ 1295 |          (colQ[i].get_read_id() != -1)) {
+      |           ~~~~~~~~~~~~~~~~~~~~~~^~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/hapchatcore.cpp: In member function ‘void HapChatCore::insert_col_and_update(std::vector<std::vector<Entry> >&, std::vector<unsigned int>&, std::vector<unsigned int>&, std::vector<Cost>&, const Pointer&, const Column&, std::vector<bool>&, const Counter&)’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/hapchatcore.cpp:1350:67: warning: comparison of integer expressions of different signedness: ‘unsigned int’ and ‘int’ [-Wsign-compare]
+ 1350 |   if(i < input[pointer].size() && input[pointer][i].get_read_id() != -1)
+      |                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~
+x86_64-linux-gnu-g++ -fno-strict-overflow -Wsign-compare -DNDEBUG -g -O2 -Wall -shared -Wl,-O1 -Wl,-Bsymbolic-functions build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/readselect.o -L/usr/lib/x86_64-linux-gnu -o build/lib.linux-x86_64-cpython-312/whatshap/readselect.cpython-312-x86_64-linux-gnu.so
+building 'whatshap.priorityqueue' extension
+x86_64-linux-gnu-g++ -fno-strict-overflow -Wsign-compare -DNDEBUG -g -O2 -Wall -fPIC -UNDEBUG -I/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src -I/home/cagysloth/Dev/github/COMP4801/.venv/include -I/usr/include/python3.12 -c /home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/priorityqueue.cpp -o build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/priorityqueue.o -std=c++11
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/priorityqueue.cpp: In function ‘void __pyx_f_8whatshap_13priorityqueue_13PriorityQueue__sift_down(__pyx_obj_8whatshap_13priorityqueue_PriorityQueue*, int)’:
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/priorityqueue.cpp:2738:37: warning: comparison of integer expressions of different signedness: ‘int’ and ‘std::vector<std::pair<std::vector<int>*, int> >::size_type’ {aka ‘long unsigned int’} [-Wsign-compare]
+ 2738 |   __pyx_t_1 = ((__pyx_v_rchildindex < __pyx_v_self->heap.size()) != 0);
+      |                 ~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/priorityqueue.cpp:2855:37: warning: comparison of integer expressions of different signedness: ‘int’ and ‘std::vector<std::pair<std::vector<int>*, int> >::size_type’ {aka ‘long unsigned int’} [-Wsign-compare]
+ 2855 |   __pyx_t_1 = ((__pyx_v_lchildindex < __pyx_v_self->heap.size()) != 0);
+      |                 ~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+x86_64-linux-gnu-g++ -fno-strict-overflow -Wsign-compare -DNDEBUG -g -O2 -Wall -shared -Wl,-O1 -Wl,-Bsymbolic-functions build/temp.linux-x86_64-cpython-312/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/priorityqueue.o -L/usr/lib/x86_64-linux-gnu -o build/lib.linux-x86_64-cpython-312/whatshap/priorityqueue.cpython-312-x86_64-linux-gnu.so
+copying build/lib.linux-x86_64-cpython-312/whatshap/core.cpython-312-x86_64-linux-gnu.so -> whatshap
+copying build/lib.linux-x86_64-cpython-312/whatshap/readselect.cpython-312-x86_64-linux-gnu.so -> whatshap
+copying build/lib.linux-x86_64-cpython-312/whatshap/priorityqueue.cpython-312-x86_64-linux-gnu.so -> whatshap
