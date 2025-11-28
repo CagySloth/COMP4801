@@ -1,0 +1,3 @@
+Found existing installation: whcore 0.0.1
+Uninstalling whcore-0.0.1:
+  Successfully uninstalled whcore-0.0.1

@@ -52,6 +52,11 @@ extensions = [
             "src/read.cpp",
             "src/readset.cpp",
             "src/transitionprobabilitycomputer.cpp",
+            "src/hapchat/balancedcombinations.cpp",
+            "src/hapchat/basictypes.cpp",
+            "src/hapchat/binomialcoefficient.cpp",
+            "src/hapchat/hapchatcolumniterator.cpp",
+            "src/hapchat/hapchatcore.cpp",
         ],
     ),
 

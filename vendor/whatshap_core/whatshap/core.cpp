@@ -37,7 +37,12 @@
             "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/phredgenotypelikelihoods.cpp",
             "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/read.cpp",
             "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/readset.cpp",
-            "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/transitionprobabilitycomputer.cpp"
+            "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/transitionprobabilitycomputer.cpp",
+            "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/balancedcombinations.cpp",
+            "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/basictypes.cpp",
+            "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/binomialcoefficient.cpp",
+            "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/hapchatcolumniterator.cpp",
+            "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src/hapchat/hapchatcore.cpp"
         ],
         "undef_macros": [
             "NDEBUG"
