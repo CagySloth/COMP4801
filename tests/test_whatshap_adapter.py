@@ -7,7 +7,7 @@ from algorithms.io import ReadsData
 
 try:
     from algorithms.diploid.whatshap_adapter import build_readset_from_readsdata
-    from vendor.whcore.py import core
+    from whatshap import core
     HAS_WHCORE = True
 except ImportError:
     HAS_WHCORE = False
@@ -15,7 +15,7 @@ except ImportError:
 
 pytestmark = pytest.mark.skipif(
     not HAS_WHCORE,
-    reason="WhatsHap core (vendor.whcore) not available / not built",
+    reason="WhatsHap core (whatshap) not available / not built",
 )
 
 

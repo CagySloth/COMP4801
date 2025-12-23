@@ -7,7 +7,7 @@ import sys
 import pytest
 
 try:
-    from vendor.whcore.py import core  # noqa: F401
+    from whatshap import core  # noqa: F401
     HAS_WHCORE = True
 except ImportError:
     HAS_WHCORE = False
@@ -15,7 +15,7 @@ except ImportError:
 
 pytestmark = pytest.mark.skipif(
     not HAS_WHCORE,
-    reason="WhatsHap core (vendor.whcore) not available / not built",
+    reason="WhatsHap core (whatshap) not available / not built",
 )
 
 

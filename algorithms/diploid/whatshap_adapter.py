@@ -1,7 +1,7 @@
 import numpy as np
 
 from algorithms.io.reads_data import ReadsData
-from vendor.whcore.py import core
+from whatshap import core
 
 def build_readset_from_readsdata(data: ReadsData) -> core.ReadSet:
     """

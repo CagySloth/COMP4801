@@ -9,13 +9,13 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 
 
 def CppExtension(name, sources):
-    # Prepend our local paths
+    # Make sources absolute so this works regardless of CWD
     full_sources = [os.path.join(HERE, s) for s in sources]
     return Extension(
         name,
         sources=full_sources,
         language="c++",
-        # extra_compile_args=["-std=c++11", "-Werror=return-type", "-Werror=narrowing"],
+        # WhatsHap uses C++11
         extra_compile_args=["-std=c++11"],
         include_dirs=[os.path.join(HERE, "src")],
         undef_macros=["NDEBUG"],
@@ -23,7 +23,7 @@ def CppExtension(name, sources):
 
 
 extensions = [
-    # 1) Core DP + ReadSet wrapper
+    # 1) Core DP + ReadSet + HapChat wrapper
     CppExtension(
         "whatshap.core",
         sources=[
@@ -52,6 +52,7 @@ extensions = [
             "src/read.cpp",
             "src/readset.cpp",
             "src/transitionprobabilitycomputer.cpp",
+            # HapChat core for single-sample MEC phasing
             "src/hapchat/balancedcombinations.cpp",
             "src/hapchat/basictypes.cpp",
             "src/hapchat/binomialcoefficient.cpp",

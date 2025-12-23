@@ -1,3 +1,57 @@
-.venv/
-output/
+# --- Python cache / bytecode ---
 __pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# --- Virtual environments (per-machine, never sync) ---
+.venv/
+venv/
+env/
+*.venv/
+
+# --- Build / packaging artifacts ---
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Root egg-info produced by `pip install -e .`
+COMP4801_Phasing_Benchmark_Platform.egg-info/
+
+# Vendor WhatsHap core egg-info / build dir
+vendor/whatshap_core/whcore.egg-info/
+vendor/whatshap_core/build/
+
+# Compiled extension modules (Linux, macOS, Windows)
+*.so
+*.pyd
+*.dll
+*.a
+*.o
+
+# Just in case, ignore platform-tagged WhatsHap core extensions
+vendor/whatshap_core/whatshap/*.so
+vendor/whatshap_core/whatshap/*.pyd
+vendor/whatshap_core/whatshap/*.dll
+
+# --- Test / tooling caches ---
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+.tox/
+
+# --- Project outputs ---
+output/
+benchmark_results/
+*.log
+
+# --- OS / editor junk ---
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+.idea/
+.vscode/

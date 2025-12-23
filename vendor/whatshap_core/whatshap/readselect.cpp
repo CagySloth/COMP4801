@@ -8,12 +8,12 @@
             "-std=c++11"
         ],
         "include_dirs": [
-            "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src"
+            "/Users/cagysloth/Library/CloudStorage/OneDrive-TheUniversityofHongKong-Connect/HKU Studies/Year 5/COMP4801 - CodeSpace/vendor/whatshap_core/src"
         ],
         "language": "c++",
         "name": "whatshap.readselect",
         "sources": [
-            "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/readselect.pyx"
+            "/Users/cagysloth/Library/CloudStorage/OneDrive-TheUniversityofHongKong-Connect/HKU Studies/Year 5/COMP4801 - CodeSpace/vendor/whatshap_core/whatshap/readselect.pyx"
         ],
         "undef_macros": [
             "NDEBUG"

@@ -5,18 +5,20 @@ import os
 import json
 import pytest
 
-try:
-    from algorithms.diploid import whatshap_driver
-    from vendor.whcore.py import core  # ensure core is importable
-    HAS_WHCORE = True
-except ImportError:
-    HAS_WHCORE = False
+from algorithms.diploid import whatshap_driver
+from whatshap import core
 
+# try:
+#     from algorithms.diploid import whatshap_driver
+#     from whatshap import core  # ensure core is importable
+#     HAS_WHCORE = True
+# except ImportError:
+#     HAS_WHCORE = False
 
-pytestmark = pytest.mark.skipif(
-    not HAS_WHCORE,
-    reason="WhatsHap core or driver not available / not built",
-)
+# pytestmark = pytest.mark.skipif(
+#     not HAS_WHCORE,
+#     reason="WhatsHap core or driver not available / not built",
+# )
 
 
 def _write_npz(tmp_path, reads_matrix, name="input.npz"):

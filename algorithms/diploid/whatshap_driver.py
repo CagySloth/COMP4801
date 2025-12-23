@@ -9,8 +9,8 @@ from algorithms.io.writer import (
 )
 
 from algorithms.diploid.whatshap_adapter import build_readset_from_readsdata
-from vendor.whcore.py import core, readselect
-from vendor.whcore.py.blocks import compute_overall_components
+from whatshap import core, readselect
+# from whatshap.blocks import compute_overall_components
 
 def main(args=None):
     parser = argparse.ArgumentParser(description="Diploid phasing via WhatsHap core")
@@ -37,6 +37,10 @@ def main(args=None):
 
     # 4) Run PedigreeDPTable (MEC) on the whole chromosome
     #    For now, no pedigree -> recombi costs empty, distrust_genotypes=False, positions=None
+    
+    # hap_core = core.HapChatCore(selected_readset)
+    # superreads_list, _ = hap_core.get_super_reads()
+    
     recombcosts = []  # no recombination cost for simple diploid single-sample
     pedigree = core.Pedigree()  # empty pedigree; check constructor in core.pyx
     dp = core.PedigreeDPTable(selected_readset, recombcosts, pedigree, False, None)
