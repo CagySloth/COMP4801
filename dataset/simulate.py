@@ -105,10 +105,13 @@ def main():
     prefix = Path(args.output_prefix)
     write_haplotypes_tsv(f"{prefix}.haplotypes.tsv", haps)
     write_reads_sparse_tsv(f"{prefix}.reads.sparse.tsv", reads)
+
+    # Build dense ReadsData and save as NPZ with keys 'reads' and 'positions'
     reads_np = ReadsData.from_fragments(reads)
-    write_haplotypes_npz(f"{prefix}.reads.npz", reads_np.reads)
+    reads_np.to_npz(f"{prefix}.reads.npz")
 
     print(f"✅ Simulated data written to: {prefix}.[haplotypes.tsv, reads.sparse.tsv, reads.npz]")
+
 
 
 if __name__ == "__main__":
