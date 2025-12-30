@@ -8,12 +8,12 @@
             "-std=c++11"
         ],
         "include_dirs": [
-            "/Users/cagysloth/Library/CloudStorage/OneDrive-TheUniversityofHongKong-Connect/HKU Studies/Year 5/COMP4801 - CodeSpace/vendor/whatshap_core/src"
+            "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/src"
         ],
         "language": "c++",
         "name": "whatshap.priorityqueue",
         "sources": [
-            "/Users/cagysloth/Library/CloudStorage/OneDrive-TheUniversityofHongKong-Connect/HKU Studies/Year 5/COMP4801 - CodeSpace/vendor/whatshap_core/whatshap/priorityqueue.pyx"
+            "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/priorityqueue.pyx"
         ],
         "undef_macros": [
             "NDEBUG"
