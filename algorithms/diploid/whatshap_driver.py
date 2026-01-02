@@ -30,6 +30,7 @@ def main(args=None):
 
     # 2) Build ReadSet
     readset = build_readset_from_readsdata(data)
+    readset.sort()
 
     # 3) Perform WhatsHap read selection
     selected_indices = readselect.readselection(readset, args.max_coverage, None)

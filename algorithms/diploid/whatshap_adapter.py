@@ -3,7 +3,7 @@ import numpy as np
 from algorithms.io.reads_data import ReadsData
 from whatshap import core
 
-def build_readset_from_readsdata(data: ReadsData) -> core.ReadSet:
+def build_readset_from_readsdata(data: ReadsData, sort_readset: bool = False) -> core.ReadSet:
     """
     Convert ReadsData (dense matrix of alleles) into a WhatsHap ReadSet.
 
@@ -41,8 +41,9 @@ def build_readset_from_readsdata(data: ReadsData) -> core.ReadSet:
 
         readset.add(read)
 
-    # VERY IMPORTANT: sort reads in ReadSet by first variant position
-    readset.sort()
+    if sort_readset:
+        # VERY IMPORTANT: sort reads in ReadSet by first variant position
+        readset.sort()
 
     return readset
 
