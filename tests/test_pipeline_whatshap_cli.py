@@ -71,3 +71,10 @@ def test_full_pipeline_with_diploid_whats(tmp_path):
         summary = json.load(f)
     assert "algorithm" in summary
     assert summary["algorithm"].startswith("diploid_whats")
+    
+    core_path = summary.get("whatshap_core_module", "").replace("\\", "/")
+    assert "/vendor/whatshap_core/" in core_path, f"Not using vendored core: {core_path}"
+
+    pkg_path = summary.get("whatshap_module", "").replace("\\", "/")
+    assert "/vendor/whatshap_core/" in pkg_path, f"Not using vendored package: {pkg_path}"
+

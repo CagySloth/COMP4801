@@ -1,5 +1,6 @@
 # algorithms/io/reads_data.py
 from dataclasses import dataclass
+from pathlib import Path
 import numpy as np
 
 @dataclass
@@ -15,21 +16,27 @@ class ReadsData:
     @property
     def R(self):
         return self.reads.shape[0]
-
+    
+    @property
+    def num_reads(self):
+        return self.R
+        
     @property
     def N(self):
         return self.reads.shape[1]
 
     @staticmethod
-    def from_fragments(fragments: list[dict]) -> "ReadsData":
+    def from_fragments(fragments: list[dict], num_variants: int | None = None) -> "ReadsData":
         """
         Convert list of sparse fragment dicts into dense reads and positions matrices.
         Each fragment must have keys: 'id', 'indices', 'values'
         """
         num_reads = len(fragments)
-        max_index = max(idx for f in fragments for idx in f["indices"])
-        num_variants = max_index + 1
-
+        
+        if num_variants is None:
+            max_index = max(idx for f in fragments for idx in f["indices"])
+            num_variants = max_index + 1
+        
         reads = np.full((num_reads, num_variants), -1, dtype=int)
         positions = np.full((num_reads, num_variants), -1, dtype=int)
 
@@ -56,11 +63,13 @@ class ReadsData:
     
     def to_npz(self, filepath: str):
         # Save reads and positions arrays (and any other relevant data)
+        Path(filepath).parent.mkdir(parents=True, exist_ok=True)
         np.savez_compressed(filepath, 
                             reads=self.reads, 
                             positions=self.positions)
     
     def to_sparse_tsv(self, filepath: str):
+        Path(filepath).parent.mkdir(parents=True, exist_ok=True)
         with open(filepath, "w") as f:
             for i in range(self.R):
                 row = []

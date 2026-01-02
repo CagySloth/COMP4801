@@ -1,5 +1,7 @@
+import os
 import argparse
 import numpy as np
+import whatshap as wh
 
 from algorithms.io.reads_data import ReadsData
 from algorithms.io.writer import (
@@ -78,13 +80,18 @@ def main(args=None):
     write_haplotypes_tsv(f"{prefix}.haplotypes.tsv", H)
     write_assignments_tsv(f"{prefix}.assignments.tsv", assignments)
     write_summary_json(
-        {
-            "algorithm": "diploid_whats",
-            "R": int(R),
-            "N": int(N),
-        },
-        f"{prefix}.summary.json",
-    )
+    {
+        "algorithm": "diploid_whats",
+        "R": int(R),
+        "N": int(N),
+        "max_coverage": int(args.max_coverage),
+        "selected_reads": int(len(selected_indices)),
+        "whatshap_module": os.path.realpath(wh.__file__),
+        "whatshap_core_module": os.path.realpath(core.__file__),
+        "whatshap_readselect_module": os.path.realpath(readselect.__file__),
+    },
+    f"{prefix}.summary.json",
+)
 
 
 if __name__ == "__main__":

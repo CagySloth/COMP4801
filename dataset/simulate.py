@@ -107,7 +107,7 @@ def main():
     write_reads_sparse_tsv(f"{prefix}.reads.sparse.tsv", reads)
 
     # Build dense ReadsData and save as NPZ with keys 'reads' and 'positions'
-    reads_np = ReadsData.from_fragments(reads)
+    reads_np = ReadsData.from_fragments(reads, num_variants=args.num_variants)
     reads_np.to_npz(f"{prefix}.reads.npz")
 
     print(f"✅ Simulated data written to: {prefix}.[haplotypes.tsv, reads.sparse.tsv, reads.npz]")
