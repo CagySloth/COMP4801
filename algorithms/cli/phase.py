@@ -73,6 +73,9 @@ def main():
     dip_wh.add_argument("--output-prefix", required=True, help="Prefix for output files")
     dip_wh.add_argument("--max-coverage", type=int, default=15)
     dip_wh.add_argument("--error-rate", type=float, default=0.01)
+    dip_wh.add_argument("--vcf", help="Input VCF with (unphased) genotypes. If set, only heterozygous sites are phased and homozygous sites are fixed by GT.")
+    dip_wh.add_argument("--sample", help="Sample name in VCF (default: first sample).")
+    dip_wh.add_argument("--output-vcf", help="Output phased VCF path (default: <output-prefix>.phased.vcf).")
     dip_wh.set_defaults(func=diploid_whats_main)
 
     args = parser.parse_args()
