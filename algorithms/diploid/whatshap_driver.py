@@ -1,5 +1,6 @@
 import os
 import argparse
+import time
 import numpy as np
 import whatshap as wh
 
@@ -153,9 +154,13 @@ def main(args=None):
 
     if args is None:
         args = parser.parse_args()
+        
+    t_total_start = time.perf_counter()
 
     # 1) Load reads
+    t_load_start = time.perf_counter()
     data = ReadsData.from_npz(args.input)
+    t_load_sec = time.perf_counter() - t_load_start
     N = data.N
     R = data.R
     
@@ -169,9 +174,16 @@ def main(args=None):
     is_het = None
 
     data_for_phasing = data
+    
+    t_vcf_parse_sec = 0.0
+    t_build_readset_sec = 0.0
+    t_readselect_sec = 0.0
+    t_solve_sec = 0.0
 
     if vcf_path:
+        t_vcf_start = time.perf_counter()
         _, alleles, is_het = _read_vcf_gt_list(vcf_path, sample=sample)
+        t_vcf_parse_sec = time.perf_counter() - t_vcf_start
         if len(is_het) != N:
             raise ValueError(f"VCF variant count ({len(is_het)}) != reads matrix N ({N}). They must match in this simulation pipeline.")
 
@@ -185,8 +197,10 @@ def main(args=None):
 
 
     # 2) Build ReadSet
+    t_rs_start = time.perf_counter()
     readset = build_readset_from_readsdata(data_for_phasing)
     readset.sort()
+    t_build_readset_sec = time.perf_counter() - t_rs_start
     
     # --- Filter non-informative reads (must cover >= 2 variants) ---
     # WhatsHap readselection expects reads with at least two variants.
@@ -201,15 +215,18 @@ def main(args=None):
         superreads_list = []
     else:
         # 3) Perform WhatsHap read selection on informative reads only
+        t_sel_start = time.perf_counter()
         sel_local = readselect.readselection(informative_readset, args.max_coverage, None)
+        t_readselect_sec = time.perf_counter() - t_sel_start
+        
         selected_readset = informative_readset.subset(sel_local)
-
-        # If you want selected_indices relative to the ORIGINAL readset:
         selected_indices = [informative_idx[i] for i in sel_local]
 
         # 4) Run HapChatCore MEC solver
+        t_solve_start = time.perf_counter()
         hap_core = core.HapChatCore(selected_readset)
         superreads_list, _ = hap_core.get_super_reads()
+        t_solve_sec = time.perf_counter() - t_solve_start
 
     # 5) Extract haplotypes from superreads
     N_phase = data_for_phasing.N
@@ -305,24 +322,52 @@ def main(args=None):
     prefix = args.output_prefix
     write_haplotypes_tsv(f"{prefix}.haplotypes.tsv", H)
     write_assignments_tsv(f"{prefix}.assignments.tsv", assignments)
+    
+    t_total_sec = time.perf_counter() - t_total_start
     summary = {
         "algorithm": "diploid_whats",
         "R": int(R),
         "N": int(N),
         "max_coverage": int(args.max_coverage),
+
+        # read stats
+        "num_reads_total": int(len(readset)),
+        "num_informative_reads": int(len(informative_readset)),
         "selected_reads": int(len(selected_indices)),
+        "num_blocks": int(len(superreads_list)),
+
+        # timing
+        "time_total_sec": float(t_total_sec),
+        "time_load_sec": float(t_load_sec),
+        "time_vcf_parse_sec": float(t_vcf_parse_sec),
+        "time_build_readset_sec": float(t_build_readset_sec),
+        "time_readselection_sec": float(t_readselect_sec),
+        "time_solve_sec": float(t_solve_sec),
+
+        # provenance
         "whatshap_module": os.path.realpath(wh.__file__),
         "whatshap_core_module": os.path.realpath(core.__file__),
         "whatshap_readselect_module": os.path.realpath(readselect.__file__),
     }
 
     if vcf_path:
+        het_total = int(sum(1 for x in is_het if x))
+        het_phased = int(sum(1 for i in range(N) if is_het[i] and ps_full[i] >= 0))
+        het_unphased = int(het_total - het_phased)
+        phase_sets = sorted({int(x) for x in ps_full if x >= 0})
+        num_phase_sets = int(len(phase_sets))
+
         summary.update({
             "N_total": int(N),
             "N_het": int(len(het_positions)),
+            "het_total": het_total,
+            "het_phased": het_phased,
+            "het_unphased": het_unphased,
+            "num_phase_sets": num_phase_sets,
             "vcf_input": os.path.realpath(vcf_path),
             "vcf_output": os.path.realpath(out_vcf),
         })
+
 
     write_summary_json(summary, f"{prefix}.summary.json")
 

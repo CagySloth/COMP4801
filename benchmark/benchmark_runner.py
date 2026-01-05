@@ -8,10 +8,8 @@ def run_simulator(ploidy: int, num_variants: int, num_reads: int, read_length: i
                   error_rate: float, missing_rate: float, alpha: float, beta: float,
                   allow_mono: bool, seed: int, out_prefix: Path):
     
-    sim_script = Path("dataset/simulate.py")
-
     cmd = [
-        "python", str(sim_script),
+        "python", "-m", "dataset.simulate",
         "-p", str(ploidy),
         "-n", str(num_variants),
         "-r", str(num_reads),
@@ -20,8 +18,8 @@ def run_simulator(ploidy: int, num_variants: int, num_reads: int, read_length: i
         "-m", str(missing_rate),
         "--maf-alpha", str(alpha),
         "--maf-beta", str(beta),
-        "-s", str(seed),
-        "-o", str(out_prefix)
+        "--seed", str(seed),
+        "-o", str(out_prefix),
     ]
 
     if allow_mono:
@@ -29,21 +27,46 @@ def run_simulator(ploidy: int, num_variants: int, num_reads: int, read_length: i
 
     subprocess.run(cmd, check=True)
 
-def run_algorithm(algo: str, input_npz: Path, output_prefix: Path, ploidy: int = None):
-    cmd = ["python", "-m", "algorithms.cli.phase", algo, "-i", str(input_npz), "-o", str(output_prefix)]
-    if ploidy and "polyploid" in algo.lower():
-        cmd += ["-k", str(ploidy)]
-    start = time.time()
+def run_algorithm(algo: str, input_npz: Path, output_prefix: Path, ploidy: int = None, vcf_path: Path = None):
+    cmd = [
+        "python", "-m", "algorithms.cli.phase",
+        algo,
+        "-i", str(input_npz),
+        "--output-prefix", str(output_prefix),
+    ]
+
+    # polyploid subcommands accept --ploidy
+    if ploidy is not None and algo.startswith("polyploid-"):
+        cmd += ["--ploidy", str(ploidy)]
+
+    # WhatsHap VCF-mode
+    if vcf_path is not None and algo == "diploid-whats":
+        cmd += ["--vcf", str(vcf_path)]
+
+    start = time.perf_counter()
     try:
         subprocess.run(cmd, check=True)
-        return time.time() - start
+        return time.perf_counter() - start
     except subprocess.CalledProcessError as e:
         print(f"[ERROR] Algorithm {algo} failed: {e}")
         return None
 
+
+# def run_algorithm(algo: str, input_npz: Path, output_prefix: Path, ploidy: int = None):
+#     cmd = ["python", "-m", "algorithms.cli.phase", algo, "-i", str(input_npz), "-o", str(output_prefix)]
+#     if ploidy and "polyploid" in algo.lower():
+#         cmd += ["-k", str(ploidy)]
+#     start = time.time()
+#     try:
+#         subprocess.run(cmd, check=True)
+#         return time.time() - start
+#     except subprocess.CalledProcessError as e:
+#         print(f"[ERROR] Algorithm {algo} failed: {e}")
+#         return None
+
 def run_accuracy_benchmark(truth_path: Path, pred_path: Path, json_out: Path):
     cmd = [
-        "python", "benchmarking/benchmark_accuracy.py",
+        "python", "-m", "benchmark.benchmark_accuracy",
         "--truth", str(truth_path),
         "--pred", str(pred_path),
         "--output", str(json_out)
@@ -85,7 +108,10 @@ def main():
             )
 
         for run_id in range(1, args.num_runs + 1):
-            sim_prefix = args.outdir / f"sim_{vary_field}{vary_val}_run{run_id}"
+            if vary_field:
+                sim_prefix = args.outdir / f"sim_{vary_field}{vary_val}_run{run_id}"
+            else:
+                sim_prefix = args.outdir / f"sim_run{run_id}"
             run_simulator(
                 ploidy=sweep_args["ploidy"],
                 num_variants=sweep_args["num_variants"],
@@ -103,17 +129,26 @@ def main():
             truth = sim_prefix.with_suffix(".haplotypes.tsv")
             sparse_tsv = sim_prefix.with_suffix(".reads.sparse.tsv")
             reads_npz = sim_prefix.with_suffix(".reads.npz")
+            vcf_path = sim_prefix.with_suffix(".vcf")
 
-            subprocess.run([
-                "python", "-m", "algorithms.cli.convert",
-                "-i", str(sparse_tsv),
-                "--to-npz", str(reads_npz)
-            ], check=True)
+            # subprocess.run([
+            #     "python", "-m", "algorithms.cli.convert",
+            #     "-i", str(sparse_tsv),
+            #     "--to-npz", str(reads_npz)
+            # ], check=True)
 
             for algo in args.algorithms:
                 print(f"[INFO] Run {run_id} | {vary_field}={vary_val} | Algorithm: {algo}")
                 algo_out = sim_prefix.parent / f"{sim_prefix.name}_{algo}"
-                duration = run_algorithm(algo, reads_npz, algo_out, ploidy=sweep_args["ploidy"])
+                vcf_for_algo = vcf_path if (algo == "diploid-whats" and vcf_path.exists()) else None
+
+                duration = run_algorithm(
+                    algo,
+                    reads_npz,
+                    algo_out,
+                    ploidy=sweep_args["ploidy"],
+                    vcf_path=vcf_for_algo,
+                )
 
                 pred_hap = algo_out.with_suffix(".haplotypes.tsv")
                 acc_json = algo_out.with_suffix(".accuracy.json")
@@ -125,7 +160,7 @@ def main():
                 else:
                     acc = {"error": "haplotypes file missing"}
 
-                summary.append({
+                record = {
                     "run": run_id,
                     "algorithm": algo,
                     "ploidy": sweep_args["ploidy"],
@@ -138,8 +173,12 @@ def main():
                     "accuracy": acc.get("accuracy"),
                     "label_permutation": acc.get("label_permutation"),
                     "note": acc.get("error"),
-                    vary_field: vary_val
-                })
+                }
+
+                if vary_field:
+                    record[vary_field] = sweep_args[vary_field]
+
+                summary.append(record)
 
     out_path = args.outdir / "benchmark_summary.json"
     with open(out_path, "w") as f:

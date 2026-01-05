@@ -100,8 +100,12 @@ def main():
     parser.add_argument("--maf-beta", type=float, default=1.0)
     parser.add_argument("--allow-monomorphic", action="store_true")
     parser.add_argument("-o", "--output-prefix", required=True)
+    parser.add_argument("--seed", type=int, default=None, help="Random seed for reproducibility.")
 
     args = parser.parse_args()
+    
+    if args.seed is not None:
+        np.random.seed(args.seed)
     
     prefix = args.output_prefix  # because you run: -o output/vcf_demo
     Path(prefix).parent.mkdir(parents=True, exist_ok=True)  # ensures "output/" exists
