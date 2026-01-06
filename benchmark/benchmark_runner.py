@@ -2,6 +2,7 @@ import argparse
 import subprocess
 import time
 import json
+import csv
 from pathlib import Path
 
 def run_simulator(ploidy: int, num_variants: int, num_reads: int, read_length: int,
@@ -51,19 +52,6 @@ def run_algorithm(algo: str, input_npz: Path, output_prefix: Path, ploidy: int =
         print(f"[ERROR] Algorithm {algo} failed: {e}")
         return None
 
-
-# def run_algorithm(algo: str, input_npz: Path, output_prefix: Path, ploidy: int = None):
-#     cmd = ["python", "-m", "algorithms.cli.phase", algo, "-i", str(input_npz), "-o", str(output_prefix)]
-#     if ploidy and "polyploid" in algo.lower():
-#         cmd += ["-k", str(ploidy)]
-#     start = time.time()
-#     try:
-#         subprocess.run(cmd, check=True)
-#         return time.time() - start
-#     except subprocess.CalledProcessError as e:
-#         print(f"[ERROR] Algorithm {algo} failed: {e}")
-#         return None
-
 def run_accuracy_benchmark(truth_path: Path, pred_path: Path, json_out: Path):
     cmd = [
         "python", "-m", "benchmark.benchmark_accuracy",
@@ -72,6 +60,50 @@ def run_accuracy_benchmark(truth_path: Path, pred_path: Path, json_out: Path):
         "--output", str(json_out)
     ]
     subprocess.run(cmd, check=True)
+    
+def write_summary_csv(records: list[dict], out_csv: Path) -> None:
+    # Expand label_permutation (list) into separate columns for easy plotting
+    max_perm = 0
+    for r in records:
+        perm = r.get("label_permutation")
+        if isinstance(perm, list):
+            max_perm = max(max_perm, len(perm))
+
+    # Collect all keys except label_permutation (handled separately)
+    keys = set()
+    for r in records:
+        keys.update(r.keys())
+    keys.discard("label_permutation")
+
+    # Stable column order: put common ones first, then the rest
+    preferred = [
+        "run", "algorithm",
+        "ploidy", "num_variants", "num_reads", "read_length",
+        "error_rate", "missing_rate",
+        "runtime_seconds", "accuracy", "note",
+        # timing breakdown columns we may add (see next section)
+        "phase_solver",
+        "phase_time_total_sec", "phase_time_build_readset_sec",
+        "phase_time_readselection_sec", "phase_time_solve_sec",
+        "phase_selected_reads", "phase_num_phase_sets",
+    ]
+    cols = [c for c in preferred if c in keys]
+    cols += sorted(keys - set(cols))
+
+    # Add label permutation columns
+    cols += [f"label_perm_{i}" for i in range(max_perm)]
+
+    with open(out_csv, "w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=cols)
+        w.writeheader()
+        for r in records:
+            row = {k: r.get(k) for k in cols if not k.startswith("label_perm_")}
+            perm = r.get("label_permutation")
+            if isinstance(perm, list):
+                for i, v in enumerate(perm):
+                    row[f"label_perm_{i}"] = v
+            w.writerow(row)
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Benchmark phasing algorithms with synthetic datasets.")
@@ -90,6 +122,10 @@ def parse_args():
     parser.add_argument("--vary", type=str, default=None, help="Parameter to vary (e.g. num_reads)")
     parser.add_argument("--vary-values", nargs="+", default=None, help="Values to sweep for --vary")
     return parser.parse_args()
+
+def add_ext(prefix: Path, ext: str) -> Path:
+    # Safe even if prefix name contains dots (e.g., 0.005)
+    return prefix.parent / (prefix.name + ext)
 
 def main():
     args = parse_args()
@@ -126,16 +162,10 @@ def main():
                 out_prefix=sim_prefix
             )
 
-            truth = sim_prefix.with_suffix(".haplotypes.tsv")
-            sparse_tsv = sim_prefix.with_suffix(".reads.sparse.tsv")
-            reads_npz = sim_prefix.with_suffix(".reads.npz")
-            vcf_path = sim_prefix.with_suffix(".vcf")
-
-            # subprocess.run([
-            #     "python", "-m", "algorithms.cli.convert",
-            #     "-i", str(sparse_tsv),
-            #     "--to-npz", str(reads_npz)
-            # ], check=True)
+            truth = add_ext(sim_prefix, ".haplotypes.tsv")
+            sparse_tsv = add_ext(sim_prefix, ".reads.sparse.tsv")
+            reads_npz = add_ext(sim_prefix, ".reads.npz")
+            vcf_path = add_ext(sim_prefix, ".vcf")
 
             for algo in args.algorithms:
                 print(f"[INFO] Run {run_id} | {vary_field}={vary_val} | Algorithm: {algo}")
@@ -149,9 +179,16 @@ def main():
                     ploidy=sweep_args["ploidy"],
                     vcf_path=vcf_for_algo,
                 )
+                
+                algo_summary_path = add_ext(algo_out, ".summary.json")
+                algo_summary = None
+                if algo_summary_path.exists():
+                    with open(algo_summary_path) as f:
+                        algo_summary = json.load(f)
 
-                pred_hap = algo_out.with_suffix(".haplotypes.tsv")
-                acc_json = algo_out.with_suffix(".accuracy.json")
+
+                pred_hap = add_ext(algo_out, ".haplotypes.tsv")
+                acc_json = add_ext(algo_out, ".accuracy.json")
 
                 if pred_hap.exists():
                     run_accuracy_benchmark(truth, pred_hap, acc_json)
@@ -174,6 +211,17 @@ def main():
                     "label_permutation": acc.get("label_permutation"),
                     "note": acc.get("error"),
                 }
+                
+                if algo_summary:
+                    # Keep these names stable for Excel/R plots
+                    record["phase_solver"] = algo_summary.get("solver")
+                    record["phase_selected_reads"] = algo_summary.get("selected_reads")
+                    record["phase_num_phase_sets"] = algo_summary.get("num_phase_sets")
+
+                    record["phase_time_total_sec"] = algo_summary.get("time_total_sec")
+                    record["phase_time_build_readset_sec"] = algo_summary.get("time_build_readset_sec")
+                    record["phase_time_readselection_sec"] = algo_summary.get("time_readselection_sec")
+                    record["phase_time_solve_sec"] = algo_summary.get("time_solve_sec")
 
                 if vary_field:
                     record[vary_field] = sweep_args[vary_field]
@@ -184,6 +232,11 @@ def main():
     with open(out_path, "w") as f:
         json.dump(summary, f, indent=2)
     print(f"[DONE] Benchmark summary written to {out_path}")
+    
+    out_csv = args.outdir / "benchmark_summary.csv"
+    write_summary_csv(summary, out_csv)
+    print(f"[DONE] Benchmark CSV written to {out_csv}")
+
 
 if __name__ == "__main__":
     main()

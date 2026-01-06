@@ -1,63 +1,43 @@
-## 📂 `scripts` – Utility Wrappers for Command-Line Use
+## 📂 `scripts` — Convenience shell wrappers
 
-This directory contains shell scripts that simplify frequent tasks like running simulations, benchmarking all algorithms, or executing the full pipeline in one go.
+This directory contains shell scripts intended as *convenience wrappers*.
 
----
+Some scripts may be older examples and might require editing to match the latest CLI/module names.
+When in doubt, prefer the module commands shown in the README:
 
-### 📄 `simulate.sh`
-
-Wrapper for generating synthetic read and haplotype data using `dataset/simulate.py`.
-
-#### Usage
-
-```bash
-./scripts/simulate.sh
-```
-
-#### Behavior
-
-* Defines ploidy, variant count, error rate, etc.
-* Saves output files with prefix `sim_output`
-
-You can modify the script parameters directly inside the file.
+- `python -m dataset.simulate`
+- `python -m algorithms.cli.phase`
+- `python -m benchmark.benchmark_runner`
 
 ---
 
-### 📄 `benchmark_all.sh`
+## `simulate.sh`
 
-Runs `benchmark_runner.py` with a full sweep over common parameters and all algorithms.
-
-#### Usage
+A thin wrapper over the simulator:
 
 ```bash
-./scripts/benchmark_all.sh
+./scripts/simulate.sh -p 2 -n 200 -r 200 -l 60 -o output/demo
 ```
-
-#### Behavior
-
-* Benchmarks all diploid and polyploid algorithms
-* Sweeps over number of reads
-* Stores output in `results/` directory
-
-Edit the script to change the `--vary` parameter or algorithms list.
 
 ---
 
-### 📄 `run_pipeline.sh`
+## Recommended “pipeline” snippet
 
-Runs the complete pipeline: simulate → convert → phase → evaluate
-
-#### Usage
+If you want an end-to-end run in bash, this is the most up-to-date shape:
 
 ```bash
-./scripts/run_pipeline.sh
+PREFIX=output/demo
+
+python -m dataset.simulate -p 2 -n 200 -r 200 -l 60 -o "$PREFIX"
+
+python -m algorithms.cli.phase diploid-whats \
+  -i "$PREFIX.reads.npz" \
+  --vcf "$PREFIX.vcf" \
+  --output-prefix "${PREFIX}_phased" \
+  --solver whatshap
+
+python -m benchmark.benchmark_accuracy \
+  --truth "$PREFIX.haplotypes.tsv" \
+  --pred  "${PREFIX}_phased.haplotypes.tsv" \
+  --output "${PREFIX}_phased.accuracy.json"
 ```
-
-#### Behavior
-
-1. Simulates one dataset
-2. Converts sparse `.tsv` to `.npz`
-3. Phases with one algorithm (edit script to change)
-4. Evaluates accuracy
-
-This is a good sanity check or demo for your repo.

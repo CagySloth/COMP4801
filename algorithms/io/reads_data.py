@@ -43,7 +43,8 @@ class ReadsData:
         for i, frag in enumerate(fragments):
             for j, (idx, val) in enumerate(zip(frag["indices"], frag["values"])):
                 reads[i, idx] = val
-                positions[i, j] = idx
+                # positions[i, j] = idx
+                positions = np.tile(np.arange(num_variants), (num_reads, 1))
 
         return ReadsData(reads=reads, positions=positions, num_variants=num_variants)
 

@@ -1,61 +1,79 @@
-## 📂 `algorithms` – Phasing Algorithms
+## 📂 `algorithms` — Phasing Algorithms
 
-This module implements multiple haplotype phasing strategies for diploid and polyploid data.
+This package contains diploid and polyploid phasing implementations and their shared adapters/utilities.
 
----
-
-### 📁 `algorithms/diploid/`
-
-Implements phasing methods designed specifically for diploid organisms (ploidy = 2).
-
-#### 📄 `em.py` — EM Algorithm for Diploid Phasing
-
-An Expectation-Maximization method assuming two haplotypes and probabilistic assignment of reads.
+The easiest way to run algorithms is via the CLI:
 
 ```bash
-python -m algorithms.cli.phase diploid_em -i input.npz -o result_prefix
-```
-
-#### 📄 `mst.py` — Minimum Spanning Tree (MST) Phasing
-
-Graph-based approach using co-occurrence of alleles to build a minimum spanning tree.
-
-```bash
-python -m algorithms.cli.phase diploid_mst -i input.npz -o result_prefix
+python -m algorithms.cli.phase <subcommand> ...
 ```
 
 ---
 
-### 📁 `algorithms/polyploid/`
+## Diploid algorithms (`algorithms/diploid`)
 
-Phasing strategies for data with ≥3 haplotypes (polyploid genomes).
+### `diploid-em` — Expectation Maximization
 
-#### 📄 `em.py` — EM Algorithm for Polyploid Phasing
-
-Extended EM method supporting arbitrary ploidy.
-
-```bash
-python -m algorithms.cli.phase polyploid_em -i input.npz -o result_prefix -k 4
-```
-
-#### 📄 `spectral.py` — Spectral Clustering for Polyploid Phasing
-
-Clustering-based phasing using the similarity graph of reads and spectral decomposition.
+- Probabilistic assignment of reads to two haplotypes.
+- Useful baseline for accuracy vs. runtime tradeoffs.
 
 ```bash
-python -m algorithms.cli.phase polyploid_spectral -i input.npz -o result_prefix -k 4
+python -m algorithms.cli.phase diploid-em       -i input.reads.npz       --output-prefix output/dip_em
 ```
+
+### `diploid-mst` — Minimum Spanning Tree (graph-based)
+
+- Builds a variant graph from co-occurrence on reads and derives a phasing via spanning-tree logic.
+
+```bash
+python -m algorithms.cli.phase diploid-mst       -i input.reads.npz       --output-prefix output/dip_mst
+```
+
+### `diploid-whats` — Vendored WhatsHap core
+
+This integrates a vendored WhatsHap core (`vendor/whatshap_core`) and supports two modes:
+
+**Matrix-mode (no VCF)**  
+- Input: only `reads.npz`
+- Solver: uses `HapChatCore` on the selected reads
+- Output: TSV haplotypes + assignments + JSON summary
+
+**VCF-mode (`--vcf ...`)**  
+- Input: `reads.npz` + a VCF containing unphased GTs
+- Only **heterozygous** variants (from GT) are phased; homozygous sites are fixed by GT.
+- Solvers:
+  - `--solver whatshap` (default) → **PedigreeDPTable** (WhatsHap default DP solver)
+  - `--solver hapchat` → **HapChatCore** (MEC-style solver)
+- Writes a phased VCF: `{output-prefix}.phased.vcf`
+
+Example:
+
+```bash
+python -m algorithms.cli.phase diploid-whats       -i output/demo.reads.npz       --vcf output/demo.vcf       --output-prefix output/demo_phased       --solver whatshap
+```
+
+WhatsHap-style details implemented in this repo:
+
+- **Read selection** via `whatshap.readselect.readselection(max_coverage=...)`
+- **Phase sets (PS)** computed from connected components of the selected read graph  
+  (PS is reported as **leftmost variant index + 1**).
 
 ---
 
-### 📁 `algorithms/io/`
+## Polyploid algorithms (`algorithms/polyploid`)
 
-Handles I/O utilities like loading `.tsv` and `.npz` files, writing results, and standardizing data structures.
+### `polyploid-em`
 
-| File            | Responsibility                                      |
-| --------------- | --------------------------------------------------- |
-| `parser.py`     | Parses reads from dense/sparse `.tsv` or `.npz`     |
-| `writer.py`     | Outputs `.haplotypes.tsv`, `.assignments.tsv` files |
-| `reads_data.py` | Defines the `ReadsData` structure for algorithms    |
+- EM-style baseline extended to `k` haplotypes.
 
-These modules are used internally by CLI scripts and algorithm runners.
+```bash
+python -m algorithms.cli.phase polyploid-em       -i input.reads.npz       --ploidy 4       --output-prefix output/poly_em
+```
+
+### `polyploid-spectral`
+
+- Spectral / matrix-factorization inspired approach for polyploid phasing.
+
+```bash
+python -m algorithms.cli.phase polyploid-spectral       -i input.reads.npz       --ploidy 4       --output-prefix output/poly_spec
+```

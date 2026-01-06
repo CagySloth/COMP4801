@@ -1,58 +1,56 @@
-## 📂 `dataset` – Simulated Data Generator
+## 📂 `dataset` — Synthetic Data Generator
 
-This module contains the main script for generating synthetic read and haplotype data used in benchmarking.
+The `dataset` package generates synthetic haplotypes and sequencing reads for benchmarking and regression tests.
+
+The main entry point is:
+
+- `dataset/simulate.py` (module: `dataset.simulate`)
 
 ---
 
-### 📄 `simulate.py`
+## `python -m dataset.simulate`
 
-Generates random haplotypes and sequencing reads for diploid or polyploid organisms with configurable parameters.
+Generate a synthetic dataset (diploid or polyploid) and write it to disk.
 
-#### Usage
+### Parameters
 
-```bash
-python dataset/simulate.py [options]
-```
+- `-p, --ploidy` (int, required): number of haplotypes (2 = diploid)
+- `-n, --num-variants` (int, required): number of variant sites
+- `-r, --num-reads` (int, required): number of reads/fragments
+- `-l, --read-length` (int, required): length of each read (in variant sites, not bp)
+- `-e, --error-rate` (float): flip probability for an observed allele (default `0.01`)
+- `-m, --missing-rate` (float): probability that an allele is missing (`-1`) (default `0.0`)
+- `--maf-alpha`, `--maf-beta` (float): Beta distribution parameters for minor allele frequency (default `1.0, 1.0`)
+- `--allow-monomorphic`: allow sites that are always 0 or always 1
+- `--seed` (int): random seed for reproducibility
+- `-o, --output-prefix` (str, required): output prefix (directory will be created if needed)
 
-#### Options
+### Output files
 
-| Option                 | Type  | Default | Description                                                        |
-| ---------------------- | ----- | ------- | ------------------------------------------------------------------ |
-| `-p`, `--ploidy`       | int   | 2       | Number of haplotypes (e.g., 2 for diploid, ≥3 for polyploid)       |
-| `-n`, `--num-variants` | int   | 1000    | Number of variant positions                                        |
-| `-r`, `--num-reads`    | int   | 5000    | Number of sequencing reads                                         |
-| `-l`, `--read-length`  | int   | 50      | Length of each read                                                |
-| `-e`, `--error-rate`   | float | 0.01    | Per-base sequencing error rate                                     |
-| `-m`, `--missing-rate` | float | 0.05    | Fraction of missing bases per read                                 |
-| `--maf-alpha`          | float | 0.4     | Alpha parameter of Beta distribution for allele frequency sampling |
-| `--maf-beta`           | float | 0.4     | Beta parameter of Beta distribution for allele frequency sampling  |
-| `--allow-monomorphic`  | flag  | False   | If set, allows non-polymorphic sites (otherwise filters them out)  |
-| `-s`, `--seed`         | int   | 42      | Random seed for reproducibility                                    |
-| `-o`, `--output`       | str   | —       | Output path prefix (no extension)                                  |
+For all ploidies:
 
-#### Output Files
+- `{prefix}.haplotypes.tsv` — ground truth haplotypes
+- `{prefix}.reads.sparse.tsv` — sparse read fragments (`read_id \t idx:allele \t idx:allele ...`)
+- `{prefix}.reads.npz` — dense reads matrix for algorithm drivers
 
-Given an output prefix like `sim_data`, it generates:
+For **diploid only** (`--ploidy 2`), additionally:
 
-* `sim_data.haplotypes.tsv`: ground-truth haplotypes (ploidy × variants)
-* `sim_data.reads.sparse.tsv`: sparse-format read matrix
-* `sim_data.truth.assignments.tsv`: true read-to-haplotype mapping
+- `{prefix}.vcf` — a minimal, single-sample VCF with **unphased GT** derived from truth haplotypes
+  - Homozygous sites: `0/0` or `1/1`
+  - Heterozygous sites: `0/1`
 
-#### Example
+### Example
 
 ```bash
-python dataset/simulate.py \
-    -p 4 \
-    -n 800 \
-    -r 6000 \
-    -l 40 \
-    -e 0.02 \
-    -m 0.05 \
-    --maf-alpha 0.3 \
-    --maf-beta 0.5 \
-    --allow-monomorphic \
-    -s 123 \
-    -o dataset/sim_poly_example
+python -m dataset.simulate       -p 2 -n 100 -r 50 -l 30       -e 0.01 -m 0.0       --seed 0       -o output/demo
 ```
 
-This would generate a polyploid dataset with 4 haplotypes, 800 SNPs, and 6000 noisy reads.
+---
+
+## Notes on formats
+
+- The `.reads.npz` file stores:
+  - `reads`: an `R x N` dense matrix with values `{0, 1, -1}` (`-1` = missing)
+  - `positions`: an `R x N` matrix of variant positions
+    - For simulated data, this is typically a tiled `0..N-1` index grid.
+    - Some drivers (e.g., WhatsHap VCF-mode) may override this to preserve original VCF coordinates after subsetting.

@@ -37,10 +37,12 @@ whatshap/__init__.py
 whatshap/blocks.py
 whatshap/coverage.py
 whatshap/graph.py
+whatshap/pedigree.py
 whatshap/priorityqueue.pyi
 whatshap/readselect.pyi
 whatshap/utils.py
 whatshap/variant.py
+whatshap/vcf.py
 whcore.egg-info/PKG-INFO
 whcore.egg-info/SOURCES.txt
 whcore.egg-info/dependency_links.txt

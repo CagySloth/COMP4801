@@ -92,31 +92,23 @@ def test_vcf_mode_end_to_end(tmp_path: Path) -> None:
     assert in_npz.exists(), f"Simulator did not write reads NPZ: {in_npz}"
     assert truth_tsv.exists(), f"Simulator did not write truth haplotypes TSV: {truth_tsv}"
 
-    # 2) Phase in VCF-mode
+    # 2) Phase in VCF-mode (PedigreeDPTable default)
     subprocess.check_call(
         [
             "python",
             "-m",
-            "dataset.simulate",
-            "-p",
-            "2",
-            "-n",
-            "100",
-            "-r",
-            "50",
-            "-l",
-            "30",
-            "-e",
-            "0.01",
-            "-m",
-            "0.0",
-            "--seed",
-            "0",
-            "-o",
-            str(prefix),
+            "algorithms.cli.phase",
+            "diploid-whats",
+            "-i",
+            str(in_npz),
+            "--vcf",
+            str(in_vcf),
+            "--output-prefix",
+            str(out_prefix),
+            "--solver",
+            "whatshap",
         ]
     )
-
 
     out_vcf = Path(str(out_prefix) + ".phased.vcf")
     pred_tsv = Path(str(out_prefix) + ".haplotypes.tsv")

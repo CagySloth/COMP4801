@@ -1,71 +1,91 @@
-## 📂 `algorithms/cli` – Command-Line Interfaces
+## 📂 `algorithms/cli` — Command-line interfaces
 
-This module provides scriptable CLI entry points for phasing and data format conversion, enabling reproducible pipelines and benchmark integration.
+This repo exposes a small set of CLIs to make simulation, conversion, phasing, and benchmarking reproducible.
 
----
+All commands can be run as modules (recommended):
 
-### 📄 `phase.py`
-
-Runs a specified phasing algorithm on an input `.npz` read file and outputs predicted haplotypes and assignments.
-
-#### Usage
-
-```bash
-python -m algorithms.cli.phase [ALGORITHM] -i reads.npz -o output_prefix [options]
-```
-
-#### Positional Arguments
-
-| Argument    | Description                                                                                       |
-| ----------- | ------------------------------------------------------------------------------------------------- |
-| `ALGORITHM` | Algorithm name. Must be one of: `diploid_em`, `diploid_mst`, `polyploid_em`, `polyploid_spectral` |
-
-#### Options
-
-| Option           | Type | Default              | Description                           |
-| ---------------- | ---- | -------------------- | ------------------------------------- |
-| `-i`, `--input`  | str  | —                    | Path to input `.npz` read file        |
-| `-o`, `--output` | str  | —                    | Prefix for output files               |
-| `-k`, `--ploidy` | int  | *Only for polyploid* | Number of haplotypes (polyploid only) |
-
-#### Outputs
-
-* `output_prefix.haplotypes.tsv` — predicted haplotypes
-* `output_prefix.assignments.tsv` — read-to-haplotype assignments
-
-#### Example
-
-```bash
-python -m algorithms.cli.phase diploid_em -i data/example.reads.npz -o results/em_run
-```
+- `python -m dataset.simulate`
+- `python -m algorithms.cli.convert`
+- `python -m algorithms.cli.phase`
+- `python -m benchmark.benchmark_runner`
+- `python -m benchmark.benchmark_accuracy`
 
 ---
 
-### 📄 `convert.py`
+## `python -m algorithms.cli.phase`
 
-Convert between `.tsv` and `.npz` read data formats.
+Run one phasing algorithm on a `.reads.npz` file.
 
-#### Usage
+### Subcommands
+
+- `diploid-em`
+- `diploid-mst`
+- `diploid-whats`
+- `polyploid-em`
+- `polyploid-spectral`
+
+### Common arguments
+
+- `-i, --input` (required): input `.reads.npz`
+- `--output-prefix` (required): prefix for outputs
+- `--max-coverage`: (supported by some algorithms; relevant for WhatsHap read selection)
+
+### Outputs
+
+Each run typically writes:
+
+- `{output-prefix}.haplotypes.tsv`
+- `{output-prefix}.assignments.tsv`
+- `{output-prefix}.summary.json` (when supported)
+
+---
+
+## `diploid-whats` (vendored WhatsHap)
+
+### Matrix-mode (no VCF)
 
 ```bash
-python -m algorithms.cli.convert -i input_file [--to-tsv output.tsv | --to-npz output.npz]
+python -m algorithms.cli.phase diploid-whats       -i output/demo.reads.npz       --output-prefix output/demo_whats
 ```
 
-#### Options
+Notes:
+- This mode does not write a VCF.
+- Internally it still performs read selection, then phases using `HapChatCore`.
 
-| Option          | Type | Description                                     |
-| --------------- | ---- | ----------------------------------------------- |
-| `-i`, `--input` | str  | Path to the input file (`.tsv` or `.npz`)       |
-| `--to-tsv`      | str  | Output path for `.tsv` format (dense or sparse) |
-| `--to-npz`      | str  | Output path for `.npz` format                   |
-
-#### Notes
-
-* If input is `.tsv`, this will save as `.npz`
-* If input is `.npz`, it will save as `.reads.sparse.tsv`
-
-#### Example
+### VCF-mode
 
 ```bash
-python -m algorithms.cli.convert -i data/example.reads.sparse.tsv --to-npz data/example.reads.npz
+python -m algorithms.cli.phase diploid-whats       -i output/demo.reads.npz       --vcf output/demo.vcf       --output-prefix output/demo_phased       --solver whatshap
+```
+
+VCF-mode options:
+
+- `--vcf PATH`: enable VCF-mode (phase only heterozygous variants from GT)
+- `--sample NAME`: which sample column in the VCF to use (default: first sample)
+- `--output-vcf PATH`: output VCF path (default: `<output-prefix>.phased.vcf`)
+- `--solver {whatshap,hapchat}`:
+  - `whatshap` → PedigreeDPTable (default WhatsHap)
+  - `hapchat` → HapChatCore
+- `--recomb-rate FLOAT`: recombination rate (cM/Mb) used to compute recombination costs (PedigreeDPTable path)
+
+---
+
+## `python -m algorithms.cli.convert`
+
+Convert between sparse TSV and dense NPZ read formats.
+
+### Usage
+
+```bash
+python -m algorithms.cli.convert <input.{tsv|npz}> --output <output.{npz|tsv}>
+```
+
+Examples:
+
+```bash
+# sparse TSV -> NPZ
+python -m algorithms.cli.convert output/demo.reads.sparse.tsv --output output/demo.reads.npz
+
+# NPZ -> sparse TSV
+python -m algorithms.cli.convert output/demo.reads.npz --output output/demo.reads.sparse.tsv
 ```

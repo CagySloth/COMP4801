@@ -76,6 +76,11 @@ def main():
     dip_wh.add_argument("--vcf", help="Input VCF with (unphased) genotypes. If set, only heterozygous sites are phased and homozygous sites are fixed by GT.")
     dip_wh.add_argument("--sample", help="Sample name in VCF (default: first sample).")
     dip_wh.add_argument("--output-vcf", help="Output phased VCF path (default: <output-prefix>.phased.vcf).")
+    dip_wh.add_argument("--solver", choices=["whatshap","hapchat"], default="whatshap",
+                    help="Solver used by diploid-whats when --vcf is provided. whatshap=PedigreeDPTable (default WhatsHap), hapchat=HapChatCore.")
+    dip_wh.add_argument("--recomb-rate", type=float, default=1.26,
+                    help="Recombination rate (cM/Mb) for PedigreeDPTable (UniformRecombinationCostComputer).")
+
     dip_wh.set_defaults(func=diploid_whats_main)
 
     args = parser.parse_args()
