@@ -1,7 +1,9 @@
 import numpy as np
 
 from algorithms.io.reads_data import ReadsData
-from whatshap import core
+from algorithms.vendor.whatshap_vendor import import_whatshap_vendor
+
+_, core, _ = import_whatshap_vendor()
 
 
 def build_readset_from_readsdata(

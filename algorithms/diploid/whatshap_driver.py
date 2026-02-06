@@ -2,7 +2,9 @@ import os
 import argparse
 import time
 import numpy as np
-import whatshap as wh
+
+from algorithms.vendor.whatshap_vendor import import_whatshap_vendor
+wh, core, readselect = import_whatshap_vendor()
 
 from algorithms.io.reads_data import ReadsData
 from algorithms.io.writer import (
@@ -12,7 +14,6 @@ from algorithms.io.writer import (
 )
 
 from algorithms.diploid.whatshap_adapter import build_readset_from_readsdata
-from whatshap import core, readselect
 
 
 def _read_vcf_gt_list(vcf_path: str, sample: str | None = None):

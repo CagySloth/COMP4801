@@ -21,6 +21,11 @@ def polyploid_spectral_main(args):
 def diploid_whats_main(args):
     from algorithms.diploid import whatshap_driver
     whatshap_driver.main(args)
+    
+def diploid_whats_bam_main(args):
+    from algorithms.diploid import whatshap_bam_driver
+    whatshap_bam_driver.main(args)
+
 
 def main():
     parser = argparse.ArgumentParser(description="Unified CLI for phasing algorithms")
@@ -82,6 +87,20 @@ def main():
                     help="Recombination rate (cM/Mb) for PedigreeDPTable (UniformRecombinationCostComputer).")
 
     dip_wh.set_defaults(func=diploid_whats_main)
+    
+    dip_wh_bam = subparsers.add_parser("diploid-whats-bam", help="Diploid phasing from BAM+VCF using vendored WhatsHap core")
+    dip_wh_bam.add_argument("--bam", required=True, help="Input BAM (sorted, indexed)")
+    dip_wh_bam.add_argument("--vcf", required=True, help="Input VCF/VCF.GZ (called, unphased)")
+    dip_wh_bam.add_argument("--output-prefix", required=True, help="Prefix for output files")
+    dip_wh_bam.add_argument("--sample", help="Sample name in VCF (default: first sample).")
+    dip_wh_bam.add_argument("--output-vcf", help="Output phased VCF path (default: <output-prefix>.phased.vcf).")
+    dip_wh_bam.add_argument("--max-coverage", type=int, default=15)
+    dip_wh_bam.add_argument("--solver", choices=["whatshap", "hapchat"], default="whatshap")
+    dip_wh_bam.add_argument("--recomb-rate", type=float, default=1.26)
+    dip_wh_bam.add_argument("--min-mapq", type=int, default=20)
+    dip_wh_bam.add_argument("--min-baseq", type=int, default=20)
+    dip_wh_bam.set_defaults(func=diploid_whats_bam_main)
+
 
     args = parser.parse_args()
     args.func(args)
