@@ -144,7 +144,7 @@ def main(args=None):
     _run(["bcftools", "view", "-Oz", "-o", truth_vcfgz, truth_vcf])
     _run(["bcftools", "index", "-t", truth_vcfgz])
 
-    # Step 3: reads (perfect reads for now)
+    # Step 3: reads (ONT-like)
     _run([
         py, "-m", "dataset.longread.readsim",
         "--hap1", hap1,
@@ -155,7 +155,22 @@ def main(args=None):
         "--min-len", str(args.min_len),
         "--max-len", str(args.max_len),
         "--hap1-frac", "0.5",
+        "--platform", "ont",
+        "--ont-profile", "classic",
     ])
+
+    # # Step 3: reads (perfect reads for now)
+    # _run([
+    #     py, "-m", "dataset.longread.readsim",
+    #     "--hap1", hap1,
+    #     "--hap2", hap2,
+    #     "-o", str(prefix),
+    #     "--seed", str(args.seed),
+    #     "--num-reads", str(args.num_reads),
+    #     "--min-len", str(args.min_len),
+    #     "--max-len", str(args.max_len),
+    #     "--hap1-frac", "0.5",
+    # ])
 
     # Step 4: align -> BAM
     _piped(
