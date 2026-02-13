@@ -2,7 +2,7 @@
 
 This package contains diploid and polyploid phasing implementations and their shared adapters/utilities.
 
-The easiest way to run algorithms is via the CLI:
+Run algorithms via the CLI:
 
 ```bash
 python -m algorithms.cli.phase <subcommand> ...
@@ -14,22 +14,21 @@ python -m algorithms.cli.phase <subcommand> ...
 
 ### `diploid-em` — Expectation Maximization
 
-- Probabilistic assignment of reads to two haplotypes.
-- Useful baseline for accuracy vs. runtime tradeoffs.
-
 ```bash
-python -m algorithms.cli.phase diploid-em       -i input.reads.npz       --output-prefix output/dip_em
+python -m algorithms.cli.phase diploid-em \
+  -i input.reads.npz \
+  --output-prefix output/dip_em
 ```
 
 ### `diploid-mst` — Minimum Spanning Tree (graph-based)
 
-- Builds a variant graph from co-occurrence on reads and derives a phasing via spanning-tree logic.
-
 ```bash
-python -m algorithms.cli.phase diploid-mst       -i input.reads.npz       --output-prefix output/dip_mst
+python -m algorithms.cli.phase diploid-mst \
+  -i input.reads.npz \
+  --output-prefix output/dip_mst
 ```
 
-### `diploid-whats` — Vendored WhatsHap core
+### `diploid-whats` — Vendored WhatsHap core (matrix / VCF-mode)
 
 This integrates a vendored WhatsHap core (`vendor/whatshap_core`) and supports two modes:
 
@@ -49,14 +48,35 @@ This integrates a vendored WhatsHap core (`vendor/whatshap_core`) and supports t
 Example:
 
 ```bash
-python -m algorithms.cli.phase diploid-whats       -i output/demo.reads.npz       --vcf output/demo.vcf       --output-prefix output/demo_phased       --solver whatshap
+python -m algorithms.cli.phase diploid-whats \
+  -i output/demo.reads.npz \
+  --vcf output/demo.vcf \
+  --output-prefix output/demo_phased \
+  --solver whatshap
 ```
 
-WhatsHap-style details implemented in this repo:
+### `diploid-whats-bam` — WhatsHap-like BAM + VCF phasing
 
-- **Read selection** via `whatshap.readselect.readselection(max_coverage=...)`
-- **Phase sets (PS)** computed from connected components of the selected read graph  
-  (PS is reported as **leftmost variant index + 1**).
+This mode is designed to mimic a more practical WhatsHap workflow:
+
+- Input: **BAM** (aligned reads) + **VCF** (called variants with GT)
+- Internally extracts allele observations from BAM at VCF sites, then runs:
+  - read selection
+  - solver (vendored WhatsHap core)
+- Output: phased VCF + summary JSON
+
+Example:
+
+```bash
+python -m algorithms.cli.phase diploid-whats-bam \
+  --bam output/lr_demo.bam \
+  --vcf output/lr_demo.called.vcf.gz \
+  --output-prefix output/lr_demo.ws \
+  --output-vcf output/lr_demo.ws.phased.vcf \
+  --max-coverage 15 \
+  --min-mapq 20 \
+  --min-baseq 20
+```
 
 ---
 
@@ -64,16 +84,18 @@ WhatsHap-style details implemented in this repo:
 
 ### `polyploid-em`
 
-- EM-style baseline extended to `k` haplotypes.
-
 ```bash
-python -m algorithms.cli.phase polyploid-em       -i input.reads.npz       --ploidy 4       --output-prefix output/poly_em
+python -m algorithms.cli.phase polyploid-em \
+  -i input.reads.npz \
+  --ploidy 4 \
+  --output-prefix output/poly_em
 ```
 
 ### `polyploid-spectral`
 
-- Spectral / matrix-factorization inspired approach for polyploid phasing.
-
 ```bash
-python -m algorithms.cli.phase polyploid-spectral       -i input.reads.npz       --ploidy 4       --output-prefix output/poly_spec
+python -m algorithms.cli.phase polyploid-spectral \
+  -i input.reads.npz \
+  --ploidy 4 \
+  --output-prefix output/poly_spec
 ```

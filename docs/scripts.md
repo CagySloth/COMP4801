@@ -3,27 +3,11 @@
 This directory contains shell scripts intended as *convenience wrappers*.
 
 Some scripts may be older examples and might require editing to match the latest CLI/module names.
-When in doubt, prefer the module commands shown in the README:
-
-- `python -m dataset.simulate`
-- `python -m algorithms.cli.phase`
-- `python -m benchmark.benchmark_runner`
+When in doubt, prefer the module commands shown in the README and docs.
 
 ---
 
-## `simulate.sh`
-
-A thin wrapper over the simulator:
-
-```bash
-./scripts/simulate.sh -p 2 -n 200 -r 200 -l 60 -o output/demo
-```
-
----
-
-## Recommended “pipeline” snippet
-
-If you want an end-to-end run in bash, this is the most up-to-date shape:
+## Matrix track: recommended snippet
 
 ```bash
 PREFIX=output/demo
@@ -41,3 +25,19 @@ python -m benchmark.benchmark_accuracy \
   --pred  "${PREFIX}_phased.haplotypes.tsv" \
   --output "${PREFIX}_phased.accuracy.json"
 ```
+
+---
+
+## Long-read track: recommended automation
+
+The most up-to-date way to run the long-read end-to-end pipeline is:
+
+```bash
+python -m benchmark.longread_pipeline_runner \
+  --prefix output/lr_demo \
+  --seed 0
+```
+
+This runs Steps 1–7 and writes a pipeline report JSON alongside all intermediate artifacts.
+
+If you prefer the manual steps, see `docs/longread_pipeline.md`.

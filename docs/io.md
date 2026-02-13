@@ -1,10 +1,10 @@
 ## 📂 `algorithms/io` — Input/Output utilities
 
-This package standardizes how simulated data and algorithm outputs are stored and loaded.
+This package standardizes how simulated data and algorithm outputs are stored and loaded for the **matrix track**.
 
 ---
 
-## Read formats
+## Matrix-track read formats
 
 ### Sparse TSV (`*.reads.sparse.tsv`)
 
@@ -30,32 +30,15 @@ A compressed numpy archive containing:
 
 - `reads`: `R x N` matrix with values `{0, 1, -1}` (`-1` = missing)
 - `positions`: `R x N` matrix of positions
-  - For simulated data this is usually a tiled `0..N-1`.
-  - Some drivers may override it (e.g., WhatsHap VCF-mode preserves original indices after subsetting).
+  - For simulated matrix data this is usually a tiled `0..N-1`.
 
 The helper class `ReadsData` wraps these matrices.
 
 ---
 
-## Key modules
+## Matrix-track outputs
 
-- `parser.py`
-  - `parse_sparse_tsv(path)` → list of sparse fragments
-  - `parse_dense_tsv(path)` → dense matrix
-  - `load_reads(path)` → `ReadsData` from `.npz` or `.tsv`
-- `reads_data.py`
-  - `ReadsData.from_fragments(fragments, num_variants=...)`
-  - `ReadsData.from_npz(path)`
-  - `ReadsData.to_npz(path)`
-  - `ReadsData.to_sparse_tsv(path)`
-- `writer.py`
-  - `write_haplotypes_tsv(path, haplotypes)`
-  - `write_assignments_tsv(path, assignments)`
-  - `write_summary_json(path, summary)`
-
----
-
-## Haplotype TSV (`*.haplotypes.tsv`)
+### Haplotype TSV (`*.haplotypes.tsv`)
 
 Two common shapes:
 
@@ -63,3 +46,24 @@ Two common shapes:
 - Polyploid: `k` lines
 
 The benchmark scorer expects dense `0/1` strings for each haplotype line.
+
+### Assignments TSV (`*.assignments.tsv`)
+
+Algorithm-dependent read → haplotype assignments (mainly for debugging/analysis).
+
+### Summary JSON (`*.summary.json`)
+
+Algorithm metadata (runtime breakdowns, selected reads, solver name, etc.).
+
+---
+
+## Long-read pipeline I/O (not handled by `algorithms/io`)
+
+The long-read track uses standard genomics formats:
+
+- Reference: `*.ref.fasta`
+- Haplotypes: `*.hap1.fasta`, `*.hap2.fasta`
+- Reads: `*.reads.fastq`
+- Alignments: `*.bam` (+ `.bai`)
+- Variants: `*.truth.vcf(.gz)`, `*.called.vcf.gz`
+- Phasing output: `*.phased.vcf`
