@@ -6,6 +6,44 @@ import numpy as np
 _BASES = np.array(list("ACGT"), dtype="<U1")
 
 
+def _intervals_overlap(a: tuple[int, int], b: tuple[int, int]) -> bool:
+    return a[0] < b[1] and a[1] > b[0]
+
+
+def _make_dropout_intervals(
+    rng: np.random.Generator,
+    genome_len: int,
+    dropout_fraction: float,
+    block_len: int,
+    max_tries: int = 5000,
+) -> list[tuple[int, int]]:
+    """Create non-overlapping dropout blocks totaling ~dropout_fraction of the genome."""
+    if dropout_fraction <= 0:
+        return []
+    if not (0.0 < dropout_fraction < 1.0):
+        raise ValueError("dropout_fraction must be in (0,1)")
+    block_len = int(block_len)
+    if block_len <= 0 or block_len > genome_len:
+        raise ValueError("invalid dropout block length")
+
+    target = int(round(genome_len * dropout_fraction))
+    n_blocks = max(1, target // block_len)
+
+    occupied: list[tuple[int, int]] = []
+    for _ in range(n_blocks):
+        for _t in range(max_tries):
+            start = int(rng.integers(0, genome_len - block_len + 1))
+            cand = (start, start + block_len)
+            if any(_intervals_overlap(cand, x) for x in occupied):
+                continue
+            occupied.append(cand)
+            break
+        else:
+            raise RuntimeError("Could not place dropout blocks; try reducing dropout_fraction or block_len")
+
+    return sorted(occupied)
+
+
 def read_single_fasta(path: Path) -> tuple[str, str]:
     name = None
     seq_parts = []
@@ -182,6 +220,14 @@ def main(args=None) -> None:
     parser.add_argument("--q-end-drop", type=float, default=4.0)
     parser.add_argument("--q-sub-penalty", type=float, default=3.0)
     parser.add_argument("--q-indel-penalty", type=float, default=4.0)
+    
+    parser.add_argument("--len-model", choices=["uniform", "lognormal"], default="uniform")
+    parser.add_argument("--ln-mean", type=float, default=8.3)
+    parser.add_argument("--ln-sigma", type=float, default=0.6)
+
+    parser.add_argument("--start-model", choices=["uniform", "dropout"], default="uniform")
+    parser.add_argument("--dropout-fraction", type=float, default=0.0)
+    parser.add_argument("--dropout-block-len", type=int, default=1000)
 
     if args is None:
         args = parser.parse_args()
@@ -208,6 +254,15 @@ def main(args=None) -> None:
     max_len = int(args.max_len)
     if min_len < 1 or max_len < min_len:
         raise ValueError("invalid min/max len")
+    
+    dropout_intervals: list[tuple[int, int]] = []
+    if args.start_model == "dropout":
+        dropout_intervals = _make_dropout_intervals(
+            rng,
+            genome_len=L,
+            dropout_fraction=float(args.dropout_fraction),
+            block_len=int(args.dropout_block_len),
+        )
 
     if args.platform == "perfect":
         qual_char = str(args.qual_char)
@@ -240,11 +295,36 @@ def main(args=None) -> None:
             hap = 1 if (rng.random() < hap1_frac) else 2
             hap_seq = seq1 if hap == 1 else seq2
 
-            rlen = int(rng.integers(min_len, max_len + 1))
+            # --- length sampling ---
+            if args.len_model == "uniform":
+                rlen = int(rng.integers(min_len, max_len + 1))
+            else:
+                raw = float(rng.lognormal(mean=float(args.ln_mean), sigma=float(args.ln_sigma)))
+                rlen = int(round(raw))
+                if rlen < min_len:
+                    rlen = min_len
+                if rlen > max_len:
+                    rlen = max_len
             if rlen > L:
                 rlen = L
 
-            start0 = int(rng.integers(0, L - rlen + 1))
+            # --- start sampling ---
+            if not dropout_intervals:
+                start0 = int(rng.integers(0, L - rlen + 1))
+            else:
+                max_tries = 20000
+                for _t in range(max_tries):
+                    start0 = int(rng.integers(0, L - rlen + 1))
+                    read_iv = (start0, start0 + rlen)
+                    if any(_intervals_overlap(read_iv, d) for d in dropout_intervals):
+                        continue
+                    break
+                else:
+                    raise RuntimeError(
+                        "Could not sample a read start outside dropout intervals. "
+                        "Try lowering --dropout-fraction, using shorter reads, or increasing genome length."
+                    )
+
             read_seq_ref = hap_seq[start0 : start0 + rlen]
 
             read_id = f"r{i}_hap{hap}_{contig1}:{start0}-{start0+rlen}"
@@ -279,6 +359,27 @@ def main(args=None) -> None:
         total_err = sub_rate + ins_rate + del_rate
         print(f"ℹ️  ONT profile={args.ont_profile} sub/ins/del={sub_rate:.4f}/{ins_rate:.4f}/{del_rate:.4f} (total≈{total_err:.4f})")
 
+    out_meta = Path(str(prefix) + ".reads.meta.json")
+    meta = {
+        "seed": args.seed,
+        "platform": str(args.platform),
+        "ont_profile": str(args.ont_profile) if args.platform == "ont" else None,
+        "num_reads": int(args.num_reads),
+        "len_model": str(args.len_model),
+        "min_len": int(args.min_len),
+        "max_len": int(args.max_len),
+        "ln_mean": float(args.ln_mean) if args.len_model == "lognormal" else None,
+        "ln_sigma": float(args.ln_sigma) if args.len_model == "lognormal" else None,
+        "start_model": str(args.start_model),
+        "dropout_fraction": float(args.dropout_fraction) if args.start_model == "dropout" else 0.0,
+        "dropout_block_len": int(args.dropout_block_len) if args.start_model == "dropout" else None,
+        "dropout_intervals": [{"start0": s, "end0": e} for (s, e) in dropout_intervals],
+        "coord_note": "All intervals are 0-based half-open [start0,end0).",
+    }
+    import json
+    with open(out_meta, "w") as f:
+        json.dump(meta, f, indent=2)
+    print(f"✅ Read meta JSON written: {out_meta}")
 
 if __name__ == "__main__":
     main()

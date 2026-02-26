@@ -139,8 +139,14 @@ def _write_phased_vcf(in_vcf: str, out_vcf: str, phased_gt: List[str], ps: List[
                 sval.append(".")
 
             d = dict(zip(fmt, sval))
-            d["GT"] = phased_gt[rec_i]
-            d["PS"] = ps[rec_i]
+            if rec_i < len(phased_gt):
+                d["GT"] = phased_gt[rec_i]
+                d["PS"] = ps[rec_i]
+            else:
+                # If this record was not part of phasing (e.g., filtered out earlier),
+                # keep original GT and write PS as '.'
+                d["GT"] = d.get("GT", "./.")
+                d["PS"] = "."
 
             fields[8] = ":".join(fmt)
             fields[sample_col] = ":".join(d.get(k, ".") for k in fmt)
