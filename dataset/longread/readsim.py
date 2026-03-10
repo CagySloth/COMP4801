@@ -44,6 +44,17 @@ def _make_dropout_intervals(
     return sorted(occupied)
 
 
+def _sample_bursts(rng, rlen: int, burst_count: int, burst_len: int):
+    burst_len = min(int(burst_len), rlen)
+    out = []
+    if burst_len <= 0:
+        return out
+    for _ in range(int(burst_count)):
+        start = int(rng.integers(0, max(1, rlen - burst_len + 1)))
+        out.append((start, start + burst_len))
+    return out
+
+
 def read_single_fasta(path: Path) -> tuple[str, str]:
     name = None
     seq_parts = []
@@ -111,6 +122,8 @@ def simulate_ont_read(
     q_end_drop: float,
     q_sub_penalty: float,
     q_indel_penalty: float,
+    bursts: list[tuple[int, int]] | None = None,
+    burst_mult: float = 1.0,
 ) -> tuple[str, str, int, int, int]:
     """
     A simple ONT-like error model:
@@ -141,9 +154,22 @@ def simulate_ont_read(
             run += 1
         hp = run >= homopolymer_len
 
+        # base indel rates, including homopolymer bias
         ins_p = ins_rate * (homopolymer_factor if hp else 1.0)
         del_p = del_rate * (homopolymer_factor if hp else 1.0)
 
+        # burst multiplier (correlated high-error segments)
+        mult = 1.0
+        if bursts:
+            for a, b in bursts:
+                if a <= i < b:
+                    mult = float(burst_mult)
+                    break
+
+        ins_p *= mult
+        del_p *= mult
+        sub_p = sub_rate * mult
+        
         frac = (i / (L - 1)) if L > 1 else 0.5
 
         # 1) insertions BEFORE this base (geometric-ish with cap)
@@ -167,7 +193,7 @@ def simulate_ont_read(
 
         # 3) substitution (or match)
         q = _sample_q(frac, rng, q_mean, q_std, q_end_drop)
-        if rng.random() < sub_rate:
+        if rng.random() < sub_p:
             base2 = _mutate_base(base, rng)
             q -= q_sub_penalty
             n_sub += 1
@@ -228,6 +254,16 @@ def main(args=None) -> None:
     parser.add_argument("--start-model", choices=["uniform", "dropout"], default="uniform")
     parser.add_argument("--dropout-fraction", type=float, default=0.0)
     parser.add_argument("--dropout-block-len", type=int, default=1000)
+    
+    # Correlated error bursts
+    parser.add_argument("--burst-prob", type=float, default=0.0,
+                        help="Probability a read contains one or more high-error bursts (0 disables).")
+    parser.add_argument("--burst-count", type=int, default=1,
+                        help="Number of bursts per affected read.")
+    parser.add_argument("--burst-len", type=int, default=200,
+                        help="Length of each burst segment (bp).")
+    parser.add_argument("--burst-mult", type=float, default=5.0,
+                        help="Multiply sub/ins/del rates inside bursts by this factor.")
 
     if args is None:
         args = parser.parse_args()
@@ -236,10 +272,10 @@ def main(args=None) -> None:
 
     contig1, seq1 = read_single_fasta(Path(args.hap1))
     contig2, seq2 = read_single_fasta(Path(args.hap2))
-    if len(seq1) != len(seq2):
-        raise ValueError("hap1 and hap2 must have same length")
-
-    L = len(seq1)
+    
+    L1 = len(seq1)
+    L2 = len(seq2)
+    
     prefix = Path(args.output_prefix)
     prefix.parent.mkdir(parents=True, exist_ok=True)
 
@@ -255,15 +291,22 @@ def main(args=None) -> None:
     if min_len < 1 or max_len < min_len:
         raise ValueError("invalid min/max len")
     
-    dropout_intervals: list[tuple[int, int]] = []
+    dropout_intervals1: list[tuple[int, int]] = []
+    dropout_intervals2: list[tuple[int, int]] = []
     if args.start_model == "dropout":
-        dropout_intervals = _make_dropout_intervals(
+        dropout_intervals1 = _make_dropout_intervals(
             rng,
-            genome_len=L,
+            genome_len=L1,
             dropout_fraction=float(args.dropout_fraction),
             block_len=int(args.dropout_block_len),
         )
-
+        dropout_intervals2 = _make_dropout_intervals(
+            rng,
+            genome_len=L2,
+            dropout_fraction=float(args.dropout_fraction),
+            block_len=int(args.dropout_block_len),
+        )
+        
     if args.platform == "perfect":
         qual_char = str(args.qual_char)
         if len(qual_char) != 1:
@@ -294,7 +337,10 @@ def main(args=None) -> None:
         for i in range(int(args.num_reads)):
             hap = 1 if (rng.random() < hap1_frac) else 2
             hap_seq = seq1 if hap == 1 else seq2
-
+            contig = contig1 if hap == 1 else contig2
+            L = len(hap_seq)
+            dropout_intervals = dropout_intervals1 if hap == 1 else dropout_intervals2
+            
             # --- length sampling ---
             if args.len_model == "uniform":
                 rlen = int(rng.integers(min_len, max_len + 1))
@@ -327,13 +373,16 @@ def main(args=None) -> None:
 
             read_seq_ref = hap_seq[start0 : start0 + rlen]
 
-            read_id = f"r{i}_hap{hap}_{contig1}:{start0}-{start0+rlen}"
-
+            read_id = f"r{i}_hap{hap}_{contig}:{start0}-{start0+rlen}"
+            
             if args.platform == "perfect":
                 read_seq = read_seq_ref
                 qual = str(args.qual_char) * len(read_seq)
                 subs = ins = dels = 0
             else:
+                bursts = None
+                if float(args.burst_prob) > 0 and rng.random() < float(args.burst_prob):
+                    bursts = _sample_bursts(rng, rlen, int(args.burst_count), int(args.burst_len))
                 read_seq, qual, subs, ins, dels = simulate_ont_read(
                     read_seq_ref,
                     rng,
@@ -348,11 +397,13 @@ def main(args=None) -> None:
                     q_end_drop=float(args.q_end_drop),
                     q_sub_penalty=float(args.q_sub_penalty),
                     q_indel_penalty=float(args.q_indel_penalty),
+                    bursts=bursts,
+                    burst_mult=float(args.burst_mult),
                 )
 
             write_fastq_record(fq, read_id, read_seq, qual)
-            tf.write(f"{read_id}\t{hap}\t{start0}\t{rlen}\t{len(read_seq)}\t{subs}\t{ins}\t{dels}\t{contig1}\n")
-
+            tf.write(f"{read_id}\t{hap}\t{start0}\t{rlen}\t{len(read_seq)}\t{subs}\t{ins}\t{dels}\t{contig}\n")
+            
     print(f"✅ FASTQ written: {out_fastq}")
     print(f"✅ Read truth TSV written: {out_truth}")
     if args.platform == "ont":
@@ -373,8 +424,12 @@ def main(args=None) -> None:
         "start_model": str(args.start_model),
         "dropout_fraction": float(args.dropout_fraction) if args.start_model == "dropout" else 0.0,
         "dropout_block_len": int(args.dropout_block_len) if args.start_model == "dropout" else None,
-        "dropout_intervals": [{"start0": s, "end0": e} for (s, e) in dropout_intervals],
-        "coord_note": "All intervals are 0-based half-open [start0,end0).",
+        "dropout_intervals_hap1": [{"start0": s, "end0": e} for (s, e) in dropout_intervals1],
+        "dropout_intervals_hap2": [{"start0": s, "end0": e} for (s, e) in dropout_intervals2],        "coord_note": "All intervals are 0-based half-open [start0,end0).",
+        "burst_prob": float(args.burst_prob),
+        "burst_count": int(args.burst_count),
+        "burst_len": int(args.burst_len),
+        "burst_mult": float(args.burst_mult),
     }
     import json
     with open(out_meta, "w") as f:

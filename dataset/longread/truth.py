@@ -114,6 +114,10 @@ def choose_alt(rng: np.random.Generator, ref: str) -> str:
     return str(rng.choice(alts))
 
 
+def rand_dna(rng: np.random.Generator, k: int) -> str:
+    return "".join(rng.choice(DNA, size=int(k)))
+
+
 def main(args=None) -> None:
     parser = argparse.ArgumentParser(
         description="Generate diploid truth (truth VCF + hap1/hap2 FASTA) from a reference FASTA."
@@ -132,6 +136,12 @@ def main(args=None) -> None:
     # Optional: avoid placing variants inside complex regions from reference meta.json
     parser.add_argument("--ref-meta", help="Reference meta JSON from Step 1 (e.g. output/demo.ref.meta.json)")
     parser.add_argument("--avoid-regions", action="store_true", help="Avoid placing SNPs inside meta regions")
+    
+    # Truth indels
+    parser.add_argument("--num-indels", type=int, default=0, help="Number of indels to inject")
+    parser.add_argument("--indel-min-len", type=int, default=1)
+    parser.add_argument("--indel-max-len", type=int, default=5)
+    parser.add_argument("--indel-het-rate", type=float, default=0.5, help="Fraction of indels that are heterozygous")
 
     # Truth phasing style
     parser.add_argument(
@@ -186,38 +196,160 @@ def main(args=None) -> None:
         is_het = (rng.random() < float(args.het_rate))
         if is_het:
             het_count += 1
-            # default: hap1=REF, hap2=ALT
             if args.random_phase and (rng.random() < 0.5):
-                hap1[pos0] = alt_base
-                hap2[pos0] = ref_base
+                allele_h1, allele_h2 = 1, 0
                 gt = "1|0" if args.phased_truth else "0/1"
             else:
-                hap1[pos0] = ref_base
-                hap2[pos0] = alt_base
+                allele_h1, allele_h2 = 0, 1
                 gt = "0|1" if args.phased_truth else "0/1"
         else:
             hom_alt_count += 1
-            hap1[pos0] = alt_base
-            hap2[pos0] = alt_base
+            allele_h1, allele_h2 = 1, 1
             gt = "1|1" if args.phased_truth else "1/1"
 
         records.append(
             {
+                "kind": "snp",
                 "chrom": contig,
-                "pos1": pos0 + 1,  # VCF is 1-based
+                "pos1": pos0 + 1,
+                "pos0": pos0,
                 "ref": ref_base,
                 "alt": alt_base,
                 "gt": gt,
-                "pos0": pos0,
+                "allele_h1": allele_h1,
+                "allele_h2": allele_h2,
             }
         )
+        
+    num_indels = int(args.num_indels)
+    indel_min = int(args.indel_min_len)
+    indel_max = int(args.indel_max_len)
+    indel_het_rate = float(args.indel_het_rate)
 
+    # occupied intervals on reference to avoid overlaps with SNPs/indels
+    occupied: list[tuple[int, int]] = [(p, p + 1) for p in positions]
+
+    def overlaps_any(a, b):
+        for s, e in occupied:
+            if a < e and b > s:
+                return True
+        return False
+
+    indel_het_count = 0
+    indel_hom_alt_count = 0
+
+    # candidate anchor positions (avoid edges for deletions)
+    cands = list(range(1, L - indel_max - 2))
+    rng.shuffle(cands)
+
+    added = 0
+    for pos0 in cands:
+        if added >= num_indels:
+            break
+
+        # choose insertion vs deletion
+        is_del = (rng.random() < 0.5)
+        k = int(rng.integers(indel_min, indel_max + 1))
+
+        if is_del:
+            # deletion uses anchor base + k deleted bases => length k+1 REF
+            if pos0 + k + 1 >= L:
+                continue
+            ref = ref_seq[pos0 : pos0 + k + 1]
+            alt = ref_seq[pos0]  # anchor only
+            iv = (pos0, pos0 + k + 1)
+        else:
+            ref = ref_seq[pos0]
+            ins = rand_dna(rng, k)
+            alt = ref + ins
+            iv = (pos0, pos0 + 1)
+
+        # enforce non-overlap with existing sites
+        if overlaps_any(iv[0], iv[1]):
+            continue
+
+        is_het = (rng.random() < indel_het_rate)
+        if is_het:
+            indel_het_count += 1
+            if args.random_phase and (rng.random() < 0.5):
+                allele_h1, allele_h2 = 1, 0
+                gt = "1|0" if args.phased_truth else "0/1"
+            else:
+                allele_h1, allele_h2 = 0, 1
+                gt = "0|1" if args.phased_truth else "0/1"
+        else:
+            indel_hom_alt_count += 1
+            allele_h1, allele_h2 = 1, 1
+            gt = "1|1" if args.phased_truth else "1/1"
+
+        records.append(
+            {
+                "kind": "indel",
+                "chrom": contig,
+                "pos1": pos0 + 1,
+                "pos0": pos0,
+                "ref": ref,
+                "alt": alt,
+                "gt": gt,
+                "allele_h1": allele_h1,
+                "allele_h2": allele_h2,
+            }
+        )
+        occupied.append(iv)
+        added += 1
+        
+    records.sort(key=lambda r: int(r["pos0"]))
+
+    hap1 = list(ref_seq)
+    hap2 = list(ref_seq)
+    off1 = 0
+    off2 = 0
+
+    for r in records:
+        pos0 = int(r["pos0"])
+        a1 = int(r.get("allele_h1", 0))
+        a2 = int(r.get("allele_h2", 0))
+
+        if r["kind"] == "snp":
+            if a1 == 1:
+                hap1[pos0 + off1] = r["alt"]
+            if a2 == 1:
+                hap2[pos0 + off2] = r["alt"]
+
+        else:  # indel
+            ref = r["ref"]
+            alt = r["alt"]
+
+            if len(ref) == 1 and len(alt) > 1:
+                # insertion after anchor
+                ins_seq = alt[1:]  # inserted bases
+                if a1 == 1:
+                    idx = pos0 + off1
+                    hap1[idx + 1:idx + 1] = list(ins_seq)
+                    off1 += len(ins_seq)
+                if a2 == 1:
+                    idx = pos0 + off2
+                    hap2[idx + 1:idx + 1] = list(ins_seq)
+                    off2 += len(ins_seq)
+
+            elif len(ref) > 1 and len(alt) == 1:
+                # deletion of len(ref)-1 bases after anchor
+                dlen = len(ref) - 1
+                if a1 == 1:
+                    idx = pos0 + off1
+                    del hap1[idx + 1: idx + 1 + dlen]
+                    off1 -= dlen
+                if a2 == 1:
+                    idx = pos0 + off2
+                    del hap2[idx + 1: idx + 1 + dlen]
+                    off2 -= dlen
+        
     # Write haplotype FASTAs
     hap1_path = Path(str(prefix) + ".hap1.fasta")
     hap2_path = Path(str(prefix) + ".hap2.fasta")
     write_fasta(hap1_path, name=f"{contig}_hap1", seq="".join(hap1))
     write_fasta(hap2_path, name=f"{contig}_hap2", seq="".join(hap2))
-
+    
     # Write truth VCF
     vcf_path = Path(str(prefix) + ".truth.vcf")
     with open(vcf_path, "w") as f:
@@ -245,6 +377,12 @@ def main(args=None) -> None:
         "avoid_regions": bool(args.avoid_regions),
         "ref_meta": str(args.ref_meta) if args.ref_meta else None,
         "coord_note": "records are 0-based internally but VCF pos is 1-based.",
+        "num_indels": int(args.num_indels),
+        "indel_min_len": int(args.indel_min_len),
+        "indel_max_len": int(args.indel_max_len),
+        "indel_het_rate": float(args.indel_het_rate),
+        "indel_het_count": int(indel_het_count),
+        "indel_hom_alt_count": int(indel_hom_alt_count),
     }
     with open(meta_path, "w") as f:
         json.dump(meta, f, indent=2)

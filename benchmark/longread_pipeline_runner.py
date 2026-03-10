@@ -179,6 +179,10 @@ def main(args=None):
     ap.add_argument("--num-snps", type=int, default=200)
     ap.add_argument("--het-rate", type=float, default=0.8)
     ap.add_argument("--avoid-regions", action="store_true")
+    ap.add_argument("--num-indels", type=int, default=0)
+    ap.add_argument("--indel-min-len", type=int, default=1)
+    ap.add_argument("--indel-max-len", type=int, default=5)
+    ap.add_argument("--indel-het-rate", type=float, default=0.5)
 
     # Reads
     ap.add_argument("--num-reads", type=int, default=200)
@@ -206,6 +210,12 @@ def main(args=None):
     ap.add_argument("--max-coverage", type=int, default=15)
     ap.add_argument("--min-mapq", type=int, default=20)
     ap.add_argument("--min-baseq", type=int, default=20)
+    
+    # Burst errors
+    ap.add_argument("--burst-prob", type=float, default=0.0)
+    ap.add_argument("--burst-count", type=int, default=1)
+    ap.add_argument("--burst-len", type=int, default=200)
+    ap.add_argument("--burst-mult", type=float, default=5.0)
 
     if args is None:
         args = ap.parse_args()
@@ -274,6 +284,10 @@ def main(args=None):
         "--het-rate", str(args.het_rate),
         "--phased-truth",
         "--random-phase",
+        "--num-indels", str(args.num_indels),
+        "--indel-min-len", str(args.indel_min_len),
+        "--indel-max-len", str(args.indel_max_len),
+        "--indel-het-rate", str(args.indel_het_rate),
     ]
     if args.avoid_regions:
         truth_cmd += ["--ref-meta", ref_meta, "--avoid-regions"]
@@ -306,12 +320,16 @@ def main(args=None):
         "--ln-mean", str(args.ln_mean),
         "--ln-sigma", str(args.ln_sigma),
         "--start-model", str(args.start_model),
+        "--burst-prob", str(args.burst_prob),
+        "--burst-count", str(args.burst_count),
+        "--burst-len", str(args.burst_len),
+        "--burst-mult", str(args.burst_mult),
     ]
     if args.platform == "ont":
         readsim_cmd += ["--ont-profile", str(args.ont_profile)]
     if args.start_model == "dropout":
         readsim_cmd += ["--dropout-fraction", str(args.dropout_fraction),
-                        "--dropout-block-len", str(args.dropout_block_len)]
+                        "--dropout-block-len", str(args.dropout_block_len)]    
     _run(readsim_cmd)
 
     # Step 4: align
@@ -444,6 +462,10 @@ def main(args=None):
             "dup_segments": int(args.dup_segments),
             "dup_len": int(args.dup_len),
             "dup_min_gap": int(args.dup_min_gap),
+            "num_indels": int(args.num_indels),
+            "indel_min_len": int(args.indel_min_len),
+            "indel_max_len": int(args.indel_max_len),
+            "indel_het_rate": float(args.indel_het_rate),
 
             "len_model": str(args.len_model),
             "ln_mean": float(args.ln_mean) if args.len_model == "lognormal" else None,
@@ -451,6 +473,11 @@ def main(args=None):
             "start_model": str(args.start_model),
             "dropout_fraction": float(args.dropout_fraction) if args.start_model == "dropout" else 0.0,
             "dropout_block_len": int(args.dropout_block_len) if args.start_model == "dropout" else None,
+            "num_indels": int(args.num_indels),
+            "burst_prob": float(args.burst_prob),
+            "burst_count": int(args.burst_count),
+            "burst_len": int(args.burst_len),
+            "burst_mult": float(args.burst_mult),
         },
         "time_total_sec": total_sec,
     }

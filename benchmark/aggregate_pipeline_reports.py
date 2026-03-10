@@ -86,6 +86,12 @@ def main():
             "start_model": get(j, "params.start_model"),
             "dropout_fraction": get(j, "params.dropout_fraction"),
             "dropout_block_len": get(j, "params.dropout_block_len"),
+            
+            # Burst errors
+            "burst_prob": get(j, "params.burst_prob"),
+            "burst_count": get(j, "params.burst_count"),
+            "burst_len": get(j, "params.burst_len"),
+            "burst_mult": get(j, "params.burst_mult"),
         }
         rows.append(row)
 
