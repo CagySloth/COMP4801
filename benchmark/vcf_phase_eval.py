@@ -26,12 +26,20 @@ def _parse_gt(gt: str) -> Tuple[Optional[int], Optional[int], bool]:
     return int(a_str), int(b_str), phased
 
 
+def _is_biallelic_snp(rec: dict) -> bool:
+    ref = rec["ref"]
+    alt = rec["alt"]
+    # Exclude multiallelic (ALT like "A,C")
+    if "," in alt:
+        return False
+    return len(ref) == 1 and len(alt) == 1
+
+
 def read_vcf_minimal(path: str, sample: Optional[str] = None):
     """
     Minimal single-sample VCF reader.
-    Returns dict keyed by (chrom, pos1) with:
-      ref, alt, gt_str, (a,b,phased), ps_str
-    """
+    Returns dict keyed by (chrom, pos1, ref, alt) with:
+    ref, alt, gt_str, (a,b,phased), ps_str    """
     out = {}
     sample_col = None
 
@@ -67,7 +75,7 @@ def read_vcf_minimal(path: str, sample: Optional[str] = None):
             ps = d.get("PS", ".")
 
             a, b, phased = _parse_gt(gt)
-            out[(chrom, pos1)] = {
+            out[(chrom, pos1, ref, alt)] = {
                 "ref": ref,
                 "alt": alt,
                 "gt": gt,
@@ -92,13 +100,16 @@ def main(args=None):
     truth = read_vcf_minimal(args.truth, sample=args.sample)
     pred = read_vcf_minimal(args.pred, sample=args.sample)
 
-    shared = sorted(set(truth.keys()) & set(pred.keys()))
-    shared_total = len(shared)
+    shared_all = set(truth.keys()) & set(pred.keys())
+    shared_total = len(shared_all)
 
-    # Only evaluate biallelic SNPs (REF/ALT length 1) for now
-    shared = [k for k in shared if len(truth[k]["ref"]) == 1 and len(truth[k]["alt"]) == 1 and len(pred[k]["ref"]) == 1 and len(pred[k]["alt"]) == 1]
+    # SNP-only, exact match by (chrom,pos,ref,alt)
+    truth_snps = {k: v for k, v in truth.items() if _is_biallelic_snp(v)}
+    pred_snps  = {k: v for k, v in pred.items()  if _is_biallelic_snp(v)}
+
+    shared = sorted(set(truth_snps.keys()) & set(pred_snps.keys()), key=lambda x: (x[0], x[1]))
     shared_snp = len(shared)
-
+    
     # Het sites in truth
     het_sites = []
     for k in shared:
@@ -199,7 +210,10 @@ def main(args=None):
         "switch_den": int(switch_den),
         "switch_error_rate": switch_error_rate,
         "phase_sets": block_stats,
-        "notes": "Evaluation assumes biallelic SNPs. Indels/multiallelic not handled yet.",
+        "truth_snp_records": len(truth_snps),
+        "pred_snp_records": len(pred_snps),
+        "shared_exact_records": shared_total,
+        "notes": "",
     }
 
     print(json.dumps(report, indent=2))
