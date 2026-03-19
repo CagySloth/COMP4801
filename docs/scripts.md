@@ -1,18 +1,16 @@
-## 📂 `scripts` — Convenience shell wrappers
+## 📂 `scripts` — Convenience wrappers
 
-This directory contains shell scripts intended as *convenience wrappers*.
-
-Some scripts may be older examples and might require editing to match the latest CLI/module names.
-When in doubt, prefer the module commands shown in the README and docs.
+This directory contains shell snippets intended as convenience wrappers.  
+Prefer the module commands shown in the README and docs when possible.
 
 ---
 
-## Matrix track: recommended snippet
+## Matrix track snippet
 
 ```bash
 PREFIX=output/demo
 
-python -m dataset.simulate -p 2 -n 200 -r 200 -l 60 -o "$PREFIX"
+python -m dataset.simulate -p 2 -n 200 -r 200 -l 60 -e 0.01 -m 0.0 --seed 0 -o "$PREFIX"
 
 python -m algorithms.cli.phase diploid-whats \
   -i "$PREFIX.reads.npz" \
@@ -28,16 +26,19 @@ python -m benchmark.benchmark_accuracy \
 
 ---
 
-## Long-read track: recommended automation
-
-The most up-to-date way to run the long-read end-to-end pipeline is:
+## Long-read pipeline snippet
 
 ```bash
 python -m benchmark.longread_pipeline_runner \
   --prefix output/lr_demo \
-  --seed 0
+  --seed 0 \
+  --ref-length 80000 --num-snps 800 \
+  --num-reads 200 --min-len 2000 --max-len 6000 \
+  --platform ont --ont-profile q20 \
+  --vcf-source both
 ```
 
-This runs Steps 1–7 and writes a pipeline report JSON alongside all intermediate artifacts.
-
-If you prefer the manual steps, see `docs/longread_pipeline.md`.
+Indels mode:
+```bash
+python -m benchmark.longread_pipeline_runner ... --num-indels 80 ... --phase-snps-only
+```

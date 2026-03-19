@@ -4,99 +4,65 @@ This folder contains:
 
 1) **Matrix-track benchmarking**
    - `benchmark.benchmark_runner`: parameter sweeps (simulate → phase → score)
-   - `benchmark.benchmark_accuracy`: accuracy from TSV haplotypes
+   - `benchmark.benchmark_accuracy`: TSV haplotype accuracy
 
 2) **VCF-track evaluation**
    - `benchmark.vcf_phase_eval`: phased VCF vs phased truth VCF (block-flip aware)
+     - Matches variants by **(CHROM,POS,REF,ALT)**
+     - Focuses on **biallelic SNPs** by default
 
 3) **Long-read end-to-end automation**
-   - `benchmark.longread_pipeline_runner`: runs Steps 1–7 and writes a pipeline report
+   - `benchmark.longread_pipeline_runner`: runs Steps 1–7 and writes `<prefix>.pipeline.json`
+
+4) **Aggregation + plotting**
+   - `benchmark.aggregate_pipeline_reports`: gather many pipeline JSONs into a single CSV
+   - `benchmark.longread_baseline_grid`: run baseline read-depth curves
+   - `benchmark.plot_baseline_results`, `benchmark.plot_refpreset_compare`: plotting helpers
 
 ---
 
-# 1) `python -m benchmark.benchmark_runner`
+# Long-read pipeline report (`.pipeline.json`)
 
-Runs many simulations and algorithms, writing a `benchmark_summary.json` + `.csv`.
+The pipeline report includes:
 
-Example:
+- `callset`: truth vs called SNP set comparison (precision/recall)
+- `phasing_runs.called` and/or `phasing_runs.oracle`
+  - `eval`: phase accuracy, switch error, num phase sets
+  - `derived`: effective phased recall, phasing rate, shared het recall, etc.
+
+Recommended headline metric for end-to-end performance:
+- **called_effective_phased_recall**
+
+---
+
+# Aggregating experiments
+
+After running multiple prefixes under a folder:
 
 ```bash
-python -m benchmark.benchmark_runner \
-  --algorithms diploid-em diploid-mst diploid-whats \
-  --ploidy 2 \
-  --num-variants 500 \
-  --num-reads 500 \
-  --read-length 60 \
-  --error-rate 0.01 \
-  --missing-rate 0.0 \
-  --num-runs 2 \
-  --outdir output/bench_smoke
+python -m benchmark.aggregate_pipeline_reports \
+  --root output/exp_folder \
+  --out  output/exp_folder/aggregate.csv
 ```
 
-Notes:
-- For `diploid-whats`, the runner enables VCF-mode when a simulated `{prefix}.vcf` exists.
-- This runner targets the **matrix track** (NPZ/TSV), not the BAM long-read track.
+Then plot mean ± std vs your sweep variable.
 
 ---
 
-# 2) `python -m benchmark.benchmark_accuracy`
-
-Scores predicted TSV haplotypes against truth TSV haplotypes.
+# Baseline grid (example)
 
 ```bash
-python -m benchmark.benchmark_accuracy \
-  --truth output/demo.haplotypes.tsv \
-  --pred  output/demo_phased.haplotypes.tsv \
-  --output output/demo_phased.accuracy.json
-```
-
----
-
-# 3) `python -m benchmark.vcf_phase_eval`
-
-Evaluates predicted phased VCF vs phased truth VCF (block-flip aware).
-
-Inputs:
-- `--truth`: truth VCF/VCF.GZ with phased GT (e.g. `0|1`, `1|0`)
-- `--pred`: predicted VCF with phased GT for het sites and PS tags
-
-Example:
-
-```bash
-python -m benchmark.vcf_phase_eval \
-  --truth output/lr_demo.truth.vcf.gz \
-  --pred  output/lr_demo.ws.phased.vcf \
-  --out   output/lr_demo.ws.eval.json
+python -m benchmark.longread_baseline_grid \
+  --outdir output/exp_baseline_q20 \
+  --ont-profile q20
+python -m benchmark.plot_baseline_results \
+  --csv output/exp_baseline_q20/aggregate.csv \
+  --outdir output/exp_baseline_q20/plots
 ```
 
 ---
 
-# 4) `python -m benchmark.longread_pipeline_runner`
+# Realism comparison script
 
-Runs the long-read end-to-end pipeline (Steps 1–7):
-
-1. reference FASTA
-2. truth phased VCF + hap FASTAs
-3. reads FASTQ
-4. align to BAM (minimap2 + samtools)
-5. call variants (bcftools mpileup + call)
-6. phase called VCF using BAM (`diploid-whats-bam`)
-7. evaluate phased VCF vs truth VCF (`vcf_phase_eval`)
-
-Example:
-
-```bash
-python -m benchmark.longread_pipeline_runner \
-  --prefix output/lr_demo \
-  --seed 0 \
-  --ref-length 20000 \
-  --num-snps 200 \
-  --het-rate 0.8 \
-  --num-reads 200 \
-  --min-len 2000 \
-  --max-len 6000
-```
-
-Outputs:
-- `{prefix}.pipeline.json` (the pipeline report)
-- plus all intermediate files under the same prefix
+`benchmark/realism_comparison.sh` runs a preset comparison and writes an aggregate CSV.  
+Use it as an example of “batch + aggregate + plot” workflow.

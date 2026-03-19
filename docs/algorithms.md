@@ -1,8 +1,6 @@
 ## 📂 `algorithms` — Phasing Algorithms
 
-This package contains diploid and polyploid phasing implementations and their shared adapters/utilities.
-
-Run algorithms via the CLI:
+Run algorithms via:
 
 ```bash
 python -m algorithms.cli.phase <subcommand> ...
@@ -10,9 +8,11 @@ python -m algorithms.cli.phase <subcommand> ...
 
 ---
 
-## Diploid algorithms (`algorithms/diploid`)
+## Diploid algorithms
 
-### `diploid-em` — Expectation Maximization
+### `diploid-em`
+Input: `.reads.npz`  
+Output: `<prefix>.haplotypes.tsv` + summary
 
 ```bash
 python -m algorithms.cli.phase diploid-em \
@@ -20,7 +20,8 @@ python -m algorithms.cli.phase diploid-em \
   --output-prefix output/dip_em
 ```
 
-### `diploid-mst` — Minimum Spanning Tree (graph-based)
+### `diploid-mst`
+Graph-based heuristic.
 
 ```bash
 python -m algorithms.cli.phase diploid-mst \
@@ -28,74 +29,59 @@ python -m algorithms.cli.phase diploid-mst \
   --output-prefix output/dip_mst
 ```
 
-### `diploid-whats` — Vendored WhatsHap core (matrix / VCF-mode)
+### `diploid-whats` (matrix / VCF-mode adapter)
+Uses **vendored WhatsHap core** on NPZ matrices.
 
-This integrates a vendored WhatsHap core (`vendor/whatshap_core`) and supports two modes:
-
-**Matrix-mode (no VCF)**  
-- Input: only `reads.npz`
-- Solver: uses `HapChatCore` on the selected reads
-- Output: TSV haplotypes + assignments + JSON summary
-
-**VCF-mode (`--vcf ...`)**  
-- Input: `reads.npz` + a VCF containing unphased GTs
-- Only **heterozygous** variants (from GT) are phased; homozygous sites are fixed by GT.
-- Solvers:
-  - `--solver whatshap` (default) → **PedigreeDPTable** (WhatsHap default DP solver)
-  - `--solver hapchat` → **HapChatCore** (MEC-style solver)
-- Writes a phased VCF: `{output-prefix}.phased.vcf`
-
-Example:
+Modes:
+- Matrix-only: phase all sites (mostly for compatibility testing)
+- VCF-mode: if `--vcf` is provided, phase **heterozygous sites only** (WhatsHap-like)
 
 ```bash
 python -m algorithms.cli.phase diploid-whats \
-  -i output/demo.reads.npz \
-  --vcf output/demo.vcf \
-  --output-prefix output/demo_phased \
+  -i input.reads.npz \
+  --vcf input.vcf \
+  --output-prefix output/dip_whats \
   --solver whatshap
 ```
 
-### `diploid-whats-bam` — WhatsHap-like BAM + VCF phasing
+Solvers:
+- `--solver whatshap`: DP-style (PedigreeDPTable)
+- `--solver hapchat`: MEC-style (HapChatCore)
 
-This mode is designed to mimic a more practical WhatsHap workflow:
+Outputs:
+- `<prefix>.haplotypes.tsv` (dense; for TSV scorer)
+- `<prefix>.phased.vcf` (authoritative phasing output for VCF-mode)
+- `<prefix>.summary.json`
 
-- Input: **BAM** (aligned reads) + **VCF** (called variants with GT)
-- Internally extracts allele observations from BAM at VCF sites, then runs:
-  - read selection
-  - solver (vendored WhatsHap core)
-- Output: phased VCF + summary JSON
+### `diploid-whats-bam` (BAM + VCF → phased VCF)
+This is the **WhatsHap-like long-read phasing** path.
 
-Example:
+Input:
+- BAM (aligned reads)
+- VCF (variants + genotypes)
+
+Output:
+- phased VCF + summary JSON
 
 ```bash
 python -m algorithms.cli.phase diploid-whats-bam \
-  --bam output/lr_demo.bam \
-  --vcf output/lr_demo.called.vcf.gz \
-  --output-prefix output/lr_demo.ws \
-  --output-vcf output/lr_demo.ws.phased.vcf \
-  --max-coverage 15 \
-  --min-mapq 20 \
-  --min-baseq 20
+  --bam input.bam \
+  --vcf input.vcf.gz \
+  --output-prefix output/ws \
+  --output-vcf output/ws.phased.vcf \
+  --max-coverage 15 --min-mapq 20 --min-baseq 20
 ```
+
+Notes:
+- Only het genotypes are phased
+- PS is assigned by connectivity across selected reads
+- In indel experiments, prefer SNP-only VCF inputs (`--phase-snps-only` in the pipeline runner)
 
 ---
 
-## Polyploid algorithms (`algorithms/polyploid`)
+## Polyploid algorithms
 
-### `polyploid-em`
+### `polyploid-em`, `polyploid-spectral`
+These operate on `.reads.npz` and output polyploid haplotypes TSV.
 
-```bash
-python -m algorithms.cli.phase polyploid-em \
-  -i input.reads.npz \
-  --ploidy 4 \
-  --output-prefix output/poly_em
-```
-
-### `polyploid-spectral`
-
-```bash
-python -m algorithms.cli.phase polyploid-spectral \
-  -i input.reads.npz \
-  --ploidy 4 \
-  --output-prefix output/poly_spec
-```
+See `python -m algorithms.cli.phase --help` for details.
