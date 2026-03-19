@@ -13,6 +13,11 @@ from typing import Dict, Any, Optional
 def _which_or_fail(tool: str) -> None:
     if shutil.which(tool) is None:
         raise RuntimeError(f"Missing system tool '{tool}'. Install it (apt/brew/conda) and retry.")
+    
+
+def _bcftools_filter_snps(in_vcfgz: str, out_vcfgz: str) -> None:
+    _run(["bcftools", "view", "-v", "snps", "-m2", "-M2", "-Oz", "-o", out_vcfgz, in_vcfgz])
+    _run(["bcftools", "index", "-t", out_vcfgz])
 
 
 def _run(cmd: list[str]) -> None:
@@ -216,6 +221,19 @@ def main(args=None):
     ap.add_argument("--burst-count", type=int, default=1)
     ap.add_argument("--burst-len", type=int, default=200)
     ap.add_argument("--burst-mult", type=float, default=5.0)
+    
+    ap.add_argument(
+        "--phase-snps-only",
+        action="store_true",
+        help="If set, filter the phasing input VCF to biallelic SNPs only (-v snps -m2 -M2). "
+            "Recommended when truth includes indels."
+    )
+    ap.add_argument(
+        "--eval-snps-only",
+        action="store_true",
+        help="If set, filter truth VCF to biallelic SNPs for evaluation. "
+            "Recommended together with --phase-snps-only."
+    )
 
     if args is None:
         args = ap.parse_args()
@@ -237,6 +255,7 @@ def main(args=None):
 
     truth_vcf = str(prefix) + ".truth.vcf"
     truth_vcfgz = truth_vcf + ".gz"
+    truth_eval_vcfgz = truth_vcfgz
 
     oracle_vcf = str(prefix) + ".oracle.vcf"
     oracle_vcfgz = oracle_vcf + ".gz"
@@ -295,6 +314,13 @@ def main(args=None):
 
     _run(["bcftools", "view", "-Oz", "-o", truth_vcfgz, truth_vcf])
     _run(["bcftools", "index", "-t", truth_vcfgz])
+    
+    # Optional: make SNP-only truth for evaluation (recommended if truth has indels)
+    if args.phase_snps_only or args.eval_snps_only:
+        truth_eval_vcfgz = str(prefix) + ".truth.snps.vcf.gz"
+        _bcftools_filter_snps(truth_vcfgz, truth_eval_vcfgz)
+    else:
+        truth_eval_vcfgz = truth_vcfgz
 
     truth_het_snps = _count_het_snps(truth_vcfgz)
 
@@ -350,20 +376,26 @@ def main(args=None):
     phase_runs: Dict[str, Dict[str, Any]] = {}
 
     def _phase_and_eval(tag: str, vcf_in: str, out_prefix: str, out_vcf: str, out_eval: str) -> None:
+        vcf_for_phasing = vcf_in
+        if args.phase_snps_only:
+            vcf_for_phasing = str(prefix) + f".{tag}.snps.vcf.gz"
+            _bcftools_filter_snps(vcf_in, vcf_for_phasing)
+            
         _run([
             py, "-m", "algorithms.cli.phase", "diploid-whats-bam",
             "--bam", bam,
-            "--vcf", vcf_in,
+            "--vcf", vcf_for_phasing,
             "--output-prefix", out_prefix,
             "--output-vcf", out_vcf,
             "--max-coverage", str(args.max_coverage),
             "--min-mapq", str(args.min_mapq),
             "--min-baseq", str(args.min_baseq),
         ])
-        _run([py, "-m", "benchmark.vcf_phase_eval", "--truth", truth_vcfgz, "--pred", out_vcf, "--out", out_eval])
+        _run([py, "-m", "benchmark.vcf_phase_eval", "--truth", truth_eval_vcfgz, "--pred", out_vcf, "--out", out_eval])
 
         phase_runs[tag] = {
             "vcf_input": vcf_in,
+            "vcf_input_for_phasing": vcf_for_phasing,
             "phased_vcf": out_vcf,
             "eval_json": out_eval,
             "summary_json": out_prefix + ".summary.json",
@@ -434,6 +466,7 @@ def main(args=None):
         "steps": {
             "ref_fasta": ref_fa,
             "truth_vcf_gz": truth_vcfgz,
+            "truth_eval_vcf_gz": truth_eval_vcfgz,
             "oracle_vcf_gz": oracle_vcfgz if want_oracle else None,
             "reads_fastq": reads_fq,
             "bam": bam,
@@ -473,7 +506,6 @@ def main(args=None):
             "start_model": str(args.start_model),
             "dropout_fraction": float(args.dropout_fraction) if args.start_model == "dropout" else 0.0,
             "dropout_block_len": int(args.dropout_block_len) if args.start_model == "dropout" else None,
-            "num_indels": int(args.num_indels),
             "burst_prob": float(args.burst_prob),
             "burst_count": int(args.burst_count),
             "burst_len": int(args.burst_len),
