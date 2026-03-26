@@ -510,6 +510,8 @@ def main(args=None):
             "burst_count": int(args.burst_count),
             "burst_len": int(args.burst_len),
             "burst_mult": float(args.burst_mult),
+            "phase_snps_only": bool(args.phase_snps_only),
+            "eval_snps_only": bool(args.eval_snps_only or args.phase_snps_only),
         },
         "time_total_sec": total_sec,
     }
