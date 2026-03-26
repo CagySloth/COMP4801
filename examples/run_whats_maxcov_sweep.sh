@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-source .venv/bin/activate
-
 OUTDIR="output/prelim/whats_maxcov_sweep_vcf"
 mkdir -p "$OUTDIR"
 

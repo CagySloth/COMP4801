@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-source .venv/bin/activate
-
 OUTDIR="output/prelim/plot2_em_mst_accuracy_error"
 mkdir -p "$OUTDIR"
 
