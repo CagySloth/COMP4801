@@ -51,3 +51,19 @@ def test_build_readset_from_readsdata_basic():
             allele = variant.allele
             assert 0 <= pos < N
             assert allele == reads[r_idx, pos]
+
+
+def test_build_readset_respects_positions_when_enabled():
+    from algorithms.diploid.whatshap_adapter import build_readset_from_readsdata
+    from algorithms.io.reads_data import ReadsData
+
+    reads = np.array([[0, 1], [1, 0]], dtype=int)          # two columns, two reads
+    positions = np.array([[5, 7], [5, 7]], dtype=int)      # columns map to original indices 5 and 7
+    data = ReadsData(reads=reads, positions=positions, num_variants=2)
+
+    rs = build_readset_from_readsdata(data, use_positions=True)
+
+    assert len(rs) == 2
+    for r in rs:
+        pos_list = [v.position for v in r]
+        assert pos_list == [5, 7], f"Expected positions [5,7], got {pos_list}"

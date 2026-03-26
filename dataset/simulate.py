@@ -9,6 +9,29 @@ from algorithms.io.writer import (
 )
 from algorithms.io.reads_data import ReadsData
 
+def write_diploid_vcf(path, haplotypes, chrom="chr1", sample="SAMPLE"):
+    """
+    Write an unphased VCF whose GT is derived from the simulated haplotypes.
+    - Homozygous: 0/0 or 1/1
+    - Heterozygous: 0/1 (unphased, as a caller would output)
+    """
+    hap1 = haplotypes[0]
+    hap2 = haplotypes[1]
+
+    with open(path, "w") as f:
+        f.write("##fileformat=VCFv4.2\n")
+        f.write('##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">\n')
+        f.write("#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t" + sample + "\n")
+
+        for i, (a, b) in enumerate(zip(hap1, hap2), start=1):
+            if a == b:
+                gt = f"{int(a)}/{int(b)}"
+            else:
+                gt = "0/1"
+            # Dummy REF/ALT for simulation
+            f.write(f"{chrom}\t{i}\t.\tA\tC\t.\tPASS\t.\tGT\t{gt}\n")
+
+
 
 def generate_diploid_data(num_variants, num_reads, read_length, error_rate, missing_rate, allow_monomorphic):
     hap1 = np.random.randint(0, 2, size=num_variants)
@@ -77,8 +100,15 @@ def main():
     parser.add_argument("--maf-beta", type=float, default=1.0)
     parser.add_argument("--allow-monomorphic", action="store_true")
     parser.add_argument("-o", "--output-prefix", required=True)
+    parser.add_argument("--seed", type=int, default=None, help="Random seed for reproducibility.")
 
     args = parser.parse_args()
+    
+    if args.seed is not None:
+        np.random.seed(args.seed)
+    
+    prefix = args.output_prefix  # because you run: -o output/vcf_demo
+    Path(prefix).parent.mkdir(parents=True, exist_ok=True)  # ensures "output/" exists
 
     if args.ploidy == 2:
         haps, reads = generate_diploid_data(
@@ -89,6 +119,7 @@ def main():
             args.missing_rate,
             args.allow_monomorphic,
         )
+        write_diploid_vcf(f"{args.output_prefix}.vcf", haps)
     else:
         haps, reads = generate_polyploid_data(
             args.num_variants,
@@ -102,12 +133,12 @@ def main():
             args.allow_monomorphic,
         )
 
-    prefix = Path(args.output_prefix)
+    # prefix = Path(args.output_prefix)
     write_haplotypes_tsv(f"{prefix}.haplotypes.tsv", haps)
     write_reads_sparse_tsv(f"{prefix}.reads.sparse.tsv", reads)
 
     # Build dense ReadsData and save as NPZ with keys 'reads' and 'positions'
-    reads_np = ReadsData.from_fragments(reads)
+    reads_np = ReadsData.from_fragments(reads, num_variants=args.num_variants)
     reads_np.to_npz(f"{prefix}.reads.npz")
 
     print(f"✅ Simulated data written to: {prefix}.[haplotypes.tsv, reads.sparse.tsv, reads.npz]")

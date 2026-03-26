@@ -1,58 +1,110 @@
-## 📂 `dataset` – Simulated Data Generator
+## 📂 `dataset` — Synthetic Data Generators
 
-This module contains the main script for generating synthetic read and haplotype data used in benchmarking.
+This repo provides two dataset generators:
+
+1) **Matrix generator** (`dataset.simulate`)  
+   Outputs the variant-level representation used by most algorithms in this repo: truth haplotypes TSV + reads in NPZ/TSV.
+
+2) **Long-read generator** (`dataset.longread.*`)  
+   Outputs a WhatsHap-like workflow: reference FASTA → truth VCF + haplotypes FASTA → reads FASTQ.
 
 ---
 
-### 📄 `simulate.py`
+# 1) Matrix generator: `python -m dataset.simulate`
 
-Generates random haplotypes and sequencing reads for diploid or polyploid organisms with configurable parameters.
+Generate a synthetic dataset (diploid or polyploid) and write it to disk.
 
-#### Usage
+Common parameters:
+- `-p, --ploidy`: number of haplotypes (2=diploid)
+- `-n, --num-variants`: number of variant sites
+- `-r, --num-reads`: number of reads/fragments
+- `-l, --read-length`: mean length (in variants, not bp)
+- `-e, --error-rate`: allele flips
+- `-m, --missing-rate`: missing alleles
+- `--seed`: reproducibility
+- `-o, --output-prefix`: output prefix
 
-```bash
-python dataset/simulate.py [options]
-```
+Outputs:
+- `<prefix>.haplotypes.tsv` (truth)
+- `<prefix>.reads.npz` (dense reads×variants allele matrix)
+- `<prefix>.reads.sparse.tsv` (sparse fragments)
 
-#### Options
+Diploid-only extra:
+- `<prefix>.vcf` (unphased GT; used for VCF-mode phasing tests)
 
-| Option                 | Type  | Default | Description                                                        |
-| ---------------------- | ----- | ------- | ------------------------------------------------------------------ |
-| `-p`, `--ploidy`       | int   | 2       | Number of haplotypes (e.g., 2 for diploid, ≥3 for polyploid)       |
-| `-n`, `--num-variants` | int   | 1000    | Number of variant positions                                        |
-| `-r`, `--num-reads`    | int   | 5000    | Number of sequencing reads                                         |
-| `-l`, `--read-length`  | int   | 50      | Length of each read                                                |
-| `-e`, `--error-rate`   | float | 0.01    | Per-base sequencing error rate                                     |
-| `-m`, `--missing-rate` | float | 0.05    | Fraction of missing bases per read                                 |
-| `--maf-alpha`          | float | 0.4     | Alpha parameter of Beta distribution for allele frequency sampling |
-| `--maf-beta`           | float | 0.4     | Beta parameter of Beta distribution for allele frequency sampling  |
-| `--allow-monomorphic`  | flag  | False   | If set, allows non-polymorphic sites (otherwise filters them out)  |
-| `-s`, `--seed`         | int   | 42      | Random seed for reproducibility                                    |
-| `-o`, `--output`       | str   | —       | Output path prefix (no extension)                                  |
+---
 
-#### Output Files
+# 2) Long-read generator (Steps 1–3)
 
-Given an output prefix like `sim_data`, it generates:
-
-* `sim_data.haplotypes.tsv`: ground-truth haplotypes (ploidy × variants)
-* `sim_data.reads.sparse.tsv`: sparse-format read matrix
-* `sim_data.truth.assignments.tsv`: true read-to-haplotype mapping
-
-#### Example
+## Step 1: `dataset.longread.reference`
 
 ```bash
-python dataset/simulate.py \
-    -p 4 \
-    -n 800 \
-    -r 6000 \
-    -l 40 \
-    -e 0.02 \
-    -m 0.05 \
-    --maf-alpha 0.3 \
-    --maf-beta 0.5 \
-    --allow-monomorphic \
-    -s 123 \
-    -o dataset/sim_poly_example
+python -m dataset.longread.reference \
+  -o output/demo \
+  --length 80000 \
+  --seed 0 \
+  --preset plain \
+  --dup-segments 0
 ```
 
-This would generate a polyploid dataset with 4 haplotypes, 800 SNPs, and 6000 noisy reads.
+Key options:
+- `--preset {plain,toy,realistic}`
+- `--dup-segments/--dup-len/--dup-min-gap` (repeat-like duplications)
+
+Outputs:
+- `<prefix>.ref.fasta`
+- `<prefix>.ref.meta.json` (regions + duplications)
+
+## Step 2: `dataset.longread.truth`
+
+```bash
+python -m dataset.longread.truth \
+  --ref output/demo.ref.fasta \
+  -o output/demo \
+  --seed 0 \
+  --num-snps 800 --het-rate 0.8 \
+  --phased-truth --random-phase
+```
+
+Indels:
+```bash
+python -m dataset.longread.truth \
+  --ref output/demo.ref.fasta \
+  -o output/demo \
+  --seed 0 \
+  --num-snps 800 \
+  --num-indels 80 --indel-min-len 1 --indel-max-len 5 --indel-het-rate 0.5 \
+  --phased-truth --random-phase
+```
+
+Region-avoidance:
+- `--avoid-regions --ref-meta <prefix>.ref.meta.json`
+
+Outputs:
+- `<prefix>.truth.vcf` (+ `.truth.meta.json`)
+- `<prefix>.hap1.fasta`, `<prefix>.hap2.fasta`
+
+## Step 3: `dataset.longread.readsim`
+
+```bash
+python -m dataset.longread.readsim \
+  --hap1 output/demo.hap1.fasta \
+  --hap2 output/demo.hap2.fasta \
+  -o output/demo \
+  --seed 0 \
+  --num-reads 200 \
+  --min-len 2000 --max-len 6000 \
+  --platform ont --ont-profile q20
+```
+
+Realism knobs:
+- length: `--len-model lognormal --ln-mean 8.3 --ln-sigma 0.6`
+- dropout: `--start-model dropout --dropout-fraction 0.1 --dropout-block-len 1000`
+- bursts: `--burst-prob 0.6 --burst-count 2 --burst-len 300 --burst-mult 8`
+
+Outputs:
+- `<prefix>.reads.fastq`
+- `<prefix>.reads.truth.tsv`
+- `<prefix>.reads.meta.json`
+
+See `docs/realism_knobs.md` for expected effects.

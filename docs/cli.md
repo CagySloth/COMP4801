@@ -1,71 +1,55 @@
-## 📂 `algorithms/cli` – Command-Line Interfaces
+## CLIs — Running the repo reproducibly
 
-This module provides scriptable CLI entry points for phasing and data format conversion, enabling reproducible pipelines and benchmark integration.
+Recommended style: run everything as Python modules.
+
+Matrix track:
+- `python -m dataset.simulate`
+- `python -m algorithms.cli.phase`
+- `python -m benchmark.benchmark_runner`
+- `python -m benchmark.benchmark_accuracy`
+
+Long-read track:
+- `python -m dataset.longread.reference`
+- `python -m dataset.longread.truth`
+- `python -m dataset.longread.readsim`
+- `python -m benchmark.longread_pipeline_runner`
+- `python -m benchmark.vcf_phase_eval`
 
 ---
 
-### 📄 `phase.py`
+## `python -m algorithms.cli.phase`
 
-Runs a specified phasing algorithm on an input `.npz` read file and outputs predicted haplotypes and assignments.
+Run one phasing algorithm.
 
-#### Usage
+Diploid subcommands:
+- `diploid-em`
+- `diploid-mst`
+- `diploid-whats`
+- `diploid-whats-bam`
 
+Example (long-read phasing on BAM+VCF):
 ```bash
-python -m algorithms.cli.phase [ALGORITHM] -i reads.npz -o output_prefix [options]
-```
-
-#### Positional Arguments
-
-| Argument    | Description                                                                                       |
-| ----------- | ------------------------------------------------------------------------------------------------- |
-| `ALGORITHM` | Algorithm name. Must be one of: `diploid_em`, `diploid_mst`, `polyploid_em`, `polyploid_spectral` |
-
-#### Options
-
-| Option           | Type | Default              | Description                           |
-| ---------------- | ---- | -------------------- | ------------------------------------- |
-| `-i`, `--input`  | str  | —                    | Path to input `.npz` read file        |
-| `-o`, `--output` | str  | —                    | Prefix for output files               |
-| `-k`, `--ploidy` | int  | *Only for polyploid* | Number of haplotypes (polyploid only) |
-
-#### Outputs
-
-* `output_prefix.haplotypes.tsv` — predicted haplotypes
-* `output_prefix.assignments.tsv` — read-to-haplotype assignments
-
-#### Example
-
-```bash
-python -m algorithms.cli.phase diploid_em -i data/example.reads.npz -o results/em_run
+python -m algorithms.cli.phase diploid-whats-bam \
+  --bam output/demo.bam \
+  --vcf output/demo.called.vcf.gz \
+  --output-prefix output/demo.ws \
+  --output-vcf output/demo.ws.phased.vcf
 ```
 
 ---
 
-### 📄 `convert.py`
+## `python -m benchmark.longread_pipeline_runner`
 
-Convert between `.tsv` and `.npz` read data formats.
+End-to-end automation (Steps 1–7).
 
-#### Usage
+Key options:
+- `--vcf-source {called,oracle,both}`
+- `--ref-preset {plain,toy,realistic}`
+- `--dup-segments/--dup-len/--dup-min-gap`
+- `--len-model {uniform,lognormal}`
+- `--start-model {uniform,dropout}`
+- `--burst-*`
+- `--num-indels ...`
+- `--phase-snps-only` (recommended when indels are enabled)
 
-```bash
-python -m algorithms.cli.convert -i input_file [--to-tsv output.tsv | --to-npz output.npz]
-```
-
-#### Options
-
-| Option          | Type | Description                                     |
-| --------------- | ---- | ----------------------------------------------- |
-| `-i`, `--input` | str  | Path to the input file (`.tsv` or `.npz`)       |
-| `--to-tsv`      | str  | Output path for `.tsv` format (dense or sparse) |
-| `--to-npz`      | str  | Output path for `.npz` format                   |
-
-#### Notes
-
-* If input is `.tsv`, this will save as `.npz`
-* If input is `.npz`, it will save as `.reads.sparse.tsv`
-
-#### Example
-
-```bash
-python -m algorithms.cli.convert -i data/example.reads.sparse.tsv --to-npz data/example.reads.npz
-```
+Run `--help` to see the full list.
