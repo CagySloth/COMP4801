@@ -36,4 +36,6 @@ tests/test_diploid_whatshap.py
 tests/test_pipeline_integration.py
 tests/test_pipeline_whatshap_cli.py
 tests/test_polyploid_algorithms.py
+tests/test_simulation_whatshap_compat.py
+tests/test_vcf_mode_pipeline.py
 tests/test_whatshap_adapter.py

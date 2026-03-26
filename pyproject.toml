@@ -14,6 +14,10 @@ dependencies = [
   "scipy >=1.10",
   "scikit-learn >=1.2",
   "networkx >=3.1",
+  "pysam >= 0.18.0",
+  "pyfaidx >= 0.9.0.3",
+  "pandas >= 3.0.1",
+  "matplotlib >= 3.10.8",
 ]
 
 [project.optional-dependencies]
@@ -23,8 +27,13 @@ dev = ["pytest", "black", "ruff"]
 simulate = "dataset.simulate:main"
 phase = "algorithms.cli.phase:main"
 convert = "algorithms.cli.convert:main"
-benchmark = "benchmarking.benchmark_runner:main"
-accuracy = "benchmarking.benchmark_accuracy:main"
+benchmark = "benchmark.benchmark_runner:main"
+accuracy = "benchmark.benchmark_accuracy:main"
+
+longread-reference = "dataset.longread.reference:main"
+longread-truth = "dataset.longread.truth:main"
+longread-readsim = "dataset.longread.readsim:main"
+
 
 [tool.setuptools]
 packages = [
@@ -35,6 +44,7 @@ packages = [
     "algorithms.io",
     "algorithms.eval",
     "dataset",
+    "dataset.longread",
     "benchmark"
 ]
 
