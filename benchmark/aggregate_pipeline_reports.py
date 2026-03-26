@@ -93,6 +93,23 @@ def main():
             "burst_len": get(j, "params.burst_len"),
             "burst_mult": get(j, "params.burst_mult"),
         }
+        
+        # Backfill SNP-only flags for older pipeline reports (or if params omitted).
+        if row.get("phase_snps_only") is None:
+            v1 = get(j, "phasing_runs.called.vcf_input_for_phasing")
+            v2 = get(j, "phasing_runs.oracle.vcf_input_for_phasing")
+            row["phase_snps_only"] = (
+                (isinstance(v1, str) and ".snps.vcf" in v1) or
+                (isinstance(v2, str) and ".snps.vcf" in v2)
+            )
+        if row.get("eval_snps_only") is None:
+            tev = get(j, "steps.truth_eval_vcf_gz")
+            row["eval_snps_only"] = (isinstance(tev, str) and ".snps.vcf" in tev)
+
+        # Normalize to 0/1 so pandas treats these as numeric.
+        row["phase_snps_only"] = int(bool(row.get("phase_snps_only")))
+        row["eval_snps_only"] = int(bool(row.get("eval_snps_only")))
+        
         rows.append(row)
 
     out = Path(args.out)
