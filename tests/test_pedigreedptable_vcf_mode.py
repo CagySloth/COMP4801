@@ -15,6 +15,12 @@ pytestmark = pytest.mark.skipif(
     reason="whatshap.core not importable (vendored core not built/installed).",
 )
 
+if not HAS_WHCORE:
+    pytest.skip(
+        "whatshap.core not importable (vendored core not built/installed).",
+        allow_module_level=True,
+    )
+
 from algorithms.diploid import whatshap_driver
 
 

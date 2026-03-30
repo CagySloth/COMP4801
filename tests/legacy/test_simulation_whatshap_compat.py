@@ -1,5 +1,5 @@
 import numpy as np
-from dataset.simulate import generate_diploid_data
+from dataset.legacy.simulate import generate_diploid_data
 from algorithms.io.reads_data import ReadsData
 
 

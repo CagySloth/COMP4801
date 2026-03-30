@@ -1,3 +1,6 @@
+# Legacy
+# Use pyproject.toml
+
 numpy>=1.23
 scipy>=1.10
 scikit-learn>=1.2
