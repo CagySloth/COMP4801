@@ -82,7 +82,7 @@ def _call_pipeline(prefix: Path, args: Dict[str, Any], force: bool) -> None:
 
 def _aggregate(exp_dir: Path) -> Path:
     out_csv = exp_dir / "aggregate.csv"
-    _run([sys.executable, "-m", "benchmark.aggregate_pipeline_reports_full",
+    _run([sys.executable, "-m", "benchmark.aggregate_pipeline_reports",
           "--root", str(exp_dir), "--out", str(out_csv)])
     return out_csv
 
@@ -202,6 +202,60 @@ def _auto_indel_phase_flags(args: Dict[str, Any]) -> None:
         args["phase_snps_only"] = True
         # eval-snps-only can be implicit in your runner; safe to set anyway.
         args["eval_snps_only"] = True
+        
+        
+def run_smoke(outdir: Path, seeds: List[int], force: bool, base: Dict[str, Any]) -> None:
+    """A fast end-to-end sanity check of the whole pipeline.
+
+    Goal:
+      - exercise reference -> truth/oracle -> readsim -> minimap2/samtools -> bcftools call
+      - phase with WhatsHap (vendored) on both called + oracle VCFs
+      - write pipeline.json and aggregate.csv
+
+    Keep this *small* so it finishes quickly on a laptop.
+    """
+    exp = outdir / "00_smoke"
+    _ensure_dir(exp)
+
+    for s in seeds:
+        args = dict(base)
+        args.update({
+            "seed": s,
+            "ref_length": 20000,
+            "num_snps": 200,
+            "num_reads": 100,
+            "min_len": 2000,
+            "max_len": 6000,
+            "vcf_source": "both",  # ensure variant calling is exercised too
+
+            # keep realism knobs OFF for a clean sanity check
+            "dup_segments": 0,
+            "dropout_fraction": 0.0,
+            "start_model": "uniform",
+            "burst_prob": 0.0,
+            "num_indels": 0,
+
+            # no SNP-only special casing needed
+            "phase_snps_only": False,
+            "eval_snps_only": False,
+
+            "ref_preset": "plain",
+        })
+
+        prefix = exp / f"smoke_s{s}"
+        _call_pipeline(prefix, args, force=force)
+
+    # convenience aggregation + quick plots
+    csvp = _aggregate(exp)
+    df = pd.read_csv(csvp)
+    _plots_basic(exp, df, "seed", [
+        ("call_recall", "Calling recall"),
+        ("oracle_effective_phased_recall", "Oracle effective phased recall"),
+        ("called_effective_phased_recall", "Called effective phased recall"),
+        ("oracle_num_phase_sets", "Oracle num phase sets"),
+        ("called_num_phase_sets", "Called num phase sets"),
+        ("called_switch_error", "Called switch error rate"),
+    ])
 
 
 def run_depth(outdir: Path, seeds: List[int], force: bool, base: Dict[str, Any]) -> None:
@@ -583,7 +637,7 @@ def main():
         "--only",
         default="",
         help="Comma-separated sections to run. Options: depth,dropout,dup,bursts,indels,lenmodel,interaction,optimize,reality. "
-             "If empty, runs all."
+             "If empty, runs all (excluding smoke)."
     )
     ap.add_argument("--real-fastq", default=None, help="Optional real FASTQ(.gz) for reality check")
     ap.add_argument("--real-bam", default=None, help="Optional real BAM for reality check")
@@ -598,6 +652,8 @@ def main():
     base = _default_base_args()
     seeds = args.seeds
 
+    if "smoke" in only:
+        run_smoke(outdir, seeds, args.force, base)
     if run_all or "depth" in only:
         run_depth(outdir, seeds, args.force, base)
     if run_all or "dropout" in only:

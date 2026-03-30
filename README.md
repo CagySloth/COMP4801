@@ -2,10 +2,10 @@
 
 A research/engineering benchmark suite for **haplotype phasing** on **synthetic data**, with two tracks:
 
-1) **Matrix track (fast + controlled)**  
+1) **Legacy: Matrix track (fast + controlled)**  
    Simulate variant-level read matrices (`.reads.npz`) → phase → evaluate TSV accuracy → run sweeps.
 
-2) **Long-read end-to-end track (WhatsHap-like)**  
+2) **Primary pipeline: Long-read end-to-end track (WhatsHap-like)**  
    Generate reference + diploid truth → simulate long reads (FASTQ) → align (BAM) → call variants (VCF) → phase (phased VCF) → evaluate.
 
 This repo is designed so you can **benchmark WhatsHap under controlled “realism knobs”** (duplications, dropout, error bursts, indels, …) and then sweep WhatsHap parameters.
