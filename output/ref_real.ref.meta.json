@@ -1,0 +1,679 @@
+{
+  "contig": "chr1",
+  "length": 200000,
+  "seed": 0,
+  "preset": "realistic",
+  "regions": [
+    {
+      "type": "homopolymer",
+      "start0": 121394,
+      "end0": 121403,
+      "base": "G",
+      "length": 9
+    },
+    {
+      "type": "homopolymer",
+      "start0": 197161,
+      "end0": 197170,
+      "base": "G",
+      "length": 9
+    },
+    {
+      "type": "homopolymer",
+      "start0": 151496,
+      "end0": 151513,
+      "base": "T",
+      "length": 17
+    },
+    {
+      "type": "homopolymer",
+      "start0": 145807,
+      "end0": 145825,
+      "base": "T",
+      "length": 18
+    },
+    {
+      "type": "homopolymer",
+      "start0": 59273,
+      "end0": 59279,
+      "base": "G",
+      "length": 6
+    },
+    {
+      "type": "homopolymer",
+      "start0": 138924,
+      "end0": 138939,
+      "base": "C",
+      "length": 15
+    },
+    {
+      "type": "homopolymer",
+      "start0": 22496,
+      "end0": 22506,
+      "base": "G",
+      "length": 10
+    },
+    {
+      "type": "homopolymer",
+      "start0": 182782,
+      "end0": 182793,
+      "base": "C",
+      "length": 11
+    },
+    {
+      "type": "homopolymer",
+      "start0": 144599,
+      "end0": 144613,
+      "base": "A",
+      "length": 14
+    },
+    {
+      "type": "homopolymer",
+      "start0": 155896,
+      "end0": 155914,
+      "base": "C",
+      "length": 18
+    },
+    {
+      "type": "homopolymer",
+      "start0": 88238,
+      "end0": 88246,
+      "base": "A",
+      "length": 8
+    },
+    {
+      "type": "homopolymer",
+      "start0": 109685,
+      "end0": 109702,
+      "base": "G",
+      "length": 17
+    },
+    {
+      "type": "homopolymer",
+      "start0": 126797,
+      "end0": 126811,
+      "base": "A",
+      "length": 14
+    },
+    {
+      "type": "homopolymer",
+      "start0": 110556,
+      "end0": 110574,
+      "base": "A",
+      "length": 18
+    },
+    {
+      "type": "homopolymer",
+      "start0": 178402,
+      "end0": 178415,
+      "base": "C",
+      "length": 13
+    },
+    {
+      "type": "homopolymer",
+      "start0": 115354,
+      "end0": 115360,
+      "base": "G",
+      "length": 6
+    },
+    {
+      "type": "homopolymer",
+      "start0": 112780,
+      "end0": 112792,
+      "base": "G",
+      "length": 12
+    },
+    {
+      "type": "homopolymer",
+      "start0": 168785,
+      "end0": 168793,
+      "base": "A",
+      "length": 8
+    },
+    {
+      "type": "homopolymer",
+      "start0": 132476,
+      "end0": 132488,
+      "base": "C",
+      "length": 12
+    },
+    {
+      "type": "homopolymer",
+      "start0": 161398,
+      "end0": 161411,
+      "base": "T",
+      "length": 13
+    },
+    {
+      "type": "homopolymer",
+      "start0": 179929,
+      "end0": 179941,
+      "base": "C",
+      "length": 12
+    },
+    {
+      "type": "homopolymer",
+      "start0": 35178,
+      "end0": 35193,
+      "base": "G",
+      "length": 15
+    },
+    {
+      "type": "homopolymer",
+      "start0": 21940,
+      "end0": 21947,
+      "base": "G",
+      "length": 7
+    },
+    {
+      "type": "homopolymer",
+      "start0": 5451,
+      "end0": 5457,
+      "base": "G",
+      "length": 6
+    },
+    {
+      "type": "homopolymer",
+      "start0": 134287,
+      "end0": 134300,
+      "base": "G",
+      "length": 13
+    },
+    {
+      "type": "homopolymer",
+      "start0": 46116,
+      "end0": 46124,
+      "base": "A",
+      "length": 8
+    },
+    {
+      "type": "homopolymer",
+      "start0": 58817,
+      "end0": 58831,
+      "base": "T",
+      "length": 14
+    },
+    {
+      "type": "homopolymer",
+      "start0": 156803,
+      "end0": 156816,
+      "base": "T",
+      "length": 13
+    },
+    {
+      "type": "homopolymer",
+      "start0": 4061,
+      "end0": 4072,
+      "base": "A",
+      "length": 11
+    },
+    {
+      "type": "homopolymer",
+      "start0": 44611,
+      "end0": 44631,
+      "base": "T",
+      "length": 20
+    },
+    {
+      "type": "homopolymer",
+      "start0": 183432,
+      "end0": 183441,
+      "base": "A",
+      "length": 9
+    },
+    {
+      "type": "homopolymer",
+      "start0": 67058,
+      "end0": 67074,
+      "base": "G",
+      "length": 16
+    },
+    {
+      "type": "homopolymer",
+      "start0": 17921,
+      "end0": 17938,
+      "base": "G",
+      "length": 17
+    },
+    {
+      "type": "homopolymer",
+      "start0": 55540,
+      "end0": 55550,
+      "base": "G",
+      "length": 10
+    },
+    {
+      "type": "homopolymer",
+      "start0": 94638,
+      "end0": 94646,
+      "base": "C",
+      "length": 8
+    },
+    {
+      "type": "homopolymer",
+      "start0": 16893,
+      "end0": 16901,
+      "base": "T",
+      "length": 8
+    },
+    {
+      "type": "homopolymer",
+      "start0": 133189,
+      "end0": 133198,
+      "base": "A",
+      "length": 9
+    },
+    {
+      "type": "homopolymer",
+      "start0": 83661,
+      "end0": 83667,
+      "base": "T",
+      "length": 6
+    },
+    {
+      "type": "homopolymer",
+      "start0": 43952,
+      "end0": 43964,
+      "base": "T",
+      "length": 12
+    },
+    {
+      "type": "homopolymer",
+      "start0": 54764,
+      "end0": 54773,
+      "base": "A",
+      "length": 9
+    },
+    {
+      "type": "str",
+      "start0": 83262,
+      "end0": 83271,
+      "motif": "TCA",
+      "repeats": 3,
+      "length": 9
+    },
+    {
+      "type": "str",
+      "start0": 138675,
+      "end0": 138687,
+      "motif": "TA",
+      "repeats": 6,
+      "length": 12
+    },
+    {
+      "type": "str",
+      "start0": 175999,
+      "end0": 176034,
+      "motif": "AGCGA",
+      "repeats": 7,
+      "length": 35
+    },
+    {
+      "type": "str",
+      "start0": 74195,
+      "end0": 74249,
+      "motif": "GGAATC",
+      "repeats": 9,
+      "length": 54
+    },
+    {
+      "type": "str",
+      "start0": 49666,
+      "end0": 49672,
+      "motif": "CG",
+      "repeats": 3,
+      "length": 6
+    },
+    {
+      "type": "str",
+      "start0": 79666,
+      "end0": 79672,
+      "motif": "CA",
+      "repeats": 3,
+      "length": 6
+    },
+    {
+      "type": "str",
+      "start0": 179811,
+      "end0": 179823,
+      "motif": "GC",
+      "repeats": 6,
+      "length": 12
+    },
+    {
+      "type": "str",
+      "start0": 196429,
+      "end0": 196459,
+      "motif": "TCGCA",
+      "repeats": 6,
+      "length": 30
+    },
+    {
+      "type": "str",
+      "start0": 153366,
+      "end0": 153386,
+      "motif": "GA",
+      "repeats": 10,
+      "length": 20
+    },
+    {
+      "type": "str",
+      "start0": 76883,
+      "end0": 76903,
+      "motif": "GGGG",
+      "repeats": 5,
+      "length": 20
+    },
+    {
+      "type": "str",
+      "start0": 162454,
+      "end0": 162479,
+      "motif": "TTACC",
+      "repeats": 5,
+      "length": 25
+    },
+    {
+      "type": "str",
+      "start0": 165910,
+      "end0": 165950,
+      "motif": "GGTCT",
+      "repeats": 8,
+      "length": 40
+    },
+    {
+      "type": "str",
+      "start0": 19439,
+      "end0": 19475,
+      "motif": "TCTACG",
+      "repeats": 6,
+      "length": 36
+    },
+    {
+      "type": "str",
+      "start0": 159009,
+      "end0": 159021,
+      "motif": "GC",
+      "repeats": 6,
+      "length": 12
+    },
+    {
+      "type": "str",
+      "start0": 75500,
+      "end0": 75527,
+      "motif": "ACA",
+      "repeats": 9,
+      "length": 27
+    },
+    {
+      "type": "str",
+      "start0": 158126,
+      "end0": 158142,
+      "motif": "GTCC",
+      "repeats": 4,
+      "length": 16
+    },
+    {
+      "type": "str",
+      "start0": 132548,
+      "end0": 132583,
+      "motif": "CCACG",
+      "repeats": 7,
+      "length": 35
+    },
+    {
+      "type": "str",
+      "start0": 132134,
+      "end0": 132149,
+      "motif": "CAT",
+      "repeats": 5,
+      "length": 15
+    },
+    {
+      "type": "str",
+      "start0": 102034,
+      "end0": 102054,
+      "motif": "GG",
+      "repeats": 10,
+      "length": 20
+    },
+    {
+      "type": "str",
+      "start0": 139163,
+      "end0": 139181,
+      "motif": "GC",
+      "repeats": 9,
+      "length": 18
+    },
+    {
+      "type": "str",
+      "start0": 97674,
+      "end0": 97704,
+      "motif": "GGCAAC",
+      "repeats": 5,
+      "length": 30
+    },
+    {
+      "type": "str",
+      "start0": 99196,
+      "end0": 99214,
+      "motif": "GTA",
+      "repeats": 6,
+      "length": 18
+    },
+    {
+      "type": "str",
+      "start0": 122445,
+      "end0": 122457,
+      "motif": "GTG",
+      "repeats": 4,
+      "length": 12
+    },
+    {
+      "type": "str",
+      "start0": 46965,
+      "end0": 46974,
+      "motif": "TCT",
+      "repeats": 3,
+      "length": 9
+    },
+    {
+      "type": "str",
+      "start0": 4550,
+      "end0": 4574,
+      "motif": "CTAG",
+      "repeats": 6,
+      "length": 24
+    },
+    {
+      "type": "str",
+      "start0": 40420,
+      "end0": 40430,
+      "motif": "CT",
+      "repeats": 5,
+      "length": 10
+    },
+    {
+      "type": "str",
+      "start0": 48149,
+      "end0": 48164,
+      "motif": "GATTC",
+      "repeats": 3,
+      "length": 15
+    },
+    {
+      "type": "str",
+      "start0": 197326,
+      "end0": 197353,
+      "motif": "TCG",
+      "repeats": 9,
+      "length": 27
+    },
+    {
+      "type": "str",
+      "start0": 24501,
+      "end0": 24525,
+      "motif": "ACTTAG",
+      "repeats": 4,
+      "length": 24
+    },
+    {
+      "type": "str",
+      "start0": 93782,
+      "end0": 93832,
+      "motif": "TCACT",
+      "repeats": 10,
+      "length": 50
+    },
+    {
+      "type": "str",
+      "start0": 179138,
+      "end0": 179188,
+      "motif": "CATCA",
+      "repeats": 10,
+      "length": 50
+    },
+    {
+      "type": "str",
+      "start0": 135126,
+      "end0": 135144,
+      "motif": "GAC",
+      "repeats": 6,
+      "length": 18
+    },
+    {
+      "type": "str",
+      "start0": 114362,
+      "end0": 114382,
+      "motif": "TGTGT",
+      "repeats": 4,
+      "length": 20
+    },
+    {
+      "type": "str",
+      "start0": 22193,
+      "end0": 22214,
+      "motif": "AAA",
+      "repeats": 7,
+      "length": 21
+    },
+    {
+      "type": "str",
+      "start0": 29858,
+      "end0": 29886,
+      "motif": "ACCG",
+      "repeats": 7,
+      "length": 28
+    },
+    {
+      "type": "str",
+      "start0": 162487,
+      "end0": 162529,
+      "motif": "CGTGTA",
+      "repeats": 7,
+      "length": 42
+    },
+    {
+      "type": "str",
+      "start0": 199648,
+      "end0": 199690,
+      "motif": "GTATAA",
+      "repeats": 7,
+      "length": 42
+    },
+    {
+      "type": "str",
+      "start0": 138470,
+      "end0": 138530,
+      "motif": "AAAAAT",
+      "repeats": 10,
+      "length": 60
+    },
+    {
+      "type": "str",
+      "start0": 34895,
+      "end0": 34901,
+      "motif": "CC",
+      "repeats": 3,
+      "length": 6
+    },
+    {
+      "type": "str",
+      "start0": 116290,
+      "end0": 116322,
+      "motif": "TCTC",
+      "repeats": 8,
+      "length": 32
+    },
+    {
+      "type": "gc_high",
+      "start0": 156884,
+      "end0": 157084,
+      "gc_target": 0.75,
+      "length": 200
+    },
+    {
+      "type": "gc_low",
+      "start0": 171979,
+      "end0": 172179,
+      "gc_target": 0.25,
+      "length": 200
+    },
+    {
+      "type": "gc_high",
+      "start0": 11484,
+      "end0": 11684,
+      "gc_target": 0.75,
+      "length": 200
+    },
+    {
+      "type": "gc_low",
+      "start0": 38138,
+      "end0": 38338,
+      "gc_target": 0.25,
+      "length": 200
+    },
+    {
+      "type": "gc_high",
+      "start0": 192032,
+      "end0": 192232,
+      "gc_target": 0.75,
+      "length": 200
+    },
+    {
+      "type": "gc_low",
+      "start0": 173192,
+      "end0": 173392,
+      "gc_target": 0.25,
+      "length": 200
+    },
+    {
+      "type": "gc_high",
+      "start0": 123102,
+      "end0": 123302,
+      "gc_target": 0.75,
+      "length": 200
+    },
+    {
+      "type": "gc_low",
+      "start0": 178725,
+      "end0": 178925,
+      "gc_target": 0.25,
+      "length": 200
+    },
+    {
+      "type": "gc_high",
+      "start0": 16223,
+      "end0": 16423,
+      "gc_target": 0.75,
+      "length": 200
+    },
+    {
+      "type": "gc_low",
+      "start0": 32820,
+      "end0": 33020,
+      "gc_target": 0.25,
+      "length": 200
+    }
+  ],
+  "coord_note": "All region coordinates are 0-based half-open [start0, end0)."
+}

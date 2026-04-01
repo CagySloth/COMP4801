@@ -1,0 +1,20 @@
+{
+  "ref": "output/experiments_all/01_depth_curve/r400_s2.ref.fasta",
+  "contig": "chr1",
+  "length": 80000,
+  "seed": 2,
+  "num_snps": 800,
+  "het_rate": 0.8,
+  "het_count": 650,
+  "hom_alt_count": 150,
+  "min_distance": 5,
+  "avoid_regions": false,
+  "ref_meta": null,
+  "coord_note": "records are 0-based internally but VCF pos is 1-based.",
+  "num_indels": 0,
+  "indel_min_len": 1,
+  "indel_max_len": 5,
+  "indel_het_rate": 0.5,
+  "indel_het_count": 0,
+  "indel_hom_alt_count": 0
+}

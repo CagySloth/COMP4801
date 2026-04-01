@@ -1,0 +1,139 @@
+{
+  "prefix": "output/lenmodel_validate/lognormal_s2",
+  "seed": 2,
+  "vcf_source": "both",
+  "steps": {
+    "ref_fasta": "output/lenmodel_validate/lognormal_s2.ref.fasta",
+    "truth_vcf_gz": "output/lenmodel_validate/lognormal_s2.truth.vcf.gz",
+    "oracle_vcf_gz": "output/lenmodel_validate/lognormal_s2.oracle.vcf.gz",
+    "reads_fastq": "output/lenmodel_validate/lognormal_s2.reads.fastq",
+    "bam": "output/lenmodel_validate/lognormal_s2.bam",
+    "called_vcf_gz": "output/lenmodel_validate/lognormal_s2.called.vcf.gz"
+  },
+  "callset": {
+    "truth_snps": 800,
+    "truth_het_snps": 650,
+    "called_snps": 542,
+    "shared_snps": 542,
+    "precision": 1.0,
+    "recall": 0.6775,
+    "notes": "Precision/recall only computed when --vcf-source includes called."
+  },
+  "phasing_runs": {
+    "called": {
+      "vcf_input": "output/lenmodel_validate/lognormal_s2.called.vcf.gz",
+      "phased_vcf": "output/lenmodel_validate/lognormal_s2.ws.phased.vcf",
+      "eval_json": "output/lenmodel_validate/lognormal_s2.ws.eval.json",
+      "summary_json": "output/lenmodel_validate/lognormal_s2.ws.summary.json",
+      "eval": {
+        "shared_total_records": 542,
+        "shared_snp_records": 541,
+        "shared_het_records": 396,
+        "pred_phased_het_records": 271,
+        "pred_unphased_het_records": 125,
+        "num_phase_sets": 1,
+        "phase_accuracy_blockflip": 0.7195571955719557,
+        "switches": 94,
+        "switch_den": 270,
+        "switch_error_rate": 0.34814814814814815,
+        "phase_sets": {
+          "2726": {
+            "size": 271,
+            "best_flip": false,
+            "match_no_flip": 195,
+            "match_flip": 76,
+            "best_match": 195
+          }
+        },
+        "notes": "Evaluation assumes biallelic SNPs. Indels/multiallelic not handled yet."
+      },
+      "derived": {
+        "truth_het_snps": 650,
+        "shared_het_snps": 396,
+        "phased_het_snps": 271,
+        "correct_phased_het_snps_bestflip": 195,
+        "phasing_rate_on_shared_het": 0.6843434343434344,
+        "effective_phased_recall": 0.3,
+        "shared_het_recall": 0.6092307692307692
+      }
+    },
+    "oracle": {
+      "vcf_input": "output/lenmodel_validate/lognormal_s2.oracle.vcf.gz",
+      "phased_vcf": "output/lenmodel_validate/lognormal_s2.ws_oracle.phased.vcf",
+      "eval_json": "output/lenmodel_validate/lognormal_s2.ws_oracle.eval.json",
+      "summary_json": "output/lenmodel_validate/lognormal_s2.ws_oracle.summary.json",
+      "eval": {
+        "shared_total_records": 800,
+        "shared_snp_records": 800,
+        "shared_het_records": 650,
+        "pred_phased_het_records": 620,
+        "pred_unphased_het_records": 30,
+        "num_phase_sets": 1,
+        "phase_accuracy_blockflip": 1.0,
+        "switches": 0,
+        "switch_den": 619,
+        "switch_error_rate": 0.0,
+        "phase_sets": {
+          "1666": {
+            "size": 620,
+            "best_flip": true,
+            "match_no_flip": 0,
+            "match_flip": 620,
+            "best_match": 620
+          }
+        },
+        "notes": "Evaluation assumes biallelic SNPs. Indels/multiallelic not handled yet."
+      },
+      "derived": {
+        "truth_het_snps": 650,
+        "shared_het_snps": 650,
+        "phased_het_snps": 620,
+        "correct_phased_het_snps_bestflip": 620,
+        "phasing_rate_on_shared_het": 0.9538461538461539,
+        "effective_phased_recall": 0.9538461538461539,
+        "shared_het_recall": 1.0
+      }
+    }
+  },
+  "counts_raw": {
+    "truth_records": 800,
+    "called_records": 545,
+    "oracle_records": 800,
+    "phasing": {
+      "called": {
+        "phased_records": 545
+      },
+      "oracle": {
+        "phased_records": 800
+      }
+    }
+  },
+  "params": {
+    "ref_preset": "plain",
+    "ref_length": 80000,
+    "num_snps": 800,
+    "het_rate": 0.8,
+    "avoid_regions": false,
+    "num_reads": 200,
+    "min_len": 2000,
+    "max_len": 6000,
+    "platform": "ont",
+    "ont_profile": "q20",
+    "map_preset": "map-ont",
+    "call_min_mapq": 20,
+    "call_min_baseq": 15,
+    "max_coverage": 15,
+    "min_mapq": 20,
+    "min_baseq": 20,
+    "dup_segments": 0,
+    "dup_len": 3000,
+    "dup_min_gap": 500,
+    "len_model": "lognormal",
+    "ln_mean": 8.3,
+    "ln_sigma": 0.6,
+    "start_model": "uniform",
+    "dropout_fraction": 0.0,
+    "dropout_block_len": null
+  },
+  "time_total_sec": 2.7872907630517147
+}

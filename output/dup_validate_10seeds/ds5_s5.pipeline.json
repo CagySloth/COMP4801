@@ -1,0 +1,160 @@
+{
+  "prefix": "output/dup_validate_10seeds/ds5_s5",
+  "seed": 5,
+  "vcf_source": "both",
+  "steps": {
+    "ref_fasta": "output/dup_validate_10seeds/ds5_s5.ref.fasta",
+    "truth_vcf_gz": "output/dup_validate_10seeds/ds5_s5.truth.vcf.gz",
+    "oracle_vcf_gz": "output/dup_validate_10seeds/ds5_s5.oracle.vcf.gz",
+    "reads_fastq": "output/dup_validate_10seeds/ds5_s5.reads.fastq",
+    "bam": "output/dup_validate_10seeds/ds5_s5.bam",
+    "called_vcf_gz": "output/dup_validate_10seeds/ds5_s5.called.vcf.gz"
+  },
+  "callset": {
+    "truth_snps": 800,
+    "truth_het_snps": 629,
+    "called_snps": 556,
+    "shared_snps": 556,
+    "precision": 1.0,
+    "recall": 0.695,
+    "notes": "Precision/recall only computed when --vcf-source includes called."
+  },
+  "phasing_runs": {
+    "called": {
+      "vcf_input": "output/dup_validate_10seeds/ds5_s5.called.vcf.gz",
+      "phased_vcf": "output/dup_validate_10seeds/ds5_s5.ws.phased.vcf",
+      "eval_json": "output/dup_validate_10seeds/ds5_s5.ws.eval.json",
+      "summary_json": "output/dup_validate_10seeds/ds5_s5.ws.summary.json",
+      "eval": {
+        "shared_total_records": 556,
+        "shared_snp_records": 556,
+        "shared_het_records": 390,
+        "pred_phased_het_records": 295,
+        "pred_unphased_het_records": 95,
+        "num_phase_sets": 3,
+        "phase_accuracy_blockflip": 0.7864406779661017,
+        "switches": 68,
+        "switch_den": 292,
+        "switch_error_rate": 0.2328767123287671,
+        "phase_sets": {
+          "2777": {
+            "size": 36,
+            "best_flip": false,
+            "match_no_flip": 36,
+            "match_flip": 0,
+            "best_match": 36
+          },
+          "12269": {
+            "size": 242,
+            "best_flip": false,
+            "match_no_flip": 183,
+            "match_flip": 59,
+            "best_match": 183
+          },
+          "69845": {
+            "size": 17,
+            "best_flip": false,
+            "match_no_flip": 13,
+            "match_flip": 4,
+            "best_match": 13
+          }
+        },
+        "notes": "Evaluation assumes biallelic SNPs. Indels/multiallelic not handled yet."
+      },
+      "derived": {
+        "truth_het_snps": 629,
+        "shared_het_snps": 390,
+        "phased_het_snps": 295,
+        "correct_phased_het_snps_bestflip": 232,
+        "phasing_rate_on_shared_het": 0.7564102564102564,
+        "effective_phased_recall": 0.3688394276629571,
+        "shared_het_recall": 0.6200317965023847
+      }
+    },
+    "oracle": {
+      "vcf_input": "output/dup_validate_10seeds/ds5_s5.oracle.vcf.gz",
+      "phased_vcf": "output/dup_validate_10seeds/ds5_s5.ws_oracle.phased.vcf",
+      "eval_json": "output/dup_validate_10seeds/ds5_s5.ws_oracle.eval.json",
+      "summary_json": "output/dup_validate_10seeds/ds5_s5.ws_oracle.summary.json",
+      "eval": {
+        "shared_total_records": 800,
+        "shared_snp_records": 800,
+        "shared_het_records": 629,
+        "pred_phased_het_records": 585,
+        "pred_unphased_het_records": 44,
+        "num_phase_sets": 2,
+        "phase_accuracy_blockflip": 1.0,
+        "switches": 0,
+        "switch_den": 583,
+        "switch_error_rate": 0.0,
+        "phase_sets": {
+          "1629": {
+            "size": 517,
+            "best_flip": false,
+            "match_no_flip": 517,
+            "match_flip": 0,
+            "best_match": 517
+          },
+          "69630": {
+            "size": 68,
+            "best_flip": false,
+            "match_no_flip": 68,
+            "match_flip": 0,
+            "best_match": 68
+          }
+        },
+        "notes": "Evaluation assumes biallelic SNPs. Indels/multiallelic not handled yet."
+      },
+      "derived": {
+        "truth_het_snps": 629,
+        "shared_het_snps": 629,
+        "phased_het_snps": 585,
+        "correct_phased_het_snps_bestflip": 585,
+        "phasing_rate_on_shared_het": 0.9300476947535771,
+        "effective_phased_recall": 0.9300476947535771,
+        "shared_het_recall": 1.0
+      }
+    }
+  },
+  "counts_raw": {
+    "truth_records": 800,
+    "called_records": 559,
+    "oracle_records": 800,
+    "phasing": {
+      "called": {
+        "phased_records": 559
+      },
+      "oracle": {
+        "phased_records": 800
+      }
+    }
+  },
+  "params": {
+    "ref_preset": "plain",
+    "ref_length": 80000,
+    "num_snps": 800,
+    "het_rate": 0.8,
+    "avoid_regions": false,
+    "num_reads": 200,
+    "min_len": 2000,
+    "max_len": 6000,
+    "platform": "ont",
+    "ont_profile": "q20",
+    "map_preset": "map-ont",
+    "call_min_mapq": 20,
+    "call_min_baseq": 15,
+    "max_coverage": 15,
+    "min_mapq": 20,
+    "min_baseq": 20,
+    "dup_segments": 5,
+    "dup_len": 3000,
+    "dup_min_gap": 500,
+    "len_model": "uniform",
+    "ln_mean": null,
+    "ln_sigma": null,
+    "start_model": "uniform",
+    "dropout_fraction": 0.0,
+    "dropout_block_len": null
+  },
+  "time_total_sec": 3.1706570609967457
+}

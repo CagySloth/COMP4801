@@ -1,0 +1,22 @@
+{
+  "shared_total_records": 554,
+  "shared_snp_records": 554,
+  "shared_het_records": 392,
+  "pred_phased_het_records": 333,
+  "pred_unphased_het_records": 59,
+  "num_phase_sets": 1,
+  "phase_accuracy_blockflip": 1.0,
+  "switches": 0,
+  "switch_den": 332,
+  "switch_error_rate": 0.0,
+  "phase_sets": {
+    "2345": {
+      "size": 333,
+      "best_flip": false,
+      "match_no_flip": 333,
+      "match_flip": 0,
+      "best_match": 333
+    }
+  },
+  "notes": "Evaluation assumes biallelic SNPs. Indels/multiallelic not handled yet."
+}

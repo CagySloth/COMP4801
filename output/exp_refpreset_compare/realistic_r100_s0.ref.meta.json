@@ -1,0 +1,76 @@
+{
+  "contig": "chr1",
+  "length": 20000,
+  "seed": 0,
+  "preset": "realistic",
+  "regions": [
+    {
+      "type": "homopolymer",
+      "start0": 11355,
+      "end0": 11364,
+      "base": "C",
+      "length": 9
+    },
+    {
+      "type": "homopolymer",
+      "start0": 8570,
+      "end0": 8590,
+      "base": "T",
+      "length": 20
+    },
+    {
+      "type": "homopolymer",
+      "start0": 16653,
+      "end0": 16665,
+      "base": "T",
+      "length": 12
+    },
+    {
+      "type": "homopolymer",
+      "start0": 6304,
+      "end0": 6318,
+      "base": "G",
+      "length": 14
+    },
+    {
+      "type": "str",
+      "start0": 17073,
+      "end0": 17105,
+      "motif": "CCCG",
+      "repeats": 8,
+      "length": 32
+    },
+    {
+      "type": "str",
+      "start0": 5573,
+      "end0": 5597,
+      "motif": "TCCTGA",
+      "repeats": 4,
+      "length": 24
+    },
+    {
+      "type": "str",
+      "start0": 17643,
+      "end0": 17693,
+      "motif": "GAGTT",
+      "repeats": 10,
+      "length": 50
+    },
+    {
+      "type": "str",
+      "start0": 9261,
+      "end0": 9269,
+      "motif": "TG",
+      "repeats": 4,
+      "length": 8
+    },
+    {
+      "type": "gc_high",
+      "start0": 4354,
+      "end0": 4554,
+      "gc_target": 0.75,
+      "length": 200
+    }
+  ],
+  "coord_note": "All region coordinates are 0-based half-open [start0, end0)."
+}
