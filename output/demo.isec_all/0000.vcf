@@ -1,0 +1,20 @@
+##fileformat=VCFv4.2
+##FILTER=<ID=PASS,Description="All filters passed">
+##contig=<ID=chr1,length=20000>
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##bcftools_viewVersion=1.23+htslib-1.23
+##bcftools_viewCommand=view -Oz -o output/demo.truth.vcf.gz output/demo.truth.vcf; Date=Mon Feb 23 19:20:32 2026
+##bcftools_isecVersion=1.23+htslib-1.23
+##bcftools_isecCommand=isec -p output/demo.isec_all output/demo.truth.vcf.gz output/demo.called.vcf.gz; Date=Mon Feb 23 19:29:31 2026
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	SAMPLE
+chr1	134	.	A	T	.	PASS	.	GT	0|1
+chr1	224	.	A	T	.	PASS	.	GT	1|0
+chr1	532	.	C	G	.	PASS	.	GT	0|1
+chr1	18861	.	G	C	.	PASS	.	GT	0|1
+chr1	18910	.	G	C	.	PASS	.	GT	0|1
+chr1	19154	.	T	C	.	PASS	.	GT	0|1
+chr1	19712	.	G	T	.	PASS	.	GT	1|0
+chr1	19725	.	G	T	.	PASS	.	GT	0|1
+chr1	19796	.	T	A	.	PASS	.	GT	0|1
+chr1	19866	.	C	G	.	PASS	.	GT	0|1
+chr1	19875	.	C	T	.	PASS	.	GT	0|1

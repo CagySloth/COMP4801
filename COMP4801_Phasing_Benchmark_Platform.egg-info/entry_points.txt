@@ -1,6 +1,9 @@
 [console_scripts]
-accuracy = benchmarking.benchmark_accuracy:main
-benchmark = benchmarking.benchmark_runner:main
+accuracy = benchmark.benchmark_accuracy:main
+benchmark = benchmark.benchmark_runner:main
 convert = algorithms.cli.convert:main
+longread-readsim = dataset.longread.readsim:main
+longread-reference = dataset.longread.reference:main
+longread-truth = dataset.longread.truth:main
 phase = algorithms.cli.phase:main
 simulate = dataset.simulate:main

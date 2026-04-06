@@ -1,0 +1,151 @@
+{
+  "seed": 3,
+  "platform": "ont",
+  "ont_profile": "q20",
+  "num_reads": 200,
+  "len_model": "uniform",
+  "min_len": 2000,
+  "max_len": 6000,
+  "ln_mean": null,
+  "ln_sigma": null,
+  "start_model": "dropout",
+  "dropout_fraction": 0.2,
+  "dropout_block_len": 1000,
+  "dropout_intervals_hap1": [
+    {
+      "start0": 3112,
+      "end0": 4112
+    },
+    {
+      "start0": 6766,
+      "end0": 7766
+    },
+    {
+      "start0": 8980,
+      "end0": 9980
+    },
+    {
+      "start0": 12619,
+      "end0": 13619
+    },
+    {
+      "start0": 14175,
+      "end0": 15175
+    },
+    {
+      "start0": 18708,
+      "end0": 19708
+    },
+    {
+      "start0": 20918,
+      "end0": 21918
+    },
+    {
+      "start0": 26244,
+      "end0": 27244
+    },
+    {
+      "start0": 34217,
+      "end0": 35217
+    },
+    {
+      "start0": 37845,
+      "end0": 38845
+    },
+    {
+      "start0": 45991,
+      "end0": 46991
+    },
+    {
+      "start0": 49077,
+      "end0": 50077
+    },
+    {
+      "start0": 54622,
+      "end0": 55622
+    },
+    {
+      "start0": 58032,
+      "end0": 59032
+    },
+    {
+      "start0": 64109,
+      "end0": 65109
+    },
+    {
+      "start0": 68670,
+      "end0": 69670
+    }
+  ],
+  "dropout_intervals_hap2": [
+    {
+      "start0": 13653,
+      "end0": 14653
+    },
+    {
+      "start0": 22452,
+      "end0": 23452
+    },
+    {
+      "start0": 25279,
+      "end0": 26279
+    },
+    {
+      "start0": 30907,
+      "end0": 31907
+    },
+    {
+      "start0": 33189,
+      "end0": 34189
+    },
+    {
+      "start0": 35718,
+      "end0": 36718
+    },
+    {
+      "start0": 40822,
+      "end0": 41822
+    },
+    {
+      "start0": 46357,
+      "end0": 47357
+    },
+    {
+      "start0": 51235,
+      "end0": 52235
+    },
+    {
+      "start0": 52641,
+      "end0": 53641
+    },
+    {
+      "start0": 55001,
+      "end0": 56001
+    },
+    {
+      "start0": 58289,
+      "end0": 59289
+    },
+    {
+      "start0": 59783,
+      "end0": 60783
+    },
+    {
+      "start0": 62110,
+      "end0": 63110
+    },
+    {
+      "start0": 70139,
+      "end0": 71139
+    },
+    {
+      "start0": 75546,
+      "end0": 76546
+    }
+  ],
+  "coord_note": "All intervals are 0-based half-open [start0,end0).",
+  "burst_prob": 0.0,
+  "burst_count": 1,
+  "burst_len": 200,
+  "burst_mult": 5.0
+}
