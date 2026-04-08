@@ -1,0 +1,20 @@
+{
+  "ref": "output/experiments_draft/07_interaction_dup_x_dropout/dup5_df0.0_s3.ref.fasta",
+  "contig": "chr1",
+  "length": 80000,
+  "seed": 3,
+  "num_snps": 800,
+  "het_rate": 0.8,
+  "het_count": 660,
+  "hom_alt_count": 140,
+  "min_distance": 5,
+  "avoid_regions": false,
+  "ref_meta": null,
+  "coord_note": "records are 0-based internally but VCF pos is 1-based.",
+  "num_indels": 0,
+  "indel_min_len": 1,
+  "indel_max_len": 5,
+  "indel_het_rate": 0.5,
+  "indel_het_count": 0,
+  "indel_hom_alt_count": 0
+}

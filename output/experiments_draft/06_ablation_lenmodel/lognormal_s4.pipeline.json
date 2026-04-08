@@ -1,0 +1,165 @@
+{
+  "prefix": "output/experiments_draft/06_ablation_lenmodel/lognormal_s4",
+  "seed": 4,
+  "vcf_source": "both",
+  "steps": {
+    "ref_fasta": "output/experiments_draft/06_ablation_lenmodel/lognormal_s4.ref.fasta",
+    "truth_vcf_gz": "output/experiments_draft/06_ablation_lenmodel/lognormal_s4.truth.vcf.gz",
+    "truth_eval_vcf_gz": "output/experiments_draft/06_ablation_lenmodel/lognormal_s4.truth.vcf.gz",
+    "oracle_vcf_gz": "output/experiments_draft/06_ablation_lenmodel/lognormal_s4.oracle.vcf.gz",
+    "reads_fastq": "output/experiments_draft/06_ablation_lenmodel/lognormal_s4.reads.fastq",
+    "bam": "output/experiments_draft/06_ablation_lenmodel/lognormal_s4.bam",
+    "called_vcf_gz": "output/experiments_draft/06_ablation_lenmodel/lognormal_s4.called.vcf.gz"
+  },
+  "callset": {
+    "truth_snps": 800,
+    "truth_het_snps": 629,
+    "called_snps": 606,
+    "shared_snps": 606,
+    "precision": 1.0,
+    "recall": 0.7575,
+    "notes": "Precision/recall only computed when --vcf-source includes called."
+  },
+  "phasing_runs": {
+    "called": {
+      "vcf_input": "output/experiments_draft/06_ablation_lenmodel/lognormal_s4.called.vcf.gz",
+      "vcf_input_for_phasing": "output/experiments_draft/06_ablation_lenmodel/lognormal_s4.called.vcf.gz",
+      "phased_vcf": "output/experiments_draft/06_ablation_lenmodel/lognormal_s4.ws.phased.vcf",
+      "eval_json": "output/experiments_draft/06_ablation_lenmodel/lognormal_s4.ws.eval.json",
+      "summary_json": "output/experiments_draft/06_ablation_lenmodel/lognormal_s4.ws.summary.json",
+      "eval": {
+        "shared_total_records": 606,
+        "shared_snp_records": 606,
+        "shared_het_records": 436,
+        "pred_phased_het_records": 321,
+        "pred_unphased_het_records": 115,
+        "num_phase_sets": 2,
+        "phase_accuracy_blockflip": 0.6479750778816199,
+        "switches": 129,
+        "switch_den": 319,
+        "switch_error_rate": 0.4043887147335423,
+        "phase_sets": {
+          "1653": {
+            "size": 217,
+            "best_flip": true,
+            "match_no_flip": 76,
+            "match_flip": 141,
+            "best_match": 141
+          },
+          "53778": {
+            "size": 104,
+            "best_flip": true,
+            "match_no_flip": 37,
+            "match_flip": 67,
+            "best_match": 67
+          }
+        },
+        "truth_snp_records": 800,
+        "pred_snp_records": 606,
+        "shared_exact_records": 606,
+        "notes": ""
+      },
+      "derived": {
+        "truth_het_snps": 629,
+        "shared_het_snps": 436,
+        "phased_het_snps": 321,
+        "correct_phased_het_snps_bestflip": 208,
+        "phasing_rate_on_shared_het": 0.7362385321100917,
+        "effective_phased_recall": 0.33068362480127184,
+        "shared_het_recall": 0.6931637519872814
+      }
+    },
+    "oracle": {
+      "vcf_input": "output/experiments_draft/06_ablation_lenmodel/lognormal_s4.oracle.vcf.gz",
+      "vcf_input_for_phasing": "output/experiments_draft/06_ablation_lenmodel/lognormal_s4.oracle.vcf.gz",
+      "phased_vcf": "output/experiments_draft/06_ablation_lenmodel/lognormal_s4.ws_oracle.phased.vcf",
+      "eval_json": "output/experiments_draft/06_ablation_lenmodel/lognormal_s4.ws_oracle.eval.json",
+      "summary_json": "output/experiments_draft/06_ablation_lenmodel/lognormal_s4.ws_oracle.summary.json",
+      "eval": {
+        "shared_total_records": 800,
+        "shared_snp_records": 800,
+        "shared_het_records": 629,
+        "pred_phased_het_records": 588,
+        "pred_unphased_het_records": 41,
+        "num_phase_sets": 1,
+        "phase_accuracy_blockflip": 1.0,
+        "switches": 0,
+        "switch_den": 587,
+        "switch_error_rate": 0.0,
+        "phase_sets": {
+          "1194": {
+            "size": 588,
+            "best_flip": false,
+            "match_no_flip": 588,
+            "match_flip": 0,
+            "best_match": 588
+          }
+        },
+        "truth_snp_records": 800,
+        "pred_snp_records": 800,
+        "shared_exact_records": 800,
+        "notes": ""
+      },
+      "derived": {
+        "truth_het_snps": 629,
+        "shared_het_snps": 629,
+        "phased_het_snps": 588,
+        "correct_phased_het_snps_bestflip": 588,
+        "phasing_rate_on_shared_het": 0.9348171701112877,
+        "effective_phased_recall": 0.9348171701112877,
+        "shared_het_recall": 1.0
+      }
+    }
+  },
+  "counts_raw": {
+    "truth_records": 800,
+    "called_records": 608,
+    "oracle_records": 800,
+    "phasing": {
+      "called": {
+        "phased_records": 608
+      },
+      "oracle": {
+        "phased_records": 800
+      }
+    }
+  },
+  "params": {
+    "ref_preset": "plain",
+    "ref_length": 80000,
+    "num_snps": 800,
+    "het_rate": 0.8,
+    "avoid_regions": false,
+    "num_reads": 200,
+    "min_len": 2000,
+    "max_len": 6000,
+    "platform": "ont",
+    "ont_profile": "q20",
+    "map_preset": "map-ont",
+    "call_min_mapq": 20,
+    "call_min_baseq": 15,
+    "max_coverage": 15,
+    "min_mapq": 20,
+    "min_baseq": 20,
+    "dup_segments": 0,
+    "dup_len": 3000,
+    "dup_min_gap": 500,
+    "num_indels": 0,
+    "indel_min_len": 1,
+    "indel_max_len": 5,
+    "indel_het_rate": 0.5,
+    "len_model": "lognormal",
+    "ln_mean": 8.3,
+    "ln_sigma": 0.6,
+    "start_model": "uniform",
+    "dropout_fraction": 0.0,
+    "dropout_block_len": null,
+    "burst_prob": 0.0,
+    "burst_count": 1,
+    "burst_len": 200,
+    "burst_mult": 5.0,
+    "phase_snps_only": false,
+    "eval_snps_only": false
+  },
+  "time_total_sec": 2.7725045359693468
+}

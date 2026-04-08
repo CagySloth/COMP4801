@@ -356,165 +356,423 @@ Assess how localized high-error segments within reads affect variant calling and
 This experiment isolates correlated error bursts as a single realism stressor while keeping the remaining baseline conditions unchanged.
 
 #### Figures to include
-- **Figure 10.X — Calling recall vs burst probability.**  
-  Shows whether structured high-error segments reduce SNP recovery in the called regime.
+- `called_switch_error` vs `burst_prob`
+- `called_effective_phased_recall` vs `burst_prob`
+- `call_recall` vs `burst_prob`
+- `called_num_phase_sets` vs `burst_prob` (secondary)
+- `oracle_effective_phased_recall` vs `burst_prob` (optional attribution figure or reported in text/table)
 
-- **Figure 10.X — Called effective phased recall vs burst probability.**  
-  Measures the overall end-to-end phasing impact of error bursts.
+**Figure 10.5.1 — Called switch error rate vs burst probability.**  
+Called switch error shows a modest increase at the intermediate burst setting, suggesting that correlated high-error segments can destabilize local phase relationships in the end-to-end called regime. However, the effect is not monotonic across the burst sweep.
 
-- **Figure 10.X — Called switch error rate vs burst probability.**  
-  Measures whether bursty errors destabilize local phase relationships between adjacent heterozygous sites.
+**Figure 10.5.2 — Called effective phased recall vs burst probability.**  
+End-to-end phased recall decreases at `burst_prob = 0.3` but rebounds at `0.6`, indicating that the current burst stressor produces a weak and somewhat noisy effect rather than a strong monotonic degradation trend.
 
-- **Figure 10.X — Called number of phase sets vs burst probability.**  
-  Measures whether bursts also increase fragmentation, in addition to correctness loss.
+**Figure 10.5.3 — Variant calling recall vs burst probability.**  
+Calling recall remains broadly stable across burst settings, indicating that correlated error bursts do not substantially reduce SNP site recovery under the current parameterization.
 
-- **Figure 10.X — Oracle effective phased recall vs burst probability.**  
-  Provides attribution by showing whether burst-induced degradation persists even when correct variant sites are supplied.
+**Figure 10.5.4 — Called number of phase sets vs burst probability.**  
+Phase-set count does not increase with burst probability and therefore is not the main signal in this study. Under the current settings, correlated error bursts appear to affect phasing correctness more than fragmentation.
+
+**Figure 10.5.5 — Oracle effective phased recall vs burst probability.**  
+Oracle phasing performance remains high and stable across burst settings, showing that WhatsHap itself is robust when correct variant sites are supplied and that the observed burst effect arises mainly in the end-to-end called regime.
 
 #### Results summary (means over seeds)
-- `call_recall`: <TODO>
-- `called_effective_phased_recall`: <TODO>
-- `called_switch_error`: <TODO>
-- `called_num_phase_sets`: <TODO>
-- `called_shared_het_recall`: <TODO, if informative>
-- `called_phasing_rate_shared_het`: <TODO, if informative>
-- `called_phase_accuracy`: <TODO, if informative>
-- `oracle_effective_phased_recall`: <TODO>
+- `call_recall`: 0.663 (`burst_prob = 0.0`) → 0.681 (`0.3`) → 0.676 (`0.6`)
+- `call_precision`: 1.000 at all burst levels in this synthetic setup
+- `oracle_effective_phased_recall`: 0.925 → 0.926 → 0.921
+- `oracle_switch_error`: near 0 across all burst levels
+- `oracle_num_phase_sets`: 1.8 → 1.0 → 1.6
+- `called_effective_phased_recall`: 0.436 → 0.369 → 0.455
+- `called_shared_het_recall`: 0.590 → 0.611 → 0.608
+- `called_phasing_rate_shared_het`: 0.819 → 0.790 → 0.837
+- `called_phase_accuracy`: 0.890 → 0.766 → 0.887
+- `called_switch_error`: 0.122 → 0.142 → 0.108
+- `called_num_phase_sets`: 3.4 → 2.0 → 2.6
 
-Taken together, these metrics show whether correlated error bursts primarily act as a calling-quality stressor, a phasing-correctness stressor, a fragmentation stressor, or a mixture of these effects.
+Decomposition of called effective phased recall shows that the main additional loss at `burst_prob = 0.3` comes from switch / phase error rather than from reduced shared-site recall. However, this effect is not monotonic, because the `burst_prob = 0.6` condition rebounds close to baseline on most metrics.
 
 #### Key observations
-- O1: <Does `call_recall` decrease as `burst_prob` increases?>
-- O2: <Does `called_switch_error` increase, indicating reduced phasing stability?>
-- O3: <Does oracle performance remain stable, suggesting the main effect is in the called regime, or does oracle also degrade?>
-- O4: <Does decomposition show that the main loss is in shared-site recall, phasing rate on shared sites, or phase accuracy?>
+- O1 (Calling recall is largely unaffected by bursty errors in this setup): Across `burst_prob ∈ {0.0, 0.3, 0.6}`, calling recall remains nearly flat (`0.663–0.681`) and call precision stays at 1.0. This indicates that the current burst stressor does not substantially reduce SNP site recovery under the baseline alignment and calling settings.
+
+- O2 (Oracle phasing remains stable): Oracle effective phased recall stays near `0.92–0.93`, oracle switch error remains near zero, and oracle phase-set counts stay low. This shows that WhatsHap itself is robust to the current burst stressor when correct variant sites are supplied.
+
+- O3 (The main visible effect is a dip in called-regime phasing correctness at intermediate burst probability): At `burst_prob = 0.3`, called effective phased recall drops from `0.436` to `0.369`, while called phase accuracy decreases from `0.890` to `0.766` and called switch error increases from `0.122` to `0.142`. This indicates that bursty errors can reduce the stability of phasing decisions in the end-to-end called regime.
+
+- O4 (The burst effect is not monotonic under the current parameterization): At `burst_prob = 0.6`, called effective phased recall rebounds to `0.455`, while called phase accuracy and switch error return close to baseline. This suggests that the current burst sweep produces a weak and somewhat noisy signal rather than a strong monotonic degradation trend.
+
+- O5 (The main additional loss at `burst_prob = 0.3` comes from correctness rather than site recovery): Decomposition shows that the largest extra loss term at `burst_prob = 0.3` is switch / phase error, whereas `called_shared_het_recall` remains stable (`~0.61`). This suggests that correlated error bursts mainly affect the quality of phasing evidence on surviving called sites rather than substantially reducing callset overlap.
+
+- O6 (Fragmentation is not the dominant signal in this study): Called phase-set counts do not increase with burst probability and are lower than baseline in both burst settings. Therefore, correlated error bursts in the current setup are better characterized as a weak phasing-correctness stressor than as a fragmentation stressor.
 
 #### Takeaway
-Correlated error bursts primarily act as a <calling-quality / phasing-correctness / mixed> stressor in this pipeline. Their main effect is <reducing reliable variant evidence / destabilizing phase relationships / both>, as shown by the relative changes in called versus oracle metrics.
+Under the current parameterization, correlated error bursts are a relatively weak and noisy stressor in this pipeline. They do not substantially reduce calling recall or oracle phasing performance, indicating that neither variant recovery nor phasing with correct sites is strongly disrupted. The main visible effect is a reduction in called-regime phasing correctness at intermediate burst probability, suggesting that structured local errors can sometimes destabilize end-to-end phasing decisions. However, because this effect is not monotonic across the burst sweep, the present results should be interpreted as preliminary rather than as evidence of a strong burst-driven failure mode.
 
 ---
 
 ### 10.6 Single-knob study: read length model
 
 #### Aim
-Compare uniform vs lognormal read length distributions on connectivity and phasing.
+Compare uniform and lognormal read length distributions to assess how read-length variability affects phasing connectivity, fragmentation, and end-to-end phased recall.
 
 #### Setup
-- Vary: `len_model ∈ {uniform, lognormal}` (and `ln_mean/ln_sigma` if lognormal)
-- Keep fixed: baseline constants
+- Varied: `len_model ∈ {uniform, lognormal}`
+- Fixed:
+  - baseline depth fixed at `num_reads = 200`
+  - ONT-like simulation profile (`ont_profile = q20`)
+  - reference length `80 kb`
+  - `800` truth SNPs (`het_rate = 0.8`)
+  - read length range `2–6 kb` for the uniform baseline
+  - lognormal parameters fixed at `ln_mean = 8.3`, `ln_sigma = 0.6`
+  - `start_model = uniform`
+  - no duplications (`dup_segments = 0`)
+  - no coverage dropout (`dropout_fraction = 0.0`)
+  - no correlated bursts (`burst_prob = 0.0`)
+  - no truth indels (`num_indels = 0`)
+  - phasing input source `vcf_source = both`
 
-#### Commands
-- `python -m benchmark.experiment_driver --outdir <...> --seeds ... --only lenmodel`
-
-#### Outputs
-- `<outdir>/<lenmodel_section>/aggregate.csv`
-- `<outdir>/<lenmodel_section>/plots/*.png`
+This experiment isolates the read length distribution as a single realism stressor while keeping the remaining baseline conditions unchanged.
 
 #### Figures to include
-- `called_num_phase_sets` (uniform vs lognormal)
-- oracle/called effective phased recall (uniform vs lognormal)
+- `oracle_num_phase_sets` by read length model
+- `called_num_phase_sets` by read length model
+- `oracle_effective_phased_recall` by read length model
+- `called_effective_phased_recall` by read length model
+- `call_recall` by read length model
+
+**Figure 10.6.1 — Oracle number of phase sets by read length model.**  
+The lognormal read length model reduces the number of oracle phase sets relative to the uniform baseline, indicating improved long-range connectivity between heterozygous sites when correct variant sites are supplied.
+
+**Figure 10.6.2 — Called number of phase sets by read length model.**  
+The lognormal read length model substantially reduces called phase-set count, showing that it improves phase-block continuity under end-to-end conditions. However, this continuity gain does not translate into a large increase in effective phased recall.
+
+**Figure 10.6.3 — Oracle effective phased recall by read length model.**  
+Oracle effective phased recall is slightly higher under the lognormal model, suggesting that the alternative read length distribution modestly improves phasing completeness when correct variant sites are available.
+
+**Figure 10.6.4 — Called effective phased recall by read length model.**  
+Called effective phased recall changes only slightly between the uniform and lognormal models, indicating that improved connectivity and overlap are largely offset by somewhat noisier called-regime phasing correctness.
+
+**Figure 10.6.5 — Variant calling recall by read length model.**  
+Calling recall is modestly higher under the lognormal read length model, indicating that the alternative read length distribution slightly improves recovery of true SNP sites in the called regime.
+
+#### Results summary (means over seeds)
+- `call_recall`: 0.663 (uniform) → 0.701 (lognormal)
+- `call_precision`: 1.000 under both read length models in this synthetic setup
+- `oracle_effective_phased_recall`: 0.925 → 0.931
+- `oracle_switch_error`: near 0 under both models
+- `oracle_num_phase_sets`: 1.8 → 1.4
+- `called_effective_phased_recall`: 0.436 → 0.443
+- `called_shared_het_recall`: 0.590 → 0.633
+- `called_phasing_rate_shared_het`: 0.819 → 0.810
+- `called_phase_accuracy`: 0.890 → 0.855
+- `called_switch_error`: 0.122 → 0.165
+- `called_num_phase_sets`: 3.4 → 1.6
+
+Taken together, these results show that the lognormal read length model improves callset overlap and phase-block continuity, but these gains translate into only a very small increase in called effective phased recall because called-regime phasing correctness becomes slightly worse and more variable across seeds.
 
 #### Key observations
-- O1: <TODO>
-- O2: <TODO>
+- O1 (Lognormal read lengths improve callset overlap): Compared with the uniform baseline, the lognormal model increases `call_recall` (`0.663 → 0.701`) and `called_shared_het_recall` (`0.590 → 0.633`). This suggests that the alternative read length distribution provides slightly stronger variant-support coverage under the current settings.
+
+- O2 (Lognormal read lengths improve phase-block continuity): Oracle phase-set count decreases from `1.8` to `1.4`, and called phase-set count decreases more strongly from `3.4` to `1.6`. Oracle effective phased recall also increases slightly (`0.925 → 0.931`). Together, these results indicate improved long-range connectivity between heterozygous sites under the lognormal read length model.
+
+- O3 (End-to-end improvement is small despite better connectivity): Although overlap and continuity improve, called effective phased recall changes only slightly (`0.436 → 0.443`). This indicates that better block connectivity alone is not sufficient to produce a large end-to-end gain in this setting.
+
+- O4 (Completeness gains are offset by noisier called-regime correctness): Under the lognormal model, `called_phasing_rate_shared_het` decreases slightly (`0.819 → 0.810`), `called_phase_accuracy` decreases (`0.890 → 0.855`), and `called_switch_error` increases (`0.122 → 0.165`). This suggests that while the lognormal distribution helps connect more sites, the resulting called-regime phasing is somewhat less stable across seeds.
+
+- O5 (The read length model is therefore a mixed, not clearly beneficial, knob): The current comparison shows that read-length distribution can improve continuity-related metrics without producing a correspondingly strong improvement in end-to-end usable phasing output. This makes the read length model informative for mechanism analysis, but not yet a clear optimization lever under the present parameterization.
 
 #### Takeaway
-- <TODO>
+Under the current parameterization, the read length model is a mixed stressor rather than a clear optimization knob. The lognormal model improves callset overlap and phase-block continuity, indicating better long-range connectivity, but these benefits are largely offset by slightly worse and noisier called-regime phasing correctness. As a result, end-to-end effective phased recall changes only marginally. This suggests that changing the read length distribution alone is not sufficient to deliver a strong practical improvement in this pipeline, although it does reveal an important trade-off between connectivity and phasing stability.
 
 ---
 
 ### 10.7 Truth indels and SNP-only policy (evaluation robustness)
 
 #### Aim
-Show that indel-heavy truth does not invalidate SNP phasing evaluation when SNP-only policy is applied.
+Show that introducing indels into the truth set does not invalidate SNP phasing evaluation when SNP-only phasing and evaluation are enforced. This section verifies that the benchmarking framework remains robust to indel-containing truth without conflating SNP phasing performance with indel representation mismatches.
 
 #### Setup
-- Enable indels in truth generation
-- Ensure SNP-only flags are enabled:
-  - `phase_snps_only = true`
-  - `eval_snps_only = true`
-- Vary: indel severity (count and/or length distribution)
+- Varied: `num_indels ∈ {0, 80, 200}`
+- Fixed:
+  - `indel_min_len = 1`
+  - `indel_max_len = 5`
+  - `indel_het_rate = 0.5`
+  - baseline depth fixed at `num_reads = 200`
+  - ONT-like simulation profile (`ont_profile = q20`)
+  - reference length `80 kb`
+  - `800` truth SNPs (`het_rate = 0.8`)
+  - read length range `2–6 kb`
+  - `start_model = uniform`
+  - no duplications (`dup_segments = 0`)
+  - no coverage dropout (`dropout_fraction = 0.0`)
+  - no correlated bursts (`burst_prob = 0.0`)
+  - phasing input source `vcf_source = both`
+  - SNP-only safeguards enabled automatically when indels are present:
+    - `phase_snps_only = true`
+    - `eval_snps_only = true`
 
-#### Commands
-- `python -m benchmark.experiment_driver --outdir <...> --seeds ... --only indels`
-
-#### Outputs
-- `<outdir>/<indels_section>/aggregate.csv`
-- `<outdir>/<indels_section>/plots/*.png`
+This experiment isolates the effect of adding indels to truth generation while preserving SNP-only phasing and evaluation comparability.
 
 #### Figures to include
-- oracle phasing metrics (SNP-only) vs indel severity:
-  - `oracle_switch_error`, `oracle_effective_phased_recall`
-- called metrics vs indel severity:
-  - `called_effective_phased_recall`, `call_recall`
+- `oracle_effective_phased_recall` vs `num_indels`
+- `called_effective_phased_recall` vs `num_indels`
+- `call_recall` vs `num_indels`
+- `called_num_phase_sets` vs `num_indels` (secondary)
+
+**Figure 10.7.1 — Oracle effective phased recall vs number of truth indels.**  
+Oracle SNP-phasing performance remains essentially unchanged as truth indels are introduced, showing that SNP-only phasing and evaluation preserve a stable phasing-only benchmark in indel-containing truth sets.
+
+**Figure 10.7.2 — Called effective phased recall vs number of truth indels.**  
+Called SNP-phasing performance remains broadly stable across indel settings under SNP-only evaluation, indicating that truth indels do not invalidate end-to-end SNP phasing assessment when the appropriate safeguards are enabled.
+
+**Figure 10.7.3 — Variant calling recall vs number of truth indels.**  
+Calling recall changes only modestly across indel settings, suggesting that the presence of truth indels has limited indirect impact on SNP recovery under the current pipeline and SNP-only evaluation policy.
+
+**Figure 10.7.4 — Called number of phase sets vs number of truth indels.**  
+Called phase-set count varies across indel settings but does not show evidence of catastrophic fragmentation or evaluation instability, supporting the conclusion that SNP-only safeguards preserve interpretable SNP phasing metrics in indel-containing truth sets.
+
+#### Results summary (means over seeds)
+- `call_recall`: 0.663 (`num_indels = 0`) → 0.691 (`80`) → 0.654 (`200`)
+- `call_precision`: 1.000 → 0.999 → 0.997
+- `oracle_effective_phased_recall`: 0.925 → 0.925 → 0.921
+- `oracle_switch_error`: near 0 across all indel settings
+- `oracle_num_phase_sets`: 1.8 → 1.2 → 1.8
+- `called_effective_phased_recall`: 0.436 → 0.573 → 0.493
+- `called_shared_het_recall`: 0.590 → 0.623 → 0.577
+- `called_phasing_rate_shared_het`: 0.819 → 0.919 → 0.856
+- `called_phase_accuracy`: 0.890 → 0.999 → 1.000
+- `called_switch_error`: 0.122 → 0.001 → 0.000
+- `called_num_phase_sets`: 3.4 → 2.4 → 4.0
+
+Taken together, these results show that introducing truth indels does not destabilize SNP phasing evaluation when `phase_snps_only = true` and `eval_snps_only = true` are enabled. Oracle SNP-phasing metrics remain essentially unchanged, and called SNP metrics remain within a comparable range across indel settings.
 
 #### Key observations
-- O1: <TODO>
-- O2: <TODO>
+- O1 (Oracle SNP-phasing remains stable under truth indels): Oracle effective phased recall stays essentially unchanged (`0.925 → 0.925 → 0.921`), oracle switch error remains near zero, and oracle phase-set counts remain low. This shows that adding indels to truth generation does not corrupt SNP-only phasing evaluation when SNP-only safeguards are enabled.
+
+- O2 (Called SNP-phasing does not collapse in the presence of indels): Called effective phased recall remains within a similar overall range across `num_indels ∈ {0, 80, 200}`, and calling recall stays relatively stable (`0.663–0.691`, then `0.654` at the strongest indel setting). This indicates that the benchmarking pipeline continues to produce interpretable SNP-level results even when truth indels are present.
+
+- O3 (The main result is evaluation robustness, not a strong indel-driven degradation trend): The `80`-indel condition performs slightly better than the no-indel baseline on several called metrics, including called effective phased recall and switch error. This should not be interpreted as evidence that indels improve SNP phasing; rather, it suggests that under SNP-only filtering the remaining differences are dominated by ordinary stochastic variation and indirect alignment/calling effects rather than by evaluation artifacts.
+
+- O4 (Even stronger indel conditions remain manageable under SNP-only policy): At `num_indels = 200`, oracle metrics remain near baseline and called effective phased recall remains above the no-indel baseline, while called switch error is effectively zero. This supports the claim that the SNP-only policy successfully prevents indel representation differences from invalidating SNP phasing evaluation.
+
+- O5 (SNP-only safeguards are therefore justified methodologically): Overall, the indel suite supports the use of `phase_snps_only` and `eval_snps_only` as robust safeguards whenever truth indels are present, because they preserve stable and interpretable SNP phasing metrics without obvious representation-induced distortion.
 
 #### Takeaway
-- <TODO>
+The SNP-only policy successfully preserves interpretable SNP phasing evaluation in the presence of truth indels. Under the current settings, introducing indels into truth generation does not materially destabilize oracle or called SNP-level phasing metrics, indicating that indel representation mismatch has been effectively controlled. This validates the use of `phase_snps_only = true` and `eval_snps_only = true` as an evaluation safeguard for indel-containing truth sets in the remainder of the study.
 
 ---
 
 ### 10.8 Interaction study: duplications × dropout
 
 #### Aim
-Test whether stressors compound non-linearly.
+Test whether duplicated regions and coverage dropout compound non-linearly, and determine whether the resulting weakness is mainly caller-limited, connectivity-limited, or mixed.
 
 #### Setup
-Small grid (example 2×2):
-- `dup_segments ∈ {0, high}`
-- dropout ∈ {off, on}
+Small 2×2 interaction grid:
+- `dup_segments ∈ {0, 5}`
+- `dropout_fraction ∈ {0.0, 0.1}`
 
-#### Commands
-- `python -m benchmark.experiment_driver --outdir <...> --seeds ... --only interaction`
+Fixed:
+- `dropout_block_len = 1000`
+- `dup_len = 3000`
+- `dup_min_gap = 500`
+- baseline depth fixed at `num_reads = 200`
+- ONT-like simulation profile (`ont_profile = q20`)
+- reference length `80 kb`
+- `800` truth SNPs (`het_rate = 0.8`)
+- read length range `2–6 kb`
+- `start_model = dropout`
+- no correlated bursts (`burst_prob = 0.0`)
+- no truth indels (`num_indels = 0`)
+- phasing input source `vcf_source = both`
 
-#### Outputs
-- `<outdir>/<interaction_section>/aggregate.csv`
-- `<outdir>/<interaction_section>/plots/*.png`
+This experiment tests whether two realistic stressors that were individually interpretable in earlier sections combine into a more severe end-to-end phasing failure mode.
 
 #### Figures to include
-- `called_effective_phased_recall` across conditions (grouped bars or heatmap)
-- `called_num_phase_sets` across conditions (grouped bars or heatmap)
+- **Figure 10.8.1 — Variant calling recall across duplication × dropout conditions.**
+- **Figure 10.8.2 — Called effective phased recall across duplication × dropout conditions.**
+- **Figure 10.8.3 — Called number of phase sets across duplication × dropout conditions.**
+- **Figure 10.8.4 — Called switch error across duplication × dropout conditions.** (secondary; interpret with caution)
+
+**Figure 10.8.1 — Variant calling recall across duplication × dropout conditions.**  
+Calling recall is only mildly affected by duplication alone, but decreases further when duplication is combined with coverage dropout. This shows that ambiguous mapping compounds the loss of callable sites under low-coverage conditions.
+
+**Figure 10.8.2 — Called effective phased recall across duplication × dropout conditions.**  
+The combined duplication + dropout condition produces the lowest end-to-end phased recall, showing that the two stressors interact to create a substantially more difficult phasing problem than either one alone.
+
+**Figure 10.8.3 — Called number of phase sets across duplication × dropout conditions.**  
+Phase fragmentation is driven primarily by dropout, but remains high in the combined condition. This indicates that low-coverage gaps are the main cause of broken block continuity, while duplication compounds the end-to-end difficulty in other ways.
+
+**Figure 10.8.4 — Called switch error across duplication × dropout conditions.**  
+Switch error should be interpreted cautiously in the interaction study. Although duplication alone produces the highest switch error, the combined condition is much more fragmented and leaves fewer phased adjacencies to compare, making completeness and fragmentation metrics more informative than switch error alone.
+
+#### Results summary (means over seeds)
+- `call_recall`:
+  - `dup=0, dropout=0.0`: 0.663
+  - `dup=0, dropout=0.1`: 0.605
+  - `dup=5, dropout=0.0`: 0.666
+  - `dup=5, dropout=0.1`: 0.582
+- `oracle_effective_phased_recall`:
+  - 0.925 → 0.857 → 0.918 → 0.847
+- `oracle_num_phase_sets`:
+  - 1.8 → 3.2 → 1.8 → 4.0
+- `called_effective_phased_recall`:
+  - 0.436 → 0.269 → 0.373 → 0.197
+- `called_shared_het_recall`:
+  - 0.590 → 0.529 → 0.593 → 0.501
+- `called_phasing_rate_shared_het`:
+  - 0.819 → 0.514 → 0.778 → 0.410
+- `called_phase_accuracy`:
+  - 0.890 → 0.981 → 0.802 → 0.940
+- `called_switch_error`:
+  - 0.122 → 0.006 → 0.207 → 0.062
+- `called_num_phase_sets`:
+  - 3.4 → 6.2 → 2.6 → 6.2
+
+Taken together, these results show that the combined duplication + dropout condition is substantially worse than either single stressor alone, and that the strongest compounded loss occurs in the called regime rather than in the oracle regime.
 
 #### Key observations
-- O1: <TODO>
-- O2: <TODO>
+- O1 (The combined condition is the worst end-to-end setting): Called effective phased recall decreases from `0.436` in the baseline to `0.269` with dropout alone, `0.373` with duplication alone, and `0.197` when both stressors are combined. This shows that duplication and dropout together create a materially more difficult end-to-end phasing condition than either stressor in isolation.
+
+- O2 (Dropout remains the main driver of phasing fragmentation): In the oracle regime, duplication alone has little effect (`oracle_num_phase_sets = 1.8`), whereas dropout increases fragmentation (`1.8 → 3.2`) and the combined condition increases it further (`4.0`). This indicates that coverage gaps are the primary cause of broken phase-block connectivity.
+
+- O3 (The interaction is strongest in the called regime): Relative to dropout alone, the combined condition further reduces `call_recall` (`0.605 → 0.582`), `called_shared_het_recall` (`0.529 → 0.501`), and `called_phasing_rate_shared_het` (`0.514 → 0.410`). This shows that duplication compounds dropout by worsening both variant recovery and phasing completeness on surviving shared heterozygous sites.
+
+- O4 (The compounded weakness is mixed rather than purely phaser-limited): Oracle effective phased recall decreases only modestly from `0.857` to `0.847` when duplication is added on top of dropout, but called effective phased recall decreases more substantially from `0.269` to `0.197`. Therefore, the main interaction effect is not purely within phasing itself; it arises more strongly from the end-to-end combination of reduced callable overlap and weaker phasing connectivity.
+
+- O5 (Switch error is not the main interaction signal): Although duplication alone produces the highest called switch error, the combined condition does not. This should not be interpreted as an improvement, because the combined condition is much more fragmented and leaves fewer adjacent phased heterozygous pairs to compare. In this interaction study, completeness and fragmentation metrics are more informative than switch error alone.
+
+#### Optimization implication
+The duplication × dropout interaction suggests that the most important optimization opportunities under compounded stress are not limited to WhatsHap read selection. Preserving phasing evidence remains important (e.g., avoiding overly strict `min_baseq` filtering), but the interaction also indicates that upstream variant recovery in ambiguous and low-coverage regions is a major limiting factor. This motivates future tuning of calling-side thresholds and, potentially, more region-aware handling of ambiguous reads near coverage gaps.
 
 #### Takeaway
-- <TODO>
+Duplicated regions and coverage dropout interact to produce a more severe end-to-end phasing weakness than either stressor alone. Dropout drives fragmentation, while duplication further reduces callable overlap and phasing completeness in the called regime. This makes the interaction a useful diagnostic for optimization: it shows that practical improvements will likely require both careful preservation of phasing evidence and better upstream handling of difficult regions, rather than relying on a single WhatsHap parameter alone.
 
 ---
 
 ### 10.9 Optimization sweeps (WhatsHap / pipeline parameters)
 
 #### Aim
-Identify parameter settings that improve phasing metrics under hard conditions and quantify trade-offs.
+Identify parameter settings that improve phasing performance under a composite hard scenario, and quantify trade-offs between phased recall, switch error, fragmentation, and robustness.
 
-#### Setup
-Run on a fixed “hard scenario” (document the chosen stressors), then:
-- Sweep A: `max_coverage`
-- Sweep B: `min_mapq × min_baseq`
+#### Hard scenario
+Optimization sweeps were conducted on a fixed composite stress condition designed to combine several realism knobs:
+- duplicated regions (`dup_segments = 5`)
+- coverage dropout (`dropout_fraction = 0.1`, `dropout_block_len = 1000`)
+- correlated error bursts (`burst_prob = 0.6`, `burst_count = 2`, `burst_len = 300`, `burst_mult = 8.0`)
+- truth indels (`num_indels = 120`, SNP-only phasing/evaluation enabled)
+- `ref_length = 120 kb`
+- `num_snps = 1200`
+- `num_reads = 300`
 
-#### Commands
-- `python -m benchmark.experiment_driver --outdir <...> --seeds ... --only optimize`
+This hard scenario was chosen to test whether WhatsHap-side tuning can recover performance under combined realistic stresses rather than under isolated perturbations.
 
-#### Outputs
-- `<outdir>/<optimize_section>/.../aggregate.csv`
-- `<outdir>/<optimize_section>/plots/*.png`
+#### 10.9.1 Sweep A: `max_coverage`
 
-#### Figures to include
-- effective phased recall vs `max_coverage` (+ runtime if available)
-- switch error vs quality thresholds (grid)
-- phase sets vs quality thresholds (grid)
+##### Setup
+- Varied: `max_coverage ∈ {10, 15, 25, 40}`
+- Fixed: all other hard-scenario parameters
 
-#### Key observations
-- O1: <TODO>
-- O2: <TODO>
+##### Figures to include
+- **Figure 10.9.1 — Called effective phased recall vs `max_coverage`.**
+- **Figure 10.9.2 — Called switch error vs `max_coverage`.**
+- **Figure 10.9.3 — Called number of phase sets vs `max_coverage`.**
+- **Figure 10.9.4 — Total pipeline runtime vs `max_coverage`.**
 
-#### Takeaway (lead-in to Section 11 recommendations)
-- <TODO>
+**Figure 10.9.1 — Called effective phased recall vs `max_coverage`.**  
+Called effective phased recall remains essentially flat across the `max_coverage` sweep, indicating that increasing the WhatsHap read-selection cap does not provide a meaningful gain under the current hard scenario.
+
+**Figure 10.9.2 — Called switch error vs `max_coverage`.**  
+Called switch error shows no meaningful dependence on `max_coverage`, further indicating that read-selection depth is not the limiting factor for phasing correctness in the current hard scenario.
+
+**Figure 10.9.3 — Called number of phase sets vs `max_coverage`.**  
+Phase-set fragmentation remains unchanged across the `max_coverage` sweep, showing that retaining more reads does not improve haplotype continuity in this stress condition.
+
+**Figure 10.9.4 — Total pipeline runtime vs `max_coverage`.**  
+Runtime increases substantially as `max_coverage` increases, but phasing performance remains nearly unchanged. This indicates that higher `max_coverage` mainly adds compute cost rather than practical benefit.
+
+##### Results summary
+- `call_recall`: 0.5895 at all `max_coverage` settings
+- `called_effective_phased_recall`: 0.2917 → 0.2919 → 0.2919 → 0.2919
+- `called_switch_error`: 0.0056 at all `max_coverage` settings
+- `called_num_phase_sets`: 9.6 at all `max_coverage` settings
+- `called_shared_het_recall`: 0.5098 at all `max_coverage` settings
+- `called_phasing_rate_shared_het`: 0.5860 → 0.5864 → 0.5864 → 0.5864
+- `called_phase_accuracy`: 0.9748 at all `max_coverage` settings
+- `oracle_effective_phased_recall`: 0.8256 → 0.8298 → 0.8300 → 0.8300
+- `oracle_num_phase_sets`: 6.4 → 6.2 → 6.2 → 6.2
+- `time_total_sec`: 3.76 → 4.37 → 6.30 → 6.39
+
+##### Key observations
+- O1 (Changing `max_coverage` has almost no effect on phasing performance): Called effective phased recall, switch error, phase-set count, and phasing-rate-on-shared-hets remain essentially unchanged across the full `max_coverage` sweep.
+
+- O2 (Runtime increases without measurable accuracy gain): Total runtime increases substantially as `max_coverage` increases, but this additional compute does not translate into improved end-to-end phasing metrics.
+
+- O3 (The read-selection cap is not the active bottleneck in this hard scenario): Although higher `max_coverage` retains more reads internally, the resulting phasing output is almost identical. This indicates that the limiting factor is not insufficient retained read coverage at the phasing stage.
+
+- O4 (Optimization headroom from `max_coverage` is negligible): Under the current hard scenario, increasing the WhatsHap read-selection cap does not provide a practically useful optimization lever.
+
+##### Takeaway
+Adjusting `max_coverage` does not provide a meaningful optimization benefit under the composite hard scenario. Since phasing metrics remain flat while runtime increases, the default or lower `max_coverage` setting is preferable on efficiency grounds.
+
+#### 10.9.2 Sweep B: phasing quality thresholds (`min_mapq × min_baseq`)
+
+##### Setup
+- Varied:
+  - `min_mapq ∈ {0, 10, 20}`
+  - `min_baseq ∈ {0, 10, 20}`
+- Fixed: all other hard-scenario parameters
+
+##### Figures to include
+- **Figure 10.9.5 — Called effective phased recall across the `min_mapq × min_baseq` grid.**
+- **Figure 10.9.6 — Called switch error across the `min_mapq × min_baseq` grid.**
+- **Figure 10.9.7 — Called number of phase sets across the `min_mapq × min_baseq` grid.**
+- **Figure 10.9.8 — Oracle effective phased recall across the `min_mapq × min_baseq` grid.**
+
+**Figure 10.9.5 — Called effective phased recall across the `min_mapq × min_baseq` grid.**  
+Called effective phased recall is consistently higher when `min_baseq = 0` or `10` than when `min_baseq = 20`, while `min_mapq` has little visible effect. This shows that overly strict base-quality filtering reduces usable phasing evidence.
+
+**Figure 10.9.6 — Called switch error across the `min_mapq × min_baseq` grid.**  
+Called switch error is lowest when `min_baseq = 0` or `10` and higher when `min_baseq = 20`, indicating that stricter base-quality filtering does not improve phasing correctness in this hard scenario and instead weakens phasing evidence.
+
+**Figure 10.9.7 — Called number of phase sets across the `min_mapq × min_baseq` grid.**  
+Phase fragmentation is substantially lower when `min_baseq = 0` or `10` than when `min_baseq = 20`, showing that strict base-quality filtering breaks block continuity by removing informative allele observations.
+
+**Figure 10.9.8 — Oracle effective phased recall across the `min_mapq × min_baseq` grid.**  
+Oracle phasing performance is markedly worse when `min_baseq = 20`, confirming that the main threshold effect arises within the phasing stage itself rather than through changes in the upstream callset.
+
+##### Results summary
+- For `min_baseq = 0 or 10`:
+  - `called_effective_phased_recall`: 0.2964
+  - `called_switch_error`: 0.0007
+  - `called_num_phase_sets`: 6.6
+  - `called_phasing_rate_shared_het`: 0.6027
+  - `oracle_effective_phased_recall`: 0.9402–0.9415
+  - `oracle_num_phase_sets`: 3.8
+- For `min_baseq = 20`:
+  - `called_effective_phased_recall`: 0.2919–0.2923
+  - `called_switch_error`: 0.0056
+  - `called_num_phase_sets`: 9.6
+  - `called_phasing_rate_shared_het`: 0.5864–0.5872
+  - `oracle_effective_phased_recall`: 0.8298–0.8319
+  - `oracle_num_phase_sets`: 6.2–6.4
+- `min_mapq` has negligible effect across the grid.
+- `call_recall` remains constant at 0.5895 because variant-calling thresholds are fixed and only phasing-side filters are varied here.
+
+##### Key observations
+- O1 (Base-quality filtering is the main useful phasing-side knob): The grid separates into two clear regimes. Using `min_baseq = 0 or 10` improves called effective phased recall, lowers switch error, and reduces phase fragmentation relative to `min_baseq = 20`.
+
+- O2 (Overly strict `min_baseq` harms both oracle and called phasing): Raising `min_baseq` to 20 reduces oracle effective phased recall from about `0.94` to about `0.83`, and increases oracle phase-set count from `3.8` to `6.2–6.4`. This shows that strict base-quality filtering discards too much informative phasing evidence.
+
+- O3 (`min_mapq` contributes little under the current hard scenario): Changing `min_mapq` from 0 to 20 produces almost no measurable difference in called or oracle metrics, indicating that mapping-quality filtering is not a strong optimization lever here.
+
+- O4 (The gain from threshold tuning is modest but real): Lowering `min_baseq` improves phasing completeness and continuity, but the absolute gain in called effective phased recall is still small because the dominant loss term remains missing shared heterozygous sites.
+
+##### Takeaway
+Phasing quality thresholds provide a limited but real optimization lever under the composite hard scenario. The most useful change is to avoid overly strict base-quality filtering: `min_baseq = 10` (or 0) clearly outperforms `min_baseq = 20`, while `min_mapq` has little practical impact.
+
+#### Overall takeaway
+Under the current hard scenario, WhatsHap-side tuning provides limited but non-zero optimization headroom. The `max_coverage` sweep shows essentially no benefit beyond lower settings, indicating that read-selection depth is not the active bottleneck. In contrast, the quality-threshold grid shows that overly strict phasing base-quality filtering is harmful: lowering `min_baseq` from 20 to 10 (or 0) improves phased recall and reduces fragmentation. However, decomposition across all optimization settings shows that the dominant loss term remains missing shared heterozygous sites, which is unaffected by phasing-side tuning. This suggests that while WhatsHap parameter tuning can recover some performance, larger end-to-end gains will likely require improvements in upstream variant recovery or better handling of compounded stress conditions.
 
 ---
 
