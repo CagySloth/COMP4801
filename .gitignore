@@ -44,7 +44,8 @@ htmlcov/
 .tox/
 
 # --- Project outputs ---
-.vscode/output/experiments_draft/*.zip
+.vscode/
+output/experiments_draft/*.zip
 benchmark_results/
 *.log
 
