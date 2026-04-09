@@ -15,6 +15,8 @@
 - **Called regime:** phase using `*.called.vcf.gz` (end-to-end)
 - **Indel policy:** when indels are enabled, use SNP-only phasing/evaluation (`phase_snps_only`, `eval_snps_only`)
 
+For this project, a custom adaptor layer was used to construct the `ReadSet` consumed by the vendored WhatsHap core. This was necessary to support the study’s experimental requirements, including oracle vs called benchmarking, unified JSON provenance, and controlled SNP-only phasing/evaluation under indel-containing truth sets. The adaptor is therefore part of the project’s benchmarking infrastructure rather than a direct reproduction of the standard production-facing WhatsHap front-end.
+
 #### 10.1.3 Fixed parameters (baseline constants)
 
 Unless stated otherwise in a subsection, experiments use the baseline defaults defined by the experiment driver. These parameters control each stage of the end-to-end pipeline (reference/truth generation → read simulation → alignment → calling → phasing → evaluation).
@@ -979,7 +981,7 @@ A final confirmation run compared the default hard-scenario configuration agains
   - `min_baseq = 20`
 
 - **Optimized configuration**
-  - `cll_min_mapq = 20`
+  - `call_min_mapq = 20`
   - `call_min_baseq = 10`
   - `max_coverage = 8`
   - `min_mapq = 20`
@@ -1374,6 +1376,73 @@ Means over 5 seeds:
 ##### Takeaway
 Caller mapping-quality filtering does not provide meaningful optimization headroom under the current hard scenario. Unlike caller base-quality, which showed a clear and useful tuning signal, `call_min_mapq` has only weak effects on the main end-to-end phasing metrics. This supports treating caller mapQ as a low-priority or effectively negligible optimization knob in this pipeline.
 
+#### 10.9.11 DP-scaling under hard conditions
+
+##### Aim
+Assess how the downstream phasing problem scales with increasing SNP density under the composite hard scenario, and determine whether the tuned configuration changes the runtime growth of the solve stage.
+
+##### Setup
+A small scaling study was conducted under the fixed hard scenario, varying only the number of SNPs:
+
+- `num_snps ∈ {400, 800, 1200, 1600}`
+
+Two configurations were compared:
+- **`default`**
+  - `call_min_baseq = 15`
+  - `max_coverage = 15`
+  - `min_baseq = 20`
+- **`balanced`**
+  - `call_min_baseq = 10`
+  - `max_coverage = 8`
+  - `min_baseq = 10`
+
+All other hard-scenario stressors were kept fixed.
+
+##### Figures to include
+- **Figure 10.9.11.1 — Called solve time vs SNP count under default and balanced configurations.**
+- **Figure 10.9.11.2 — Oracle solve time vs SNP count under default and balanced configurations.**
+- **Figure 10.9.11.3 — Called effective phased recall vs SNP count under default and balanced configurations.**
+- **Figure 10.9.11.4 — Called number of phase sets vs SNP count under default and balanced configurations.**
+
+**Figure 10.9.11.1 — Called solve time vs SNP count under default and balanced configurations.**  
+Called solve time increases with SNP density under both configurations, but grows much more steeply under the default setting. This shows that the tuned configuration makes the residual phasing problem easier to solve as variant density increases.
+
+**Figure 10.9.11.2 — Oracle solve time vs SNP count under default and balanced configurations.**  
+Oracle solve time also increases with SNP density, confirming that the solver becomes more expensive as the phasing-only problem grows. The balanced configuration remains substantially faster, indicating that its benefit is not solely due to changes in the called callset.
+
+**Figure 10.9.11.3 — Called effective phased recall vs SNP count under default and balanced configurations.**  
+Across the scaling range, the balanced configuration maintains slightly higher end-to-end phased recall than the default configuration, showing that its runtime benefit is not obtained by sacrificing phasing quality.
+
+**Figure 10.9.11.4 — Called number of phase sets vs SNP count under default and balanced configurations.**  
+The balanced configuration generally produces fewer phase sets than the default configuration as SNP density increases, indicating better phase-block continuity and a less fragmented residual phasing problem.
+
+##### Results summary
+Means over 3 seeds:
+
+- **Balanced**
+  - `called_time_solve_sec`: `0.0026 → 0.0046 → 0.0051 → 0.0067`
+  - `oracle_time_solve_sec`: `0.0044 → 0.0066 → 0.0091 → 0.0114`
+  - `called_effective_phased_recall`: `0.3071 → 0.3705 → 0.3295 → 0.3280`
+  - `called_num_phase_sets`: `6.0 → 5.7 → 7.3 → 6.3`
+
+- **Default**
+  - `called_time_solve_sec`: `0.0053 → 0.0352 → 0.0545 → 0.1002`
+  - `oracle_time_solve_sec`: `0.0114 → 0.0533 → 0.0863 → 0.1407`
+  - `called_effective_phased_recall`: `0.2935 → 0.3539 → 0.3164 → 0.3141`
+  - `called_num_phase_sets`: `8.3 → 10.7 → 10.0 → 7.7`
+
+##### Key observations
+- O1 (Solve time increases with SNP density): In both oracle and called regimes, solve time increases as `num_snps` increases from 400 to 1600, showing that the downstream phasing problem becomes more expensive as variant density rises.
+
+- O2 (The balanced configuration scales much better than default): The growth in solve time is much steeper under the default configuration than under the balanced configuration. At `num_snps = 1600`, default solve time is substantially higher than balanced in both oracle and called regimes, indicating that the tuned settings make the residual phasing problem easier to solve.
+
+- O3 (Balanced remains better on phasing continuity as the problem grows): Across the scaling range, the balanced configuration generally maintains fewer phase sets and slightly better phased recall than the default configuration. This suggests that the tuning improves not only final phasing output but also the structure of the instance presented to the solver.
+
+- O4 (Solve time still does not dominate total runtime end-to-end): Although solve time grows with SNP density, total phasing runtime remains dominated by preprocessing/readset construction in the current research pipeline. Therefore, the main value of this result is algorithmic interpretation rather than end-to-end runtime engineering.
+
+##### Takeaway
+The DP-scaling study shows that increasing SNP density makes the phasing solve stage progressively more expensive, but also that the balanced tuned configuration scales substantially better than the default configuration. This suggests that practical tuning can improve not only phased output quality but also the difficulty of the residual wMEC-style problem faced by the solver.
+
 #### Overall takeaway
 Under the current hard scenario, optimization headroom exists but is uneven across knobs. WhatsHap-side tuning provides only limited gains: increasing `max_coverage` does not help, and the main useful phasing-side adjustment is to avoid overly strict `min_baseq` filtering. In contrast, caller-side tuning is more impactful: lowering `call_min_baseq` from 20 to a moderate value such as 10 improves variant recovery, shared heterozygous overlap, and end-to-end phased recall without materially reducing precision. Taken together, these results indicate that practical optimization in this pipeline is not purely a WhatsHap parameter problem; meaningful gains are more likely to come from a combination of permissive phasing evidence retention and improved upstream variant recovery.
 
@@ -1382,20 +1451,70 @@ Under the current hard scenario, optimization headroom exists but is uneven acro
 ### 10.10 Summary of results (cross-experiment synthesis)
 
 #### 10.10.1 Attribution summary (oracle vs called)
-For each stressor, classify the main bottleneck using oracle vs called gap and decomposition columns:
-- Duplications: <caller-limited / phaser-limited / mixed> (evidence: <TODO>)
-- Dropout: <...>
-- Bursts: <...>
-- Indels (SNP-only): <...>
+
+Taken together, the oracle-vs-called comparison provides a consistent attribution picture across the stress studies.
+
+- **Duplications:** primarily a **called-regime phasing/evidence-quality stressor**, rather than a strong caller-limited bottleneck. Calling recall remains nearly unchanged across duplication levels, and oracle effective phased recall remains high and stable. The main degradation appears only at the strongest duplication level, where called phasing completeness and phase accuracy worsen without a corresponding drop in shared-site recall. This indicates that duplicated regions mainly weaken the consistency of phasing evidence on surviving called sites.
+
+- **Coverage dropout:** primarily a **fragmentation-dominated stressor**, becoming **mixed** at high severity. Oracle phase-set counts increase strongly with dropout fraction and oracle effective phased recall declines, showing that dropout directly breaks read connectivity even when correct sites are supplied. In the called regime, performance degrades more strongly still, and at severe dropout both shared-site recall and phasing completeness collapse. This makes dropout the clearest example of a connectivity bottleneck that later becomes both a calling and phasing bottleneck.
+
+- **Correlated error bursts:** a **weak and somewhat noisy called-regime correctness stressor** under the current parameterization. Oracle metrics remain stable, calling recall is broadly unchanged, and the main visible effect is a dip in called-regime phase accuracy and switch stability at intermediate burst probability. Because the response is non-monotonic, this stressor should be interpreted cautiously and does not currently provide a strong optimization signal.
+
+- **Read length model:** a **mixed continuity/overlap trade-off** rather than a clear stressor or optimization knob. The lognormal model improves calling recall, shared-site recall, and phase-block continuity, but these gains are largely offset by slightly worse called-regime phasing correctness. This shows that better connectivity alone does not guarantee a strong end-to-end gain.
+
+- **Truth indels with SNP-only policy:** primarily a **methodology-validity result**, not a performance stressor. Oracle SNP-phasing metrics remain stable and called SNP-level metrics stay within a comparable range across indel settings, indicating that `phase_snps_only` and `eval_snps_only` successfully preserve interpretable SNP phasing evaluation even when truth indels are present.
+
+- **Duplication × dropout interaction:** a **mixed compounded weakness**, strongest in the called regime. Dropout remains the main source of fragmentation, but duplication further worsens both called-site overlap and phasing completeness on surviving sites. This interaction shows that realistic end-to-end failure modes arise most clearly when ambiguous mapping and low-coverage gaps are combined.
+
+Overall, the attribution pattern is consistent: whenever oracle performance remains strong but called performance degrades, the dominant bottleneck lies in the overlap and quality of called heterozygous sites. When oracle performance also degrades, the stressor is directly harming phase-block connectivity or phasing completeness.
 
 #### 10.10.2 Most impactful stressors
-Rank stressors by impact on:
-- `called_effective_phased_recall`
-- `called_switch_error`
-- `called_num_phase_sets`
+
+Across the single-knob and interaction studies, the realism knobs differ substantially in practical impact.
+
+- **Most impactful overall:** **coverage dropout**. It produces the clearest and strongest reduction in called effective phased recall, strongly increases phase fragmentation, and eventually also reduces calling recall. It is the most important isolated stressor in this study.
+
+- **Most impactful compounded weakness:** **duplication × dropout interaction**. While duplication alone is relatively mild, its combination with dropout creates a substantially worse end-to-end condition than either stressor alone, especially in the called regime. This reveals a realistic mixed failure mode involving both reduced callable overlap and weaker phasing connectivity.
+
+- **Moderate impact:** **read length model** and **strong duplication**. The read length model changes continuity and overlap in opposite directions, while strong duplication mainly affects called-regime phasing quality at the highest severity.
+
+- **Weak / noisy impact:** **correlated error bursts**. Under the current parameterization, bursts do not produce a strong monotonic degradation trend and therefore are less informative as a practical optimization target.
+
+- **Methodological rather than stress-inducing:** **truth indels under SNP-only policy**. Their main value is to validate that the evaluation remains interpretable under indel-containing truth sets.
+
+If stressors are ranked by effect on the main end-to-end metric (`called_effective_phased_recall`), the most important findings are:  
+1. **dropout**,  
+2. **duplication × dropout interaction**,  
+3. **strong duplication / read-length trade-off effects**,  
+4. **bursts (weak/noisy)**,  
+with the indel study serving primarily as an evaluation-robustness check rather than a degradation study.
 
 #### 10.10.3 Optimization summary
-Summarize best trade-off settings found in §10.9 (to be expanded in Section 11):
-- Recommended `max_coverage`: <TODO>
-- Recommended `min_mapq/min_baseq`: <TODO>
-- Notes on runtime and trade-offs: <TODO>
+
+Optimization sweeps under the composite hard scenario showed that optimization headroom exists, but is uneven across knobs.
+
+Runtime profiling of the research pipeline indicated that the largest share of phasing time is spent in the custom readset-construction adaptor that feeds the vendored WhatsHap core. Excluding this adaptor, the remaining runtime is configuration-dependent: in default-like settings the solve stage dominates the residual cost, whereas in the tuned settings read selection and solving are more balanced. Since the dominant end-to-end bottleneck is a property of the project-specific experimental interface rather than necessarily of the core WhatsHap solver, adaptor-level runtime optimization was not pursued further as a main contribution. The study therefore focused on optimization directions more directly relevant to practical WhatsHap-based phasing workflows, including caller-side filtering, phasing-side filtering, retained coverage, and robustness across scenarios.
+
+The main optimization findings are:
+
+- **Useful caller-side knob:** `call_min_baseq`. Lowering the caller base-quality threshold from 20 to a moderate value such as 10 substantially improves calling recall, shared heterozygous overlap, and end-to-end phased recall without materially harming precision. This is the strongest optimization signal found in the study.
+
+- **Useful phasing-side knob:** `min_baseq`, but mainly as a **rule-out of overly strict filtering**. Phasing performance is stable for `min_baseq = 0–15`, but degrades at `20`, indicating that strict phasing base-quality filtering discards too much informative evidence. A moderate setting such as `min_baseq = 10` is the cleanest practical recommendation.
+
+- **Useful runtime knob:** `max_coverage`. Increasing `max_coverage` beyond 8–10 does not improve phasing performance, while lower values such as 8 preserve full performance with lower runtime. This makes `max_coverage = 8` a practical efficiency setting.
+
+- **Weak / negligible knobs:** caller `call_min_mapq`, phasing `min_mapq`, and high `max_coverage` values above the plateau. These do not provide meaningful practical gains under the tested hard scenario.
+
+- **Robustness of tuning:** the tuned configurations generalize across baseline, dropout, interaction, and hard scenarios. In all tested cases, the balanced tuned configuration improves called effective phased recall and reduces fragmentation relative to default, while a runtime-biased configuration performs almost identically and remains a viable alternative when efficiency is prioritized.
+
+- **Algorithm-facing scaling result:** increasing SNP density makes the solve stage more expensive, but the balanced tuned configuration scales much better than the default configuration. This suggests that practical tuning not only improves phased output quality, but also reduces the difficulty of the residual wMEC-style problem faced by the solver.
+
+Based on the optimization sweeps, the recommended practical settings for this pipeline are:
+
+- **Recommended `max_coverage`:** `8`  
+- **Recommended phasing thresholds:** `min_mapq = 20`, `min_baseq = 10`  
+- **Recommended calling thresholds:** `call_min_mapq = 20` (or leave at default, as the effect is negligible), `call_min_baseq = 10`
+
+A slightly more runtime-biased alternative (`max_coverage = 6`, with the same caller/phasing quality thresholds) performs almost identically on the main accuracy metrics and may be acceptable when efficiency is prioritized.
+
+Future work could compare the custom adaptor against the standard WhatsHap front-end directly, or optimize the adaptor separately if pipeline-level runtime becomes a primary objective.
