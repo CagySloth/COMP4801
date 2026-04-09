@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-source .venv/bin/activate
-
 OUTDIR="output/prelim/whats_maxcov_sweep_vcf"
 mkdir -p "$OUTDIR"
 
@@ -57,4 +55,4 @@ for MC in "${MAXCOVS[@]}"; do
 done
 
 echo "Done. Results in: $OUTDIR"
-echo "Next: python scripts/collect_whats_maxcov_sweep.py (update its OUTDIR path if needed)"
+echo "Next: python examples/collect_whats_maxcov_sweep.py (update its OUTDIR path if needed)"

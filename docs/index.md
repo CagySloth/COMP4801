@@ -16,4 +16,4 @@ Start here:
 - [Pipeline validation](validation.md)
 - [Experiment planning](experiments.md)
 - [I/O formats](io.md)
-- [Scripts](scripts.md)
+- [Example Scripts](examples.md)
