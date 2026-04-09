@@ -8,7 +8,7 @@
 - minimap2 versions: 2.30-r1287
 - samtools version: 1.23
 - bcftools version: 1.23
-- Vendored WhatsHap core path (from `*.ws*.summary.json`): <TODO>
+- Vendored WhatsHap core path: `vendor/whatshap_core/whatshap/core.<platform-specific extension>`
 
 #### 10.1.2 Pipeline regimes
 - **Oracle regime:** phase using `*.oracle.vcf.gz` (phaser-limited)
