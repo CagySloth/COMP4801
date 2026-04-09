@@ -507,9 +507,12 @@ def run_optimize(outdir: Path, seeds: List[int], force: bool, base: Dict[str, An
     Available sweeps:
       - cov: existing max_coverage sweep
       - qual: existing phasing min_mapq x min_baseq grid
-      - calling: NEW caller-side call_min_mapq x call_min_baseq grid
-      - runtime: NEW lower max_coverage sweep to hunt for runtime savings
-      - bqfine: NEW fine-grained phasing min_baseq sweep
+      - calling: caller-side call_min_mapq x call_min_baseq grid
+      - runtime: lower max_coverage sweep to hunt for runtime savings
+      - bqfine: fine-grained phasing min_baseq sweep
+      - local: local joint search around the current best caller/phasing base-quality settings
+      - frontier: representative accuracy/runtime frontier comparison
+      - confirm: default-vs-optimized confirmation comparison
     """
     exp = outdir / "08_optimize_whatshap"
     _ensure_dir(exp)
@@ -640,6 +643,157 @@ def run_optimize(outdir: Path, seeds: List[int], force: bool, base: Dict[str, An
         _bottleneck_decomposition(df5, "called", bq_dir / "decomposition_called.csv")
 
 
+    # 8F) NEW: local joint caller/phasing base-quality search
+    if "local" in selected:
+        local_dir = exp / "local_joint_bq_search"
+        _ensure_dir(local_dir)
+        for cbq in [5, 10, 15]:
+            for pbq in [5, 10, 15]:
+                for s in seeds:
+                    args = dict(hard)
+                    args["seed"] = s
+                    args["call_min_mapq"] = 20
+                    args["call_min_baseq"] = cbq
+                    args["max_coverage"] = 8
+                    args["min_mapq"] = 20
+                    args["min_baseq"] = pbq
+                    prefix = local_dir / f"cbq{cbq}_pbq{pbq}_s{s}"
+                    _call_pipeline(prefix, args, force=force)
+        csvp_local = _aggregate(local_dir)
+        df_local = pd.read_csv(csvp_local)
+        _plots_heatmap(local_dir, df_local, "call_min_baseq", "min_baseq", [
+            ("call_recall", "Calling recall"),
+            ("called_shared_het_recall", "Called shared het recall"),
+            ("called_effective_phased_recall", "Called effective phased recall"),
+            ("time_total_sec", "Total runtime (s)"),
+        ])
+        _bottleneck_decomposition(df_local, "called", local_dir / "decomposition_called.csv")
+
+
+    # 8G) NEW: representative accuracy/runtime frontier comparison
+    if "frontier" in selected:
+        fr_dir = exp / "frontier_config_comparison"
+        _ensure_dir(fr_dir)
+        configs = [
+            ("default", {
+                "call_min_mapq": 20,
+                "call_min_baseq": 15,
+                "max_coverage": 15,
+                "min_mapq": 20,
+                "min_baseq": 20,
+            }),
+            ("caller_only", {
+                "call_min_mapq": 20,
+                "call_min_baseq": 10,
+                "max_coverage": 15,
+                "min_mapq": 20,
+                "min_baseq": 20,
+            }),
+            ("phasing_only", {
+                "call_min_mapq": 20,
+                "call_min_baseq": 15,
+                "max_coverage": 8,
+                "min_mapq": 20,
+                "min_baseq": 10,
+            }),
+            ("balanced", {
+                "call_min_mapq": 20,
+                "call_min_baseq": 10,
+                "max_coverage": 8,
+                "min_mapq": 20,
+                "min_baseq": 10,
+            }),
+            ("runtime", {
+                "call_min_mapq": 20,
+                "call_min_baseq": 10,
+                "max_coverage": 6,
+                "min_mapq": 20,
+                "min_baseq": 10,
+            }),
+        ]
+        for label, overrides in configs:
+            for s in seeds:
+                args = dict(hard)
+                args["seed"] = s
+                args.update(overrides)
+                prefix = fr_dir / f"{label}_s{s}"
+                _call_pipeline(prefix, args, force=force)
+        csvp_fr = _aggregate(fr_dir)
+        df_fr = pd.read_csv(csvp_fr)
+        if "pipeline_json" in df_fr.columns:
+            df_fr["config_label"] = df_fr["pipeline_json"].astype(str).str.extract(r"/(default|caller_only|phasing_only|balanced|runtime)_s\d+\.pipeline\.json$")[0]
+        elif "prefix" in df_fr.columns:
+            df_fr["config_label"] = df_fr["prefix"].astype(str).str.extract(r"/(default|caller_only|phasing_only|balanced|runtime)_s\d+$")[0]
+        else:
+            df_fr["config_label"] = None
+        if df_fr["config_label"].isna().all():
+            df_fr["config_label"] = [
+                "caller_only" if "caller_only" in str(x) else
+                "phasing_only" if "phasing_only" in str(x) else
+                "balanced" if "balanced" in str(x) else
+                "runtime" if "runtime" in str(x) else
+                "default"
+                for x in df_fr.get("pipeline_json", df_fr.index)
+            ]
+        df_fr.to_csv(csvp_fr, index=False)
+        _plots_basic(fr_dir, df_fr, "config_label", [
+            ("called_effective_phased_recall", "Called effective phased recall"),
+            ("called_shared_het_recall", "Called shared het recall"),
+            ("called_num_phase_sets", "Called num phase sets"),
+            ("time_total_sec", "Total runtime (s)"),
+        ])
+        _bottleneck_decomposition(df_fr, "called", fr_dir / "decomposition_called.csv")
+
+
+    # 8H) NEW: default-vs-optimized confirmation comparison
+    if "confirm" in selected:
+        cf_dir = exp / "confirm_default_vs_optimized"
+        _ensure_dir(cf_dir)
+        configs = [
+            ("default", {
+                "call_min_mapq": 20,
+                "call_min_baseq": 15,
+                "max_coverage": 15,
+                "min_mapq": 20,
+                "min_baseq": 20,
+            }),
+            ("optimized", {
+                "call_min_mapq": 20,
+                "call_min_baseq": 10,
+                "max_coverage": 8,
+                "min_mapq": 20,
+                "min_baseq": 10,
+            }),
+        ]
+        for label, overrides in configs:
+            for s in seeds:
+                args = dict(hard)
+                args["seed"] = s
+                args.update(overrides)
+                prefix = cf_dir / f"{label}_s{s}"
+                _call_pipeline(prefix, args, force=force)
+        csvp6 = _aggregate(cf_dir)
+        df6 = pd.read_csv(csvp6)
+        # Derive a stable categorical column from the output path/prefix naming.
+        if "pipeline_json" in df6.columns:
+            df6["config_label"] = df6["pipeline_json"].astype(str).str.extract(r"/(default|optimized)_s\d+\.pipeline\.json$")[0]
+        elif "prefix" in df6.columns:
+            df6["config_label"] = df6["prefix"].astype(str).str.extract(r"/(default|optimized)_s\d+$")[0]
+        else:
+            df6["config_label"] = None
+        if df6["config_label"].isna().all():
+            # Fallback in case paths are formatted differently.
+            df6["config_label"] = ["optimized" if "optimized" in str(x) else "default" for x in df6.get("pipeline_json", df6.index)]
+        df6.to_csv(csvp6, index=False)
+        _plots_basic(cf_dir, df6, "config_label", [
+            ("called_effective_phased_recall", "Called effective phased recall"),
+            ("called_shared_het_recall", "Called shared het recall"),
+            ("call_recall", "Calling recall"),
+            ("time_total_sec", "Total runtime (s)"),
+        ])
+        _bottleneck_decomposition(df6, "called", cf_dir / "decomposition_called.csv")
+
+
 def run_reality_check(outdir: Path, real_fastq: Optional[str], real_bam: Optional[str]) -> None:
     """
     Optional: compare simulated vs a real dataset if you have one.
@@ -716,7 +870,7 @@ def main():
     ap.add_argument(
         "--optimize-sweeps",
         default="cov,qual,calling,runtime,bqfine",
-        help="Comma-separated optimize sub-sweeps: cov,qual,calling,runtime,bqfine. Used when optimize is selected."
+        help="Comma-separated optimize sub-sweeps: cov,qual,calling,runtime,bqfine,local,confirm. Used when optimize is selected."
     )
     ap.add_argument("--real-fastq", default=None, help="Optional real FASTQ(.gz) for reality check")
     ap.add_argument("--real-bam", default=None, help="Optional real BAM for reality check")

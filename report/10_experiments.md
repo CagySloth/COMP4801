@@ -674,21 +674,21 @@ This hard scenario was chosen to test whether WhatsHap-side tuning can recover p
 - Fixed: all other hard-scenario parameters
 
 ##### Figures to include
-- **Figure 10.9.1 — Called effective phased recall vs `max_coverage`.**
-- **Figure 10.9.2 — Called switch error vs `max_coverage`.**
-- **Figure 10.9.3 — Called number of phase sets vs `max_coverage`.**
-- **Figure 10.9.4 — Total pipeline runtime vs `max_coverage`.**
+- **Figure 10.9.1.1 — Called effective phased recall vs `max_coverage`.**
+- **Figure 10.9.1.2 — Called switch error vs `max_coverage`.**
+- **Figure 10.9.1.3 — Called number of phase sets vs `max_coverage`.**
+- **Figure 10.9.1.4 — Total pipeline runtime vs `max_coverage`.**
 
-**Figure 10.9.1 — Called effective phased recall vs `max_coverage`.**  
+**Figure 10.9.1.1 — Called effective phased recall vs `max_coverage`.**  
 Called effective phased recall remains essentially flat across the `max_coverage` sweep, indicating that increasing the WhatsHap read-selection cap does not provide a meaningful gain under the current hard scenario.
 
-**Figure 10.9.2 — Called switch error vs `max_coverage`.**  
+**Figure 10.9.1.2 — Called switch error vs `max_coverage`.**  
 Called switch error shows no meaningful dependence on `max_coverage`, further indicating that read-selection depth is not the limiting factor for phasing correctness in the current hard scenario.
 
-**Figure 10.9.3 — Called number of phase sets vs `max_coverage`.**  
+**Figure 10.9.1.3 — Called number of phase sets vs `max_coverage`.**  
 Phase-set fragmentation remains unchanged across the `max_coverage` sweep, showing that retaining more reads does not improve haplotype continuity in this stress condition.
 
-**Figure 10.9.4 — Total pipeline runtime vs `max_coverage`.**  
+**Figure 10.9.1.4 — Total pipeline runtime vs `max_coverage`.**  
 Runtime increases substantially as `max_coverage` increases, but phasing performance remains nearly unchanged. This indicates that higher `max_coverage` mainly adds compute cost rather than practical benefit.
 
 ##### Results summary
@@ -724,21 +724,21 @@ Adjusting `max_coverage` does not provide a meaningful optimization benefit unde
 - Fixed: all other hard-scenario parameters
 
 ##### Figures to include
-- **Figure 10.9.5 — Called effective phased recall across the `min_mapq × min_baseq` grid.**
-- **Figure 10.9.6 — Called switch error across the `min_mapq × min_baseq` grid.**
-- **Figure 10.9.7 — Called number of phase sets across the `min_mapq × min_baseq` grid.**
-- **Figure 10.9.8 — Oracle effective phased recall across the `min_mapq × min_baseq` grid.**
+- **Figure 10.9.2.1 — Called effective phased recall across the `min_mapq × min_baseq` grid.**
+- **Figure 10.9.2.2 — Called switch error across the `min_mapq × min_baseq` grid.**
+- **Figure 10.9.2.3 — Called number of phase sets across the `min_mapq × min_baseq` grid.**
+- **Figure 10.9.2.4 — Oracle effective phased recall across the `min_mapq × min_baseq` grid.**
 
-**Figure 10.9.5 — Called effective phased recall across the `min_mapq × min_baseq` grid.**  
+**Figure 10.9.2.1 — Called effective phased recall across the `min_mapq × min_baseq` grid.**  
 Called effective phased recall is consistently higher when `min_baseq = 0` or `10` than when `min_baseq = 20`, while `min_mapq` has little visible effect. This shows that overly strict base-quality filtering reduces usable phasing evidence.
 
-**Figure 10.9.6 — Called switch error across the `min_mapq × min_baseq` grid.**  
+**Figure 10.9.2.2 — Called switch error across the `min_mapq × min_baseq` grid.**  
 Called switch error is lowest when `min_baseq = 0` or `10` and higher when `min_baseq = 20`, indicating that stricter base-quality filtering does not improve phasing correctness in this hard scenario and instead weakens phasing evidence.
 
-**Figure 10.9.7 — Called number of phase sets across the `min_mapq × min_baseq` grid.**  
+**Figure 10.9.2.3 — Called number of phase sets across the `min_mapq × min_baseq` grid.**  
 Phase fragmentation is substantially lower when `min_baseq = 0` or `10` than when `min_baseq = 20`, showing that strict base-quality filtering breaks block continuity by removing informative allele observations.
 
-**Figure 10.9.8 — Oracle effective phased recall across the `min_mapq × min_baseq` grid.**  
+**Figure 10.9.2.4 — Oracle effective phased recall across the `min_mapq × min_baseq` grid.**  
 Oracle phasing performance is markedly worse when `min_baseq = 20`, confirming that the main threshold effect arises within the phasing stage itself rather than through changes in the upstream callset.
 
 ##### Results summary
@@ -771,8 +771,333 @@ Oracle phasing performance is markedly worse when `min_baseq = 20`, confirming t
 ##### Takeaway
 Phasing quality thresholds provide a limited but real optimization lever under the composite hard scenario. The most useful change is to avoid overly strict base-quality filtering: `min_baseq = 10` (or 0) clearly outperforms `min_baseq = 20`, while `min_mapq` has little practical impact.
 
+#### 10.9.3 Sweep C: calling thresholds (`call_min_mapq × call_min_baseq`)
+
+##### Setup
+- Varied:
+  - `call_min_mapq ∈ {0, 10, 20}`
+  - `call_min_baseq ∈ {5, 10, 15, 20}`
+- Fixed:
+  - hard-scenario stressors unchanged
+  - phasing parameters fixed to the best practical settings identified earlier:
+    - `max_coverage = 10`
+    - `min_mapq = 20`
+    - `min_baseq = 10`
+
+##### Figures to include
+- **Figure 10.9.3.1 — Calling recall across the `call_min_mapq × call_min_baseq` grid.**
+- **Figure 10.9.3.2 — Called effective phased recall across the `call_min_mapq × call_min_baseq` grid.**
+- **Figure 10.9.3.3 — Called shared heterozygous recall across the `call_min_mapq × call_min_baseq` grid.**
+- **Figure 10.9.3.4 — Call precision across the `call_min_mapq × call_min_baseq` grid.**
+
+**Figure 10.9.3.1 — Calling recall across the `call_min_mapq × call_min_baseq` grid.**  
+Calling recall depends strongly on `call_min_baseq` but only weakly on `call_min_mapq`. Moderate base-quality thresholds retain more true SNP evidence, whereas `call_min_baseq = 20` is overly strict and sharply reduces variant recovery.
+
+**Figure 10.9.3.2 — Called effective phased recall across the `call_min_mapq × call_min_baseq` grid.**  
+End-to-end phased recall is highest when `call_min_baseq = 5` or `10`, showing that caller-side base-quality filtering has a direct downstream impact on usable phasing performance.
+
+**Figure 10.9.3.3 — Called shared heterozygous recall across the `call_min_mapq × call_min_baseq` grid.**  
+Called shared heterozygous recall follows the same pattern as calling recall, indicating that the main benefit of moderate caller thresholds is better recovery of true heterozygous SNPs that can subsequently be phased.
+
+**Figure 10.9.3.4 — Call precision across the `call_min_mapq × call_min_baseq` grid.**  
+Call precision remains very high across the full threshold grid, showing that the gains from moderate caller base-quality thresholds are achieved without a substantial precision penalty.
+
+##### Results summary
+- For `call_min_baseq = 5 or 10`:
+  - `call_precision`: ~0.9995
+  - `call_recall`: ~0.596–0.597
+  - `called_shared_het_recall`: ~0.517–0.518
+  - `called_effective_phased_recall`: ~0.3155–0.3157
+  - `called_phasing_rate_shared_het`: ~0.609–0.610
+  - `called_switch_error`: 0.0000
+  - `called_num_phase_sets`: 6.6
+- For `call_min_baseq = 15`:
+  - `call_recall`: ~0.589–0.590
+  - `called_shared_het_recall`: ~0.509–0.510
+  - `called_effective_phased_recall`: ~0.307–0.3074
+- For `call_min_baseq = 20`:
+  - `call_precision`: ~0.9991
+  - `call_recall`: ~0.3645–0.3647
+  - `called_shared_het_recall`: ~0.287
+  - `called_effective_phased_recall`: ~0.1144–0.1146
+  - `called_phasing_rate_shared_het`: ~0.399
+  - `called_num_phase_sets`: 7.0
+- `call_min_mapq` has negligible effect across the grid.
+
+##### Key observations
+- O1 (Caller base-quality filtering is a strong optimization lever): Lowering `call_min_baseq` from 20 to 10 or 5 substantially improves call recall, called shared-heterozygous recall, and called effective phased recall. This shows that overly strict caller base-quality filtering removes too much useful variant evidence under the composite hard scenario.
+
+- O2 (Caller mapping-quality filtering has little practical effect): Changing `call_min_mapq` from 0 to 20 produces almost no measurable difference in calling or phasing metrics. Under the current hard scenario, base-quality filtering is therefore the dominant caller-side threshold knob.
+
+- O3 (The gain arises through overlap recovery rather than phasing correctness): Oracle effective phased recall remains fixed (~0.9402), while called phase accuracy and switch error remain near-perfect in the best settings. This indicates that the improvement comes mainly from recovering more true shared heterozygous sites rather than from changing phasing correctness itself.
+
+- O4 (Moderate caller thresholds outperform strict thresholds without sacrificing precision): The best-performing settings (`call_min_baseq = 5 or 10`) retain very high call precision (~0.9995) while increasing end-to-end phased recall. This makes moderate caller base-quality thresholds a practical optimization opportunity in this pipeline.
+
+##### Takeaway
+Calling thresholds provide a more effective optimization lever than the WhatsHap-only sweeps tested earlier. In particular, a moderate caller base-quality threshold (`call_min_baseq = 10`, or 5) improves variant recovery and end-to-end phased recall without materially harming precision, while `call_min_baseq = 20` is clearly too strict under the current hard scenario.
+
+#### 10.9.4 Sweep D: runtime-focused lower `max_coverage`
+
+##### Setup
+- Varied: `max_coverage ∈ {4, 6, 8, 10, 15}`
+- Fixed:
+  - hard-scenario stressors unchanged
+  - caller thresholds fixed to a strong practical setting:
+    - `call_min_mapq = 20`
+    - `call_min_baseq = 15`
+  - phasing thresholds fixed to the best practical settings identified earlier:
+    - `min_mapq = 20`
+    - `min_baseq = 10`
+
+##### Figures to include
+- **Figure 10.9.4.1 — Called effective phased recall vs lower `max_coverage`.**
+- **Figure 10.9.4.2 — Called number of phase sets vs lower `max_coverage`.**
+- **Figure 10.9.4.3 — Oracle effective phased recall vs lower `max_coverage`.**
+- **Figure 10.9.4.4 — Total pipeline runtime vs lower `max_coverage`.**
+
+**Figure 10.9.4.1 — Called effective phased recall vs lower `max_coverage`.**  
+Called effective phased recall is essentially unchanged for `max_coverage = 8, 10, 15`, indicating that retained phasing coverage above 8 provides no practical benefit in the current hard scenario.
+
+**Figure 10.9.4.2 — Called number of phase sets vs lower `max_coverage`.**  
+Phase fragmentation is stable from `max_coverage = 6` upward, but becomes slightly worse at `max_coverage = 4`, suggesting that very aggressive down-selection can begin to remove useful connectivity.
+
+**Figure 10.9.4.3 — Oracle effective phased recall vs lower `max_coverage`.**  
+Oracle phasing performance improves slightly from `max_coverage = 4` to `8`, then plateaus. This indicates that a small amount of retained coverage is necessary for full phasing continuity, but higher retained coverage beyond 8 is unnecessary.
+
+**Figure 10.9.4.4 — Total pipeline runtime vs lower `max_coverage`.**  
+Runtime is similar for `max_coverage = 6–10` but increases noticeably at `15`, showing that a lower retained-coverage cap can reduce compute cost without sacrificing phasing performance.
+
+##### Results summary
+- `call_recall`: 0.5895 at all `max_coverage` settings
+- `call_precision`: 0.9994 at all `max_coverage` settings
+- `called_effective_phased_recall`:
+  - 0.2958 (`max_coverage = 4`)
+  - 0.2960 (`6`)
+  - 0.2964 (`8`)
+  - 0.2964 (`10`)
+  - 0.2964 (`15`)
+- `called_switch_error`:
+  - 0.0051 → 0.0038 → 0.0007 → 0.0007 → 0.0007
+- `called_num_phase_sets`:
+  - 6.8 → 6.6 → 6.6 → 6.6 → 6.6
+- `called_phase_accuracy`:
+  - 0.9604 → 0.9610 → 0.9625 → 0.9625 → 0.9625
+- `oracle_effective_phased_recall`:
+  - 0.9228 → 0.9348 → 0.9402 → 0.9402 → 0.9402
+- `oracle_num_phase_sets`:
+  - 5.0 → 3.8 → 3.8 → 3.8 → 3.8
+- `time_total_sec`:
+  - 3.6877 → 3.6720 → 3.6769 → 3.6774 → 4.2029
+
+##### Key observations
+- O1 (Performance plateaus by `max_coverage = 8`): Called effective phased recall, switch error, phase-set count, and phase accuracy are essentially identical for `max_coverage = 8, 10, 15`. This shows that retained phasing coverage above 8 does not provide additional practical benefit under the current hard scenario.
+
+- O2 (Very low `max_coverage` begins to hurt modestly): At `max_coverage = 4`, oracle effective phased recall and oracle continuity are slightly worse, and called metrics are also marginally lower. This suggests that reducing retained coverage too aggressively can begin to remove useful bridging evidence.
+
+- O3 (The best efficiency region is around `max_coverage = 8–10`): Runtime remains around 3.67 seconds for `max_coverage = 6–10`, but increases to about 4.20 seconds at `15` without any measurable gain in phasing performance.
+
+- O4 (`max_coverage = 15` is unnecessarily expensive): Compared with `max_coverage = 8–10`, the setting `15` increases runtime by roughly 14% while leaving the main phasing metrics unchanged. This makes higher retained coverage unattractive on efficiency grounds.
+
+##### Takeaway
+A lower `max_coverage` setting provides a practical runtime optimization under the composite hard scenario. The best trade-off is around `max_coverage = 8` or `10`, where performance is indistinguishable from `15` but runtime is lower. In contrast, `max_coverage = 4` is slightly too aggressive and begins to degrade continuity-related metrics.
+
+#### 10.9.5 Sweep E: fine phasing `min_baseq`
+
+##### Setup
+- Varied: `min_baseq ∈ {0, 5, 10, 15, 20}`
+- Fixed:
+  - hard-scenario stressors unchanged
+  - caller thresholds fixed to a strong practical setting:
+    - `call_min_mapq = 20`
+    - `call_min_baseq = 15`
+  - phasing parameters otherwise fixed:
+    - `max_coverage = 10`
+    - `min_mapq = 20`
+
+##### Figures to include
+- **Figure 10.9.5.1 — Called effective phased recall vs fine phasing `min_baseq`.**
+- **Figure 10.9.5.2 — Called number of phase sets vs fine phasing `min_baseq`.**
+- **Figure 10.9.5.3 — Oracle effective phased recall vs fine phasing `min_baseq`.**
+- **Figure 10.9.5.4 — Called switch error vs fine phasing `min_baseq`.**
+
+**Figure 10.9.5.1 — Called effective phased recall vs fine phasing `min_baseq`.**  
+Called effective phased recall remains flat from `min_baseq = 0` to `15`, then decreases at `20`, indicating that only overly strict phasing base-quality filtering harms usable end-to-end phasing output.
+
+**Figure 10.9.5.2 — Called number of phase sets vs fine phasing `min_baseq`.**  
+Phase fragmentation is unchanged across `min_baseq = 0–15` but increases substantially at `20`, showing that strict phasing base-quality filtering breaks block continuity by discarding informative allele observations.
+
+**Figure 10.9.5.3 — Oracle effective phased recall vs fine phasing `min_baseq`.**  
+Oracle phasing performance is stable up to `min_baseq = 15` and then drops sharply at `20`, confirming that the harmful threshold effect arises within the phasing stage itself rather than through upstream callset changes.
+
+**Figure 10.9.5.4 — Called switch error vs fine phasing `min_baseq`.**  
+Called switch error remains very low and stable from `min_baseq = 0` to `15`, but increases at `20`, indicating that overly strict phasing base-quality filtering weakens the consistency of retained phasing evidence.
+
+##### Results summary
+- `call_recall`: 0.5895 at all `min_baseq` settings
+- `call_precision`: 0.9994 at all `min_baseq` settings
+- `called_effective_phased_recall`:
+  - 0.2964 (`min_baseq = 0`)
+  - 0.2964 (`5`)
+  - 0.2964 (`10`)
+  - 0.2964 (`15`)
+  - 0.2917 (`20`)
+- `called_switch_error`:
+  - 0.0007 → 0.0007 → 0.0007 → 0.0007 → 0.0056
+- `called_num_phase_sets`:
+  - 6.6 → 6.6 → 6.6 → 6.6 → 9.6
+- `called_phase_accuracy`:
+  - 0.9625 → 0.9625 → 0.9625 → 0.9625 → 0.9748
+- `oracle_effective_phased_recall`:
+  - 0.9402 → 0.9402 → 0.9402 → 0.9375 → 0.8256
+- `oracle_num_phase_sets`:
+  - 3.8 → 3.8 → 3.8 → 3.8 → 6.4
+- `time_total_sec`:
+  - 3.6758 → 3.6505 → 3.6501 → 3.6172 → 3.6158
+
+##### Key observations
+- O1 (Phasing performance is flat from `min_baseq = 0` to `15`): Called effective phased recall, switch error, phase-set count, and phase accuracy are effectively identical across `min_baseq ∈ {0, 5, 10, 15}`. This indicates that moderate variation in phasing base-quality filtering has no measurable effect within this range.
+
+- O2 (The harmful threshold is `min_baseq = 20`): Raising `min_baseq` to 20 reduces called effective phased recall, increases switch error, and increases phase fragmentation. Oracle effective phased recall also drops sharply (`0.9402 → 0.8256`), confirming that the loss is caused within the phasing stage itself.
+
+- O3 (There is no practical benefit to using values below 10): Since `0`, `5`, and `10` perform identically, more permissive phasing base-quality thresholds do not yield additional measurable gains under the current hard scenario.
+
+- O4 (`min_baseq = 10` is the best practical recommendation): Because `10` lies on the same performance plateau as `0`, `5`, and `15`, but is easier to justify as a moderate threshold, it provides the cleanest practical phasing setting for the remainder of the study.
+
+##### Takeaway
+The fine phasing `min_baseq` sweep confirms that performance is stable across `min_baseq = 0–15` and degrades only when the threshold becomes too strict (`20`). A moderate phasing base-quality threshold such as `min_baseq = 10` is therefore the most practical recommendation: it retains full performance while avoiding unnecessary permissiveness and clearly outperforming the overly strict setting.
+
+#### 10.9.6 Final confirmation: default vs optimized
+
+##### Setup
+A final confirmation run compared the default hard-scenario configuration against the best practical tuned configuration identified from the preceding optimization sweeps.
+
+- **Default configuration**
+  - `call_min_mapq = 20`
+  - `call_min_baseq = 15`
+  - `max_coverage = 15`
+  - `min_mapq = 20`
+  - `min_baseq = 20`
+
+- **Optimized configuration**
+  - `cll_min_mapq = 20`
+  - `call_min_baseq = 10`
+  - `max_coverage = 8`
+  - `min_mapq = 20`
+  - `min_baseq = 10`
+
+All other hard-scenario stressors were kept fixed.
+
+##### Figures to include
+- **Figure 10.9.6.1 — Called effective phased recall: default vs optimized.**
+- **Figure 10.9.6.2 — Called shared heterozygous recall: default vs optimized.**
+- **Figure 10.9.6.3 — Called number of phase sets: default vs optimized.**
+- **Figure 10.9.6.4 — Total pipeline runtime: default vs optimized.**
+
+**Figure 10.9.6.1 — Called effective phased recall: default vs optimized.**  
+The optimized configuration achieves higher end-to-end phased recall than the default hard-scenario setting, confirming that coordinated parameter tuning yields a measurable improvement under compounded realistic stress.
+
+**Figure 10.9.6.2 — Called shared heterozygous recall: default vs optimized.**  
+The optimized configuration increases called shared heterozygous recall, indicating that part of the improvement comes from recovering more true heterozygous sites that can subsequently be phased.
+
+**Figure 10.9.6.3 — Called number of phase sets: default vs optimized.**  
+The optimized configuration substantially reduces the number of phase sets, showing that it preserves stronger phase-block continuity than the default setting under the hard scenario.
+
+**Figure 10.9.6.4 — Total pipeline runtime: default vs optimized.**  
+The optimized configuration is slightly faster than the default while also improving phasing performance, showing that the observed gains are not achieved at the cost of higher compute.
+
+##### Results summary
+Means over 5 seeds:
+
+- `time_total_sec`: 4.0614 → 3.9783
+- `call_precision`: 0.9994 → 0.9995
+- `call_recall`: 0.5895 → 0.5970
+- `oracle_effective_phased_recall`: 0.8298 → 0.9402
+- `oracle_switch_error`: 0.0083 → 0.0031
+- `oracle_num_phase_sets`: 6.2 → 3.8
+- `called_effective_phased_recall`: 0.2919 → 0.3041
+- `called_shared_het_recall`: 0.5098 → 0.5181
+- `called_phasing_rate_shared_het`: 0.5864 → 0.6090
+- `called_phase_accuracy`: 0.9748 → 0.9622
+- `called_switch_error`: 0.0056 → 0.0007
+- `called_num_phase_sets`: 9.6 → 6.6
+
+##### Key observations
+- O1 (The optimized configuration improves end-to-end phased recall): Called effective phased recall increases from `0.2919` to `0.3041`, confirming that the tuned configuration provides a real, if moderate, end-to-end gain under the composite hard scenario.
+
+- O2 (The improvement comes mainly from better overlap and phasing completeness): The optimized configuration increases `call_recall` (`0.5895 → 0.5970`), `called_shared_het_recall` (`0.5098 → 0.5181`), and `called_phasing_rate_shared_het` (`0.5864 → 0.6090`). This shows that the gain arises primarily from recovering and retaining more useful phasing evidence rather than from a large change in phase accuracy itself.
+
+- O3 (Fragmentation is substantially reduced): Called phase-set count decreases from `9.6` to `6.6`, while oracle phase-set count decreases from `6.2` to `3.8`. This indicates that the optimized configuration preserves much stronger block continuity under the hard scenario.
+
+- O4 (The optimized configuration is also slightly faster): Total runtime decreases from `4.0614 s` to `3.9783 s`, showing that the optimized setting improves performance without increasing compute cost.
+
+##### Takeaway
+The final confirmation run shows that the optimized configuration is practically preferable to the default hard-scenario setting. It improves end-to-end phased recall, increases shared-site overlap and phasing completeness, reduces fragmentation, lowers switch error, and slightly reduces runtime. Although the absolute gain in called effective phased recall is moderate, this experiment confirms that coordinated tuning of caller-side and phasing-side parameters can produce a measurable improvement under compounded realistic stress.
+
+#### 10.9.7 Sweep F: local joint search around recommended thresholds
+
+##### Setup
+A focused local search was performed around the current best practical threshold settings to test whether the recommended caller/phasing base-quality pair is locally optimal or whether a nearby combination performs better.
+
+- Varied:
+  - `call_min_baseq ∈ {5, 10, 15}`
+  - `min_baseq ∈ {5, 10, 15}`
+- Fixed:
+  - `call_min_mapq = 20`
+  - `min_mapq = 20`
+  - `max_coverage = 8`
+  - hard-scenario stressors unchanged
+
+##### Figures to include
+- **Figure 10.9.7.1 — Called effective phased recall across the local caller/phasing base-quality grid.**
+- **Figure 10.9.7.2 — Called shared heterozygous recall across the local caller/phasing base-quality grid.**
+- **Figure 10.9.7.3 — Calling recall across the local caller/phasing base-quality grid.**
+- **Figure 10.9.7.4 — Total pipeline runtime across the local caller/phasing base-quality grid.**
+
+**Figure 10.9.7.1 — Called effective phased recall across the local caller/phasing base-quality grid.**  
+Called effective phased recall is highest whenever `call_min_baseq = 5` or `10`, while varying phasing `min_baseq` between 5 and 15 has no measurable effect. This shows that local sensitivity is driven mainly by the caller-side threshold.
+
+**Figure 10.9.7.2 — Called shared heterozygous recall across the local caller/phasing base-quality grid.**  
+Called shared heterozygous recall follows the same pattern as called effective phased recall, indicating that the local optimization gain arises from recovering more true heterozygous sites rather than from changing phasing correctness.
+
+**Figure 10.9.7.3 — Calling recall across the local caller/phasing base-quality grid.**  
+Calling recall improves when `call_min_baseq` is reduced from 15 to 10 or 5, while phasing `min_baseq` has no effect as expected. This confirms that the decisive local optimization lever is the caller base-quality threshold.
+
+**Figure 10.9.7.4 — Total pipeline runtime across the local caller/phasing base-quality grid.**  
+Runtime varies only slightly across the local search grid, indicating that the local threshold refinement primarily affects accuracy-related metrics rather than compute cost.
+
+##### Results summary
+Grouped means over 5 seeds:
+
+- For `call_min_baseq = 5 or 10`:
+  - `call_recall`: 0.5970
+  - `called_shared_het_recall`: 0.5181
+  - `called_effective_phased_recall`: 0.3041
+  - `called_phasing_rate_shared_het`: 0.6090
+  - `called_switch_error`: 0.0007
+  - `called_num_phase_sets`: 6.6
+- For `call_min_baseq = 15`:
+  - `call_recall`: 0.5895
+  - `called_shared_het_recall`: 0.5098
+  - `called_effective_phased_recall`: 0.2964
+  - `called_phasing_rate_shared_het`: 0.6027
+  - `called_switch_error`: 0.0007
+  - `called_num_phase_sets`: 6.6
+- Across `min_baseq ∈ {5, 10, 15}`, the main called metrics are effectively unchanged for a fixed `call_min_baseq`.
+
+##### Key observations
+- O1 (The recommended setting is locally robust): No combination in the 3×3 local grid outperforms the existing recommended region. The best results are obtained whenever `call_min_baseq = 5 or 10`, regardless of whether phasing `min_baseq` is 5, 10, or 15.
+
+- O2 (Caller base-quality remains the decisive local knob): Lowering `call_min_baseq` from 15 to 10 or 5 improves `call_recall`, `called_shared_het_recall`, and `called_effective_phased_recall`. This confirms that the main optimization gain still comes from recovering more useful variant evidence upstream.
+
+- O3 (Phasing base-quality is insensitive within the moderate range): For fixed caller thresholds, varying phasing `min_baseq` between 5 and 15 has no measurable effect on the main called metrics. This indicates that, once overly strict filtering has been avoided, phasing base-quality is not a sensitive local optimization lever.
+
+- O4 (`call_min_baseq = 10`, `min_baseq = 10` remains the best practical recommendation): Although `call_min_baseq = 5` performs equivalently to 10, the value 10 is easier to justify as a moderate threshold. Likewise, phasing `min_baseq = 10` lies on the same performance plateau as 5 and 15, making it the cleanest practical choice.
+
+##### Takeaway
+The local search confirms that the recommended optimized threshold pair is robust. The main local sensitivity lies in the caller base-quality threshold, where 10 (or 5) is clearly better than 15, while phasing base-quality is effectively flat within the moderate range 5–15. This strengthens confidence that the chosen optimized configuration is not a fragile one-off result.
+
 #### Overall takeaway
-Under the current hard scenario, WhatsHap-side tuning provides limited but non-zero optimization headroom. The `max_coverage` sweep shows essentially no benefit beyond lower settings, indicating that read-selection depth is not the active bottleneck. In contrast, the quality-threshold grid shows that overly strict phasing base-quality filtering is harmful: lowering `min_baseq` from 20 to 10 (or 0) improves phased recall and reduces fragmentation. However, decomposition across all optimization settings shows that the dominant loss term remains missing shared heterozygous sites, which is unaffected by phasing-side tuning. This suggests that while WhatsHap parameter tuning can recover some performance, larger end-to-end gains will likely require improvements in upstream variant recovery or better handling of compounded stress conditions.
+Under the current hard scenario, optimization headroom exists but is uneven across knobs. WhatsHap-side tuning provides only limited gains: increasing `max_coverage` does not help, and the main useful phasing-side adjustment is to avoid overly strict `min_baseq` filtering. In contrast, caller-side tuning is more impactful: lowering `call_min_baseq` from 20 to a moderate value such as 10 improves variant recovery, shared heterozygous overlap, and end-to-end phased recall without materially reducing precision. Taken together, these results indicate that practical optimization in this pipeline is not purely a WhatsHap parameter problem; meaningful gains are more likely to come from a combination of permissive phasing evidence retention and improved upstream variant recovery.
 
 ---
 
