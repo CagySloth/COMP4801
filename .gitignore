@@ -46,6 +46,7 @@ htmlcov/
 # --- Project outputs ---
 .vscode/
 output/experiments_draft/*.zip
+output/experiments_draft/**/*.zip
 benchmark_results/
 *.log
 
