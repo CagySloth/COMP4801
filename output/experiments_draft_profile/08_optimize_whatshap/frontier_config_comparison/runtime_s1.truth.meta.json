@@ -1,0 +1,20 @@
+{
+  "ref": "output/experiments_draft_profile/08_optimize_whatshap/frontier_config_comparison/runtime_s1.ref.fasta",
+  "contig": "chr1",
+  "length": 120000,
+  "seed": 1,
+  "num_snps": 1200,
+  "het_rate": 0.8,
+  "het_count": 965,
+  "hom_alt_count": 235,
+  "min_distance": 5,
+  "avoid_regions": false,
+  "ref_meta": null,
+  "coord_note": "records are 0-based internally but VCF pos is 1-based.",
+  "num_indels": 120,
+  "indel_min_len": 1,
+  "indel_max_len": 5,
+  "indel_het_rate": 0.5,
+  "indel_het_count": 75,
+  "indel_hom_alt_count": 45
+}

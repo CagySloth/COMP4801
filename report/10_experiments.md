@@ -1096,6 +1096,284 @@ Grouped means over 5 seeds:
 ##### Takeaway
 The local search confirms that the recommended optimized threshold pair is robust. The main local sensitivity lies in the caller base-quality threshold, where 10 (or 5) is clearly better than 15, while phasing base-quality is effectively flat within the moderate range 5–15. This strengthens confidence that the chosen optimized configuration is not a fragile one-off result.
 
+#### 10.9.8 Sweep G: accuracy/runtime frontier comparison
+
+##### Setup
+Representative configurations were compared under the same hard scenario to summarize the practical trade-off between end-to-end phased recall, block continuity, and runtime.
+
+Configurations compared:
+- **`default`**
+  - `call_min_mapq = 20`
+  - `call_min_baseq = 15`
+  - `max_coverage = 15`
+  - `min_mapq = 20`
+  - `min_baseq = 20`
+- **`caller_only`**
+  - `call_min_mapq = 20`
+  - `call_min_baseq = 10`
+  - `max_coverage = 15`
+  - `min_mapq = 20`
+  - `min_baseq = 20`
+- **`phasing_only`**
+  - `call_min_mapq = 20`
+  - `call_min_baseq = 15`
+  - `max_coverage = 8`
+  - `min_mapq = 20`
+  - `min_baseq = 10`
+- **`balanced`**
+  - `call_min_mapq = 20`
+  - `call_min_baseq = 10`
+  - `max_coverage = 8`
+  - `min_mapq = 20`
+  - `min_baseq = 10`
+- **`runtime`**
+  - `call_min_mapq = 20`
+  - `call_min_baseq = 10`
+  - `max_coverage = 6`
+  - `min_mapq = 20`
+  - `min_baseq = 10`
+
+All other hard-scenario stressors were kept fixed.
+
+##### Figures to include
+- **Figure 10.9.8.1 — Called effective phased recall across representative configurations.**
+- **Figure 10.9.8.2 — Called shared heterozygous recall across representative configurations.**
+- **Figure 10.9.8.3 — Called number of phase sets across representative configurations.**
+- **Figure 10.9.8.4 — Total pipeline runtime across representative configurations.**
+
+**Figure 10.9.8.1 — Called effective phased recall across representative configurations.**  
+The balanced configuration achieves the highest end-to-end phased recall, while the runtime-biased configuration performs almost identically. This shows that combining caller-side and phasing-side tuning yields the strongest practical performance.
+
+**Figure 10.9.8.2 — Called shared heterozygous recall across representative configurations.**  
+Called shared heterozygous recall is highest for the configurations that use the improved caller threshold, confirming that part of the overall gain comes from recovering more true heterozygous sites before phasing.
+
+**Figure 10.9.8.3 — Called number of phase sets across representative configurations.**  
+Phase fragmentation is much lower in the phasing-tuned, balanced, and runtime configurations than in the default or caller-only configurations. This shows that phasing-side tuning is the main driver of improved block continuity.
+
+**Figure 10.9.8.4 — Total pipeline runtime across representative configurations.**  
+Runtime differences between the representative configurations are modest, but the balanced and runtime-biased settings both remain competitive while outperforming the default configuration on the main phasing metrics.
+
+##### Results summary
+Means over 5 seeds:
+
+- **`default`**
+  - `time_total_sec`: 3.9338
+  - `call_precision`: 0.9994
+  - `call_recall`: 0.5895
+  - `oracle_effective_phased_recall`: 0.8298
+  - `oracle_num_phase_sets`: 6.2
+  - `called_effective_phased_recall`: 0.2919
+  - `called_shared_het_recall`: 0.5098
+  - `called_phasing_rate_shared_het`: 0.5864
+  - `called_switch_error`: 0.0056
+  - `called_num_phase_sets`: 9.6
+
+- **`caller_only`**
+  - `time_total_sec`: 4.0540
+  - `call_precision`: 0.9995
+  - `call_recall`: 0.5970
+  - `oracle_effective_phased_recall`: 0.8298
+  - `oracle_num_phase_sets`: 6.2
+  - `called_effective_phased_recall`: 0.2994
+  - `called_shared_het_recall`: 0.5181
+  - `called_phasing_rate_shared_het`: 0.5934
+  - `called_switch_error`: 0.0077
+  - `called_num_phase_sets`: 9.0
+
+- **`phasing_only`**
+  - `time_total_sec`: 3.7970
+  - `call_precision`: 0.9994
+  - `call_recall`: 0.5895
+  - `oracle_effective_phased_recall`: 0.9402
+  - `oracle_num_phase_sets`: 3.8
+  - `called_effective_phased_recall`: 0.2964
+  - `called_shared_het_recall`: 0.5098
+  - `called_phasing_rate_shared_het`: 0.6027
+  - `called_switch_error`: 0.0007
+  - `called_num_phase_sets`: 6.6
+
+- **`balanced`**
+  - `time_total_sec`: 3.8682
+  - `call_precision`: 0.9995
+  - `call_recall`: 0.5970
+  - `oracle_effective_phased_recall`: 0.9402
+  - `oracle_num_phase_sets`: 3.8
+  - `called_effective_phased_recall`: 0.3041
+  - `called_shared_het_recall`: 0.5181
+  - `called_phasing_rate_shared_het`: 0.6090
+  - `called_switch_error`: 0.0007
+  - `called_num_phase_sets`: 6.6
+
+- **`runtime`**
+  - `time_total_sec`: 3.8504
+  - `call_precision`: 0.9995
+  - `call_recall`: 0.5970
+  - `oracle_effective_phased_recall`: 0.9348
+  - `oracle_num_phase_sets`: 3.8
+  - `called_effective_phased_recall`: 0.3039
+  - `called_shared_het_recall`: 0.5181
+  - `called_phasing_rate_shared_het`: 0.6090
+  - `called_switch_error`: 0.0022
+  - `called_num_phase_sets`: 6.6
+
+##### Key observations
+- O1 (The balanced configuration provides the best overall trade-off): Among the representative configurations, `balanced` achieves the highest called effective phased recall (`0.3041`) while also maintaining low fragmentation (`6.6` phase sets), very low switch error (`0.0007`), and lower runtime than the default configuration.
+
+- O2 (Default is dominated by the tuned configurations): The default configuration is worse than `balanced` and `runtime` on called effective phased recall, called shared heterozygous recall, switch error, and fragmentation, while also not being the fastest option. This indicates that the untuned hard-scenario settings are not practically competitive.
+
+- O3 (Caller-only and phasing-only tuning recover complementary parts of the gain): `caller_only` improves overlap-related metrics (`call_recall`, `called_shared_het_recall`) but leaves fragmentation high, whereas `phasing_only` strongly improves continuity and oracle phasing metrics but does not recover additional called-site overlap. The balanced configuration combines both benefits.
+
+- O4 (The runtime-biased configuration is a viable alternative): `runtime` performs almost identically to `balanced` on the main called metrics (`0.3039` vs `0.3041` called effective phased recall) while using a slightly lower `max_coverage`. This makes it a reasonable alternative when efficiency is prioritized, although `balanced` remains the cleaner general recommendation.
+
+##### Takeaway
+The frontier comparison shows that the best practical performance comes from combining moderate caller-side and phasing-side tuning rather than optimizing either stage in isolation. The balanced configuration is the preferred general setting because it delivers the highest end-to-end phased recall together with strong continuity and low switch error. A slightly more runtime-biased configuration performs almost identically and may be acceptable when efficiency is prioritized, but the default configuration is clearly dominated.
+
+#### 10.9.9 Optimization robustness across scenarios
+
+##### Setup
+To test whether the recommended optimized settings generalize beyond the hard tuning scenario, three representative configurations were compared across four scenarios:
+
+Configurations compared:
+- **`default`**
+- **`balanced`**
+- **`runtime`**
+
+Scenarios compared:
+- **baseline**
+- **dropout**
+- **interaction**
+- **hard**
+
+The aim was to determine whether the recommended tuning is broadly useful or only beneficial in the hard scenario used for parameter selection.
+
+##### Figures to include
+- **Figure 10.9.9.1 — Called effective phased recall across scenarios and representative configurations.**
+- **Figure 10.9.9.2 — Called shared heterozygous recall across scenarios and representative configurations.**
+- **Figure 10.9.9.3 — Called number of phase sets across scenarios and representative configurations.**
+- **Figure 10.9.9.4 — Total pipeline runtime across scenarios and representative configurations.**
+
+**Figure 10.9.9.1 — Called effective phased recall across scenarios and representative configurations.**  
+Across all tested scenarios, the balanced and runtime configurations achieve higher end-to-end phased recall than the default configuration, showing that the selected tuning generalizes beyond the hard optimization scenario.
+
+**Figure 10.9.9.2 — Called shared heterozygous recall across scenarios and representative configurations.**  
+The tuned configurations consistently improve called shared heterozygous recall, indicating that part of the transferable gain comes from recovering more true heterozygous sites across multiple scenarios.
+
+**Figure 10.9.9.3 — Called number of phase sets across scenarios and representative configurations.**  
+The balanced and runtime configurations reduce phase fragmentation relative to the default configuration in all tested scenarios, showing that the tuning also improves block continuity rather than only site recovery.
+
+**Figure 10.9.9.4 — Total pipeline runtime across scenarios and representative configurations.**  
+Runtime remains competitive for the tuned configurations across scenarios, and the runtime-biased variant offers nearly identical accuracy with similar or slightly improved efficiency.
+
+##### Results summary
+Means over 5 seeds:
+
+- **Baseline**
+  - `default`: `called_effective_phased_recall = 0.4364`, `called_shared_het_recall = 0.5902`, `called_num_phase_sets = 3.4`, `time_total_sec = 2.9850`
+  - `balanced`: `0.5448`, `0.6097`, `1.4`, `3.0223`
+  - `runtime`: `0.5448`, `0.6097`, `1.4`, `2.9596`
+
+- **Dropout**
+  - `default`: `0.2694`, `0.5292`, `6.2`, `2.9768`
+  - `balanced`: `0.2908`, `0.5420`, `4.2`, `2.9362`
+  - `runtime`: `0.2908`, `0.5420`, `4.2`, `2.9391`
+
+- **Interaction**
+  - `default`: `0.1972`, `0.5014`, `6.2`, `3.0043`
+  - `balanced`: `0.2118`, `0.5094`, `5.4`, `2.8789`
+  - `runtime`: `0.2118`, `0.5094`, `5.4`, `2.9750`
+
+- **Hard**
+  - `default`: `0.2919`, `0.5098`, `9.6`, `4.3644`
+  - `balanced`: `0.3041`, `0.5181`, `6.6`, `4.2497`
+  - `runtime`: `0.3039`, `0.5181`, `6.6`, `4.3050`
+
+##### Key observations
+- O1 (The tuned configurations generalize across scenarios): In all four scenarios, both `balanced` and `runtime` outperform `default` on called effective phased recall and called shared heterozygous recall. This shows that the tuned settings are not overfit to the hard scenario alone.
+
+- O2 (The balanced configuration is the safest general recommendation): `balanced` is never worse than `default` and is either best or tied for best on the main called metrics across all scenarios. This supports its use as the default recommended configuration.
+
+- O3 (The runtime-biased configuration is highly competitive): `runtime` is effectively identical to `balanced` on the main called metrics in this sweep and remains competitive on runtime. This makes it a reasonable alternative when efficiency is prioritized.
+
+- O4 (The gains transfer to both easy and hard cases): The tuned configurations improve performance not only in the hard scenario, but also in the baseline, dropout, and interaction scenarios. This indicates that the optimization is robust across qualitatively different data conditions.
+
+##### Takeaway
+The recommended tuned settings are robust across the representative scenarios tested in this study. The balanced configuration is the cleanest general recommendation because it consistently improves end-to-end phased recall and reduces fragmentation relative to the default. A runtime-biased alternative performs almost identically and may be preferred when efficiency is prioritized.
+
+#### 10.9.10 Sweep H: caller `call_min_mapq` rule-out
+
+##### Setup
+A final small rule-out sweep was conducted to test whether caller mapping-quality filtering provides meaningful optimization headroom once the other recommended settings are fixed.
+
+- Varied:
+  - `call_min_mapq ∈ {0, 10, 20}`
+- Fixed:
+  - `call_min_baseq = 10`
+  - `max_coverage = 8`
+  - `min_mapq = 20`
+  - `min_baseq = 10`
+  - hard-scenario stressors unchanged
+
+##### Figures to include
+- **Figure 10.9.10.1 — Called effective phased recall vs `call_min_mapq`.**
+- **Figure 10.9.10.2 — Calling recall vs `call_min_mapq`.**
+- **Figure 10.9.10.3 — Called shared heterozygous recall vs `call_min_mapq`.**
+- **Figure 10.9.10.4 — Call precision vs `call_min_mapq`.**
+
+**Figure 10.9.10.1 — Called effective phased recall vs `call_min_mapq`.**  
+Called effective phased recall changes only slightly across the caller mapping-quality sweep, indicating that `call_min_mapq` is not a strong optimization lever under the current hard scenario.
+
+**Figure 10.9.10.2 — Calling recall vs `call_min_mapq`.**  
+Calling recall remains essentially unchanged across the caller mapping-quality sweep, showing that mapQ filtering has little influence on variant recovery in this setup.
+
+**Figure 10.9.10.3 — Called shared heterozygous recall vs `call_min_mapq`.**  
+Called shared heterozygous recall is nearly flat across the caller mapping-quality sweep, confirming that caller mapQ does not materially alter the overlap of useful true heterozygous sites.
+
+**Figure 10.9.10.4 — Call precision vs `call_min_mapq`.**  
+Call precision remains extremely high across all caller mapping-quality settings, indicating that stricter mapQ filtering does not provide a meaningful precision advantage in this pipeline.
+
+##### Results summary
+Means over 5 seeds:
+
+- `call_min_mapq = 0`
+  - `call_precision = 0.9995`
+  - `call_recall = 0.5962`
+  - `called_shared_het_recall = 0.5171`
+  - `called_effective_phased_recall = 0.3155`
+  - `called_phasing_rate_shared_het = 0.6102`
+  - `called_phase_accuracy = 1.0000`
+  - `called_switch_error = 0.0000`
+  - `time_total_sec = 4.1980`
+
+- `call_min_mapq = 10`
+  - `call_precision = 0.9995`
+  - `call_recall = 0.5970`
+  - `called_shared_het_recall = 0.5181`
+  - `called_effective_phased_recall = 0.3157`
+  - `called_phasing_rate_shared_het = 0.6094`
+  - `called_phase_accuracy = 1.0000`
+  - `called_switch_error = 0.0000`
+  - `time_total_sec = 4.1432`
+
+- `call_min_mapq = 20`
+  - `call_precision = 0.9995`
+  - `call_recall = 0.5970`
+  - `called_shared_het_recall = 0.5181`
+  - `called_effective_phased_recall = 0.3041`
+  - `called_phasing_rate_shared_het = 0.6090`
+  - `called_phase_accuracy = 0.9622`
+  - `called_switch_error = 0.0007`
+  - `time_total_sec = 4.1246`
+
+##### Key observations
+- O1 (Caller mapping-quality filtering has little effect on overlap recovery): Calling recall and called shared heterozygous recall remain essentially unchanged across `call_min_mapq ∈ {0, 10, 20}`. This indicates that caller mapping-quality filtering does not materially alter the amount of useful variant evidence reaching the phasing stage.
+
+- O2 (The optimization signal is much weaker than for caller base-quality): In contrast to the earlier caller base-quality sweep, changing `call_min_mapq` produces only very small differences in the main called metrics. This shows that caller mapping-quality is not a strong optimization lever in the current pipeline.
+
+- O3 (No compelling benefit is obtained from stricter caller mapQ filtering): Although `call_min_mapq = 20` shows a slight reduction in called effective phased recall, the effect is small and not accompanied by meaningful changes in call precision or shared-site recall. This suggests that aggressive caller mapQ filtering provides no practical advantage here.
+
+##### Takeaway
+Caller mapping-quality filtering does not provide meaningful optimization headroom under the current hard scenario. Unlike caller base-quality, which showed a clear and useful tuning signal, `call_min_mapq` has only weak effects on the main end-to-end phasing metrics. This supports treating caller mapQ as a low-priority or effectively negligible optimization knob in this pipeline.
+
 #### Overall takeaway
 Under the current hard scenario, optimization headroom exists but is uneven across knobs. WhatsHap-side tuning provides only limited gains: increasing `max_coverage` does not help, and the main useful phasing-side adjustment is to avoid overly strict `min_baseq` filtering. In contrast, caller-side tuning is more impactful: lowering `call_min_baseq` from 20 to a moderate value such as 10 improves variant recovery, shared heterozygous overlap, and end-to-end phased recall without materially reducing precision. Taken together, these results indicate that practical optimization in this pipeline is not purely a WhatsHap parameter problem; meaningful gains are more likely to come from a combination of permissive phasing evidence retention and improved upstream variant recovery.
 

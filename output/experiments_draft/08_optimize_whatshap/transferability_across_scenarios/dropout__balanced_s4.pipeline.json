@@ -1,0 +1,186 @@
+{
+  "prefix": "output/experiments_draft/08_optimize_whatshap/transferability_across_scenarios/dropout__balanced_s4",
+  "seed": 4,
+  "vcf_source": "both",
+  "steps": {
+    "ref_fasta": "output/experiments_draft/08_optimize_whatshap/transferability_across_scenarios/dropout__balanced_s4.ref.fasta",
+    "truth_vcf_gz": "output/experiments_draft/08_optimize_whatshap/transferability_across_scenarios/dropout__balanced_s4.truth.vcf.gz",
+    "truth_eval_vcf_gz": "output/experiments_draft/08_optimize_whatshap/transferability_across_scenarios/dropout__balanced_s4.truth.vcf.gz",
+    "oracle_vcf_gz": "output/experiments_draft/08_optimize_whatshap/transferability_across_scenarios/dropout__balanced_s4.oracle.vcf.gz",
+    "reads_fastq": "output/experiments_draft/08_optimize_whatshap/transferability_across_scenarios/dropout__balanced_s4.reads.fastq",
+    "bam": "output/experiments_draft/08_optimize_whatshap/transferability_across_scenarios/dropout__balanced_s4.bam",
+    "called_vcf_gz": "output/experiments_draft/08_optimize_whatshap/transferability_across_scenarios/dropout__balanced_s4.called.vcf.gz"
+  },
+  "callset": {
+    "truth_snps": 800,
+    "truth_het_snps": 629,
+    "called_snps": 505,
+    "shared_snps": 505,
+    "precision": 1.0,
+    "recall": 0.63125,
+    "notes": "Precision/recall only computed when --vcf-source includes called."
+  },
+  "phasing_runs": {
+    "called": {
+      "vcf_input": "output/experiments_draft/08_optimize_whatshap/transferability_across_scenarios/dropout__balanced_s4.called.vcf.gz",
+      "vcf_input_for_phasing": "output/experiments_draft/08_optimize_whatshap/transferability_across_scenarios/dropout__balanced_s4.called.vcf.gz",
+      "phased_vcf": "output/experiments_draft/08_optimize_whatshap/transferability_across_scenarios/dropout__balanced_s4.ws.phased.vcf",
+      "eval_json": "output/experiments_draft/08_optimize_whatshap/transferability_across_scenarios/dropout__balanced_s4.ws.eval.json",
+      "summary_json": "output/experiments_draft/08_optimize_whatshap/transferability_across_scenarios/dropout__balanced_s4.ws.summary.json",
+      "eval": {
+        "shared_total_records": 505,
+        "shared_snp_records": 505,
+        "shared_het_records": 347,
+        "pred_phased_het_records": 179,
+        "pred_unphased_het_records": 168,
+        "num_phase_sets": 3,
+        "phase_accuracy_blockflip": 0.9776536312849162,
+        "switches": 4,
+        "switch_den": 176,
+        "switch_error_rate": 0.022727272727272728,
+        "phase_sets": {
+          "1259": {
+            "size": 148,
+            "best_flip": true,
+            "match_no_flip": 0,
+            "match_flip": 148,
+            "best_match": 148
+          },
+          "42050": {
+            "size": 18,
+            "best_flip": false,
+            "match_no_flip": 18,
+            "match_flip": 0,
+            "best_match": 18
+          },
+          "59669": {
+            "size": 13,
+            "best_flip": false,
+            "match_no_flip": 9,
+            "match_flip": 4,
+            "best_match": 9
+          }
+        },
+        "truth_snp_records": 800,
+        "pred_snp_records": 505,
+        "shared_exact_records": 505,
+        "notes": ""
+      },
+      "derived": {
+        "truth_het_snps": 629,
+        "shared_het_snps": 347,
+        "phased_het_snps": 179,
+        "correct_phased_het_snps_bestflip": 175,
+        "phasing_rate_on_shared_het": 0.515850144092219,
+        "effective_phased_recall": 0.27821939586645467,
+        "shared_het_recall": 0.5516693163751988
+      }
+    },
+    "oracle": {
+      "vcf_input": "output/experiments_draft/08_optimize_whatshap/transferability_across_scenarios/dropout__balanced_s4.oracle.vcf.gz",
+      "vcf_input_for_phasing": "output/experiments_draft/08_optimize_whatshap/transferability_across_scenarios/dropout__balanced_s4.oracle.vcf.gz",
+      "phased_vcf": "output/experiments_draft/08_optimize_whatshap/transferability_across_scenarios/dropout__balanced_s4.ws_oracle.phased.vcf",
+      "eval_json": "output/experiments_draft/08_optimize_whatshap/transferability_across_scenarios/dropout__balanced_s4.ws_oracle.eval.json",
+      "summary_json": "output/experiments_draft/08_optimize_whatshap/transferability_across_scenarios/dropout__balanced_s4.ws_oracle.summary.json",
+      "eval": {
+        "shared_total_records": 800,
+        "shared_snp_records": 800,
+        "shared_het_records": 629,
+        "pred_phased_het_records": 589,
+        "pred_unphased_het_records": 40,
+        "num_phase_sets": 3,
+        "phase_accuracy_blockflip": 1.0,
+        "switches": 0,
+        "switch_den": 586,
+        "switch_error_rate": 0.0,
+        "phase_sets": {
+          "660": {
+            "size": 374,
+            "best_flip": false,
+            "match_no_flip": 374,
+            "match_flip": 0,
+            "best_match": 374
+          },
+          "49791": {
+            "size": 136,
+            "best_flip": false,
+            "match_no_flip": 136,
+            "match_flip": 0,
+            "best_match": 136
+          },
+          "69958": {
+            "size": 79,
+            "best_flip": true,
+            "match_no_flip": 0,
+            "match_flip": 79,
+            "best_match": 79
+          }
+        },
+        "truth_snp_records": 800,
+        "pred_snp_records": 800,
+        "shared_exact_records": 800,
+        "notes": ""
+      },
+      "derived": {
+        "truth_het_snps": 629,
+        "shared_het_snps": 629,
+        "phased_het_snps": 589,
+        "correct_phased_het_snps_bestflip": 589,
+        "phasing_rate_on_shared_het": 0.9364069952305246,
+        "effective_phased_recall": 0.9364069952305246,
+        "shared_het_recall": 1.0
+      }
+    }
+  },
+  "counts_raw": {
+    "truth_records": 800,
+    "called_records": 507,
+    "oracle_records": 800,
+    "phasing": {
+      "called": {
+        "phased_records": 507
+      },
+      "oracle": {
+        "phased_records": 800
+      }
+    }
+  },
+  "params": {
+    "ref_preset": "plain",
+    "ref_length": 80000,
+    "num_snps": 800,
+    "het_rate": 0.8,
+    "avoid_regions": false,
+    "num_reads": 200,
+    "min_len": 2000,
+    "max_len": 6000,
+    "platform": "ont",
+    "ont_profile": "q20",
+    "map_preset": "map-ont",
+    "call_min_mapq": 20,
+    "call_min_baseq": 10,
+    "max_coverage": 8,
+    "min_mapq": 20,
+    "min_baseq": 10,
+    "dup_segments": 0,
+    "dup_len": 3000,
+    "dup_min_gap": 500,
+    "num_indels": 0,
+    "indel_min_len": 1,
+    "indel_max_len": 5,
+    "indel_het_rate": 0.5,
+    "len_model": "uniform",
+    "ln_mean": null,
+    "ln_sigma": null,
+    "start_model": "dropout",
+    "dropout_fraction": 0.1,
+    "dropout_block_len": 1000,
+    "burst_prob": 0.0,
+    "burst_count": 1,
+    "burst_len": 200,
+    "burst_mult": 5.0,
+    "phase_snps_only": false,
+    "eval_snps_only": false
+  },
+  "time_total_sec": 3.129097543998796
+}

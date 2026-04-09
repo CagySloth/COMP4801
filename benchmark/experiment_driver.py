@@ -512,6 +512,8 @@ def run_optimize(outdir: Path, seeds: List[int], force: bool, base: Dict[str, An
       - bqfine: fine-grained phasing min_baseq sweep
       - local: local joint search around the current best caller/phasing base-quality settings
       - frontier: representative accuracy/runtime frontier comparison
+      - transfer: robustness/transferability of selected configs across scenarios
+      - callmq: caller-side call_min_mapq rule-out sweep under the balanced setting
       - confirm: default-vs-optimized confirmation comparison
     """
     exp = outdir / "08_optimize_whatshap"
@@ -745,6 +747,115 @@ def run_optimize(outdir: Path, seeds: List[int], force: bool, base: Dict[str, An
         _bottleneck_decomposition(df_fr, "called", fr_dir / "decomposition_called.csv")
 
 
+    # 8H) NEW: robustness / transferability comparison across representative scenarios
+    if "transfer" in selected:
+        tr_dir = exp / "transferability_across_scenarios"
+        _ensure_dir(tr_dir)
+        scenarios = [
+            ("baseline", dict(base)),
+            ("dropout", {**dict(base), "start_model": "dropout", "dropout_fraction": 0.1, "dropout_block_len": 1000, "dup_segments": 0, "burst_prob": 0.0, "num_indels": 0}),
+            ("interaction", {**dict(base), "dup_segments": 5, "dup_len": 3000, "dup_min_gap": 500, "start_model": "dropout", "dropout_fraction": 0.1, "dropout_block_len": 1000, "burst_prob": 0.0, "num_indels": 0}),
+            ("hard", _hard_optimize_args(base)),
+        ]
+        configs = [
+            ("default", {
+                "call_min_mapq": 20,
+                "call_min_baseq": 15,
+                "max_coverage": 15,
+                "min_mapq": 20,
+                "min_baseq": 20,
+            }),
+            ("balanced", {
+                "call_min_mapq": 20,
+                "call_min_baseq": 10,
+                "max_coverage": 8,
+                "min_mapq": 20,
+                "min_baseq": 10,
+            }),
+            ("runtime", {
+                "call_min_mapq": 20,
+                "call_min_baseq": 10,
+                "max_coverage": 6,
+                "min_mapq": 20,
+                "min_baseq": 10,
+            }),
+        ]
+        for scen_label, scen_args in scenarios:
+            scen_args = dict(scen_args)
+            if scen_label != "hard":
+                scen_args["phase_snps_only"] = False
+                scen_args["eval_snps_only"] = False
+            for cfg_label, overrides in configs:
+                for s in seeds:
+                    args = dict(scen_args)
+                    args["seed"] = s
+                    args.update(overrides)
+                    prefix = tr_dir / f"{scen_label}__{cfg_label}_s{s}"
+                    _call_pipeline(prefix, args, force=force)
+        csvp_tr = _aggregate(tr_dir)
+        df_tr = pd.read_csv(csvp_tr)
+        if "pipeline_json" in df_tr.columns:
+            ext = df_tr["pipeline_json"].astype(str).str.extract(r"/(baseline|dropout|interaction|hard)__([a-z_]+)_s\d+\.pipeline\.json$")
+            df_tr["scenario_label"] = ext[0]
+            df_tr["config_label"] = ext[1]
+        elif "prefix" in df_tr.columns:
+            ext = df_tr["prefix"].astype(str).str.extract(r"/(baseline|dropout|interaction|hard)__([a-z_]+)_s\d+$")
+            df_tr["scenario_label"] = ext[0]
+            df_tr["config_label"] = ext[1]
+        else:
+            df_tr["scenario_label"] = None
+            df_tr["config_label"] = None
+        if df_tr["scenario_label"].isna().all() or df_tr["config_label"].isna().all():
+            labels = df_tr.get("pipeline_json", df_tr.index).astype(str) if hasattr(df_tr.get("pipeline_json", None), 'astype') else pd.Series(df_tr.index.astype(str))
+            df_tr["scenario_label"] = [
+                "interaction" if "interaction__" in str(x) else
+                "dropout" if "dropout__" in str(x) else
+                "hard" if "hard__" in str(x) else
+                "baseline"
+                for x in labels
+            ]
+            df_tr["config_label"] = [
+                "runtime" if "__runtime_" in str(x) else
+                "balanced" if "__balanced_" in str(x) else
+                "default"
+                for x in labels
+            ]
+        df_tr.to_csv(csvp_tr, index=False)
+        _plots_heatmap(tr_dir, df_tr, "config_label", "scenario_label", [
+            ("called_effective_phased_recall", "Called effective phased recall"),
+            ("called_shared_het_recall", "Called shared het recall"),
+            ("called_num_phase_sets", "Called num phase sets"),
+            ("time_total_sec", "Total runtime (s)"),
+        ])
+        _bottleneck_decomposition(df_tr, "called", tr_dir / "decomposition_called.csv")
+
+    # 8I) NEW: caller-side mapping-quality rule-out sweep under the balanced setting
+    if "callmq" in selected:
+        cmq_dir = exp / "callmapq_ruleout_sweep"
+        _ensure_dir(cmq_dir)
+        for cmq in [0, 10, 20]:
+            for s in seeds:
+                args = dict(hard)
+                args["seed"] = s
+                args["call_min_mapq"] = cmq
+                args["call_min_baseq"] = 10
+                args["max_coverage"] = 8
+                args["min_mapq"] = 20
+                args["min_baseq"] = 10
+                prefix = cmq_dir / f"cmq{cmq}_s{s}"
+                _call_pipeline(prefix, args, force=force)
+        csvp_cmq = _aggregate(cmq_dir)
+        df_cmq = pd.read_csv(csvp_cmq)
+        _plots_basic(cmq_dir, df_cmq, "call_min_mapq", [
+            ("call_precision", "Call precision"),
+            ("call_recall", "Calling recall"),
+            ("called_shared_het_recall", "Called shared het recall"),
+            ("called_effective_phased_recall", "Called effective phased recall"),
+            ("time_total_sec", "Total runtime (s)"),
+        ])
+
+
+
     # 8H) NEW: default-vs-optimized confirmation comparison
     if "confirm" in selected:
         cf_dir = exp / "confirm_default_vs_optimized"
@@ -870,7 +981,7 @@ def main():
     ap.add_argument(
         "--optimize-sweeps",
         default="cov,qual,calling,runtime,bqfine",
-        help="Comma-separated optimize sub-sweeps: cov,qual,calling,runtime,bqfine,local,confirm. Used when optimize is selected."
+        help="Comma-separated optimize sub-sweeps: cov,qual,calling,runtime,bqfine,local,frontier,transfer,callmq,confirm. Used when optimize is selected."
     )
     ap.add_argument("--real-fastq", default=None, help="Optional real FASTQ(.gz) for reality check")
     ap.add_argument("--real-bam", default=None, help="Optional real BAM for reality check")
