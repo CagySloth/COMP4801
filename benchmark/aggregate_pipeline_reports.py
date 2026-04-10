@@ -111,6 +111,24 @@ def main():
             "called_snps": get(j, "callset.called_snps"),
             "shared_snps": get(j, "callset.shared_snps"),
 
+            # oracle runtime breakdown
+            "oracle_time_vcf_parse_sec": get(j, "phasing_runs.oracle.summary.time_vcf_parse_sec"),
+            "oracle_time_build_readset_sec": get(j, "phasing_runs.oracle.summary.time_build_readset_sec"),
+            "oracle_time_readselection_sec": get(j, "phasing_runs.oracle.summary.time_readselection_sec"),
+            "oracle_time_solve_sec": get(j, "phasing_runs.oracle.summary.time_solve_sec"),
+            "oracle_time_ps_sec": get(j, "phasing_runs.oracle.summary.time_ps_sec"),
+            "oracle_time_write_sec": get(j, "phasing_runs.oracle.summary.time_write_sec"),
+            "oracle_time_total_sec": get(j, "phasing_runs.oracle.summary.time_total_sec"),
+
+            # called runtime breakdown
+            "called_time_vcf_parse_sec": get(j, "phasing_runs.called.summary.time_vcf_parse_sec"),
+            "called_time_build_readset_sec": get(j, "phasing_runs.called.summary.time_build_readset_sec"),
+            "called_time_readselection_sec": get(j, "phasing_runs.called.summary.time_readselection_sec"),
+            "called_time_solve_sec": get(j, "phasing_runs.called.summary.time_solve_sec"),
+            "called_time_ps_sec": get(j, "phasing_runs.called.summary.time_ps_sec"),
+            "called_time_write_sec": get(j, "phasing_runs.called.summary.time_write_sec"),
+            "called_time_total_sec": get(j, "phasing_runs.called.summary.time_total_sec"),
+
             # oracle eval
             "oracle_phase_accuracy": get(j, "phasing_runs.oracle.eval.phase_accuracy_blockflip"),
             "oracle_switch_error": get(j, "phasing_runs.oracle.eval.switch_error_rate"),

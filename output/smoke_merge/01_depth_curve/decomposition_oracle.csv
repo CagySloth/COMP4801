@@ -1,0 +1,5 @@
+pipeline_json,seed,oracle_shared_het_recall,oracle_phasing_rate_shared_het,oracle_phase_accuracy,oracle_effective_phased_recall,oracle_loss_calling_or_sites,oracle_loss_unphased,oracle_loss_switch_or_phase_error,oracle_effective_phased_recall_check
+output/smoke_merge/01_depth_curve/r100_s0.pipeline.json,0,1.0,0.7978056426332288,0.9980353634577604,0.7962382445141066,0.0,0.20219435736677116,0.0015673981191221494,0.7962382445141067
+output/smoke_merge/01_depth_curve/r200_s0.pipeline.json,0,1.0,0.9545454545454546,1.0,0.9545454545454546,0.0,0.045454545454545414,0.0,0.9545454545454546
+output/smoke_merge/01_depth_curve/r400_s0.pipeline.json,0,1.0,0.9796238244514106,1.0,0.9796238244514106,0.0,0.020376175548589393,0.0,0.9796238244514106
+output/smoke_merge/01_depth_curve/r50_s0.pipeline.json,0,1.0,0.5532915360501567,0.9971671388101984,0.5517241379310345,0.0,0.4467084639498433,0.0015673981191222232,0.5517241379310345

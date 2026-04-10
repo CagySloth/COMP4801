@@ -1,0 +1,17 @@
+{
+  "shared_total_records": 25,
+  "shared_snp_records": 25,
+  "shared_het_records": 11,
+  "pred_phased_het_records": 0,
+  "pred_unphased_het_records": 11,
+  "num_phase_sets": 0,
+  "phase_accuracy_blockflip": null,
+  "switches": 0,
+  "switch_den": 0,
+  "switch_error_rate": null,
+  "phase_sets": {},
+  "truth_snp_records": 100,
+  "pred_snp_records": 25,
+  "shared_exact_records": 25,
+  "notes": ""
+}

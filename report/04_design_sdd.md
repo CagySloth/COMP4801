@@ -70,7 +70,7 @@ This pipeline structure supports two evaluation regimes:
 | 5 | orchestrated by `benchmark.longread_pipeline_runner` | `bcftools mpileup/call`, `bcftools index` | `*.called.vcf.gz`, `*.called.vcf.gz.tbi` |
 | 6 | `python -m algorithms.cli.phase diploid-whats-bam` → `algorithms/diploid/whatshap_bam_driver.py` | (vendored) `whatshap_core` | `*.phased.vcf`, `*.summary.json` |
 | 7 | `python -m benchmark.vcf_phase_eval` + report writer in runner | — | `*.eval.json`, `*.pipeline.json` |
-| 8 | `python -m benchmark.experiment_driver` + `benchmark.aggregate_pipeline_reports_full` | — | `aggregate.csv`, `plots/*.png` |
+| 8 | `python -m benchmark.experiment_driver` + `benchmark.aggregate_pipeline_reports` | — | `aggregate.csv`, `plots/*.png` |
 
 The single-run orchestrator `python -m benchmark.longread_pipeline_runner` is the canonical “glue” that runs stages 1–7 and writes `*.pipeline.json`. The experiment driver is a wrapper that repeatedly invokes the single-run orchestrator and then aggregates outputs.
 
@@ -225,7 +225,7 @@ This is the phasing entrypoint called by the pipeline runner.
 
 ---
 
-#### 4.3.8 Aggregation (`benchmark.aggregate_pipeline_reports_full`)
+#### 4.3.8 Aggregation (`benchmark.aggregate_pipeline_reports`)
 
 **Responsibility:** Convert many `*.pipeline.json` reports into a single `aggregate.csv` with standardized columns for plotting and analysis.
 
@@ -337,7 +337,7 @@ The design supports incremental realism and experimentation:
 - **New realism knobs** can be added in `dataset.longread.reference/truth/readsim`, then surfaced via:
   - `benchmark.longread_pipeline_runner` (single-run support)
   - `benchmark.experiment_driver` (sweep support)
-  - `benchmark.aggregate_pipeline_reports_full` (CSV column support)
+  - `benchmark.aggregate_pipeline_reports` (CSV column support)
 
 - **Alternative phasers** can be added by:
   - implementing a new driver under `algorithms/`

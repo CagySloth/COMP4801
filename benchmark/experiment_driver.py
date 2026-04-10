@@ -21,7 +21,7 @@ Reality check:
 
 This driver calls:
   - python -m benchmark.longread_pipeline_runner
-  - python -m benchmark.aggregate_pipeline_reports_full
+  - python -m benchmark.aggregate_pipeline_reports
 and generates plots (matplotlib) under each experiment directory.
 
 Notes:

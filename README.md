@@ -41,7 +41,7 @@ This repo is designed so you can **benchmark WhatsHap under controlled “realis
 
 ### Prerequisites
 
-- Python **3.11+**
+- Python **3.11 or 3.12** (tested with Python 3.12.12)
 - System tools for the long-read track:
   - `minimap2`, `samtools`, `bcftools`
 

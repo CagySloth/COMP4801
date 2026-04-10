@@ -22,7 +22,7 @@ The repository is organized around three concerns: data generation, phasing algo
   Implements end-to-end orchestration, evaluation, experiments, and aggregation:
   - `longread_pipeline_runner.py`: single-run orchestrator producing `*.pipeline.json`
   - `vcf_phase_eval.py`: phasing evaluation vs truth VCF
-  - `aggregate_pipeline_reports_full.py`: produces `aggregate.csv` from many `pipeline.json`
+  - `aggregate_pipeline_reports.py`: produces `aggregate.csv` from many `pipeline.json`
   - `experiment_driver.py`: runs experiment suites across seeds, aggregates and plots
 
 - `tests/`  
@@ -187,7 +187,7 @@ These flags are recorded in `*.pipeline.json` and surfaced into `aggregate.csv` 
 
 #### 5.6.2 Aggregation contract
 
-`benchmark.aggregate_pipeline_reports_full` reads each `*.pipeline.json` and outputs a standardized `aggregate.csv` containing:
+`benchmark.aggregate_pipeline_reports` reads each `*.pipeline.json` and outputs a standardized `aggregate.csv` containing:
 - configuration columns (including realism knobs and SNP-only flags)
 - callset metrics (precision/recall where applicable)
 - phasing metrics for oracle/called regimes

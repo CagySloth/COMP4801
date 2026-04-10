@@ -1,0 +1,208 @@
+{
+  "prefix": "output/poster_depth_dense/depth400_s0",
+  "seed": 0,
+  "vcf_source": "both",
+  "steps": {
+    "ref_fasta": "output/poster_depth_dense/depth400_s0.ref.fasta",
+    "truth_vcf_gz": "output/poster_depth_dense/depth400_s0.truth.vcf.gz",
+    "truth_eval_vcf_gz": "output/poster_depth_dense/depth400_s0.truth.vcf.gz",
+    "oracle_vcf_gz": "output/poster_depth_dense/depth400_s0.oracle.vcf.gz",
+    "reads_fastq": "output/poster_depth_dense/depth400_s0.reads.fastq",
+    "bam": "output/poster_depth_dense/depth400_s0.bam",
+    "called_vcf_gz": "output/poster_depth_dense/depth400_s0.called.vcf.gz"
+  },
+  "callset": {
+    "truth_snps": 800,
+    "truth_het_snps": 638,
+    "called_snps": 728,
+    "shared_snps": 728,
+    "precision": 1.0,
+    "recall": 0.91,
+    "notes": "Precision/recall only computed when --vcf-source includes called."
+  },
+  "phasing_runs": {
+    "called": {
+      "vcf_input": "output/poster_depth_dense/depth400_s0.called.vcf.gz",
+      "vcf_input_for_phasing": "output/poster_depth_dense/depth400_s0.called.vcf.gz",
+      "phased_vcf": "output/poster_depth_dense/depth400_s0.ws.phased.vcf",
+      "eval_json": "output/poster_depth_dense/depth400_s0.ws.eval.json",
+      "summary_json": "output/poster_depth_dense/depth400_s0.ws.summary.json",
+      "summary": {
+        "algorithm": "diploid_whats_bam",
+        "solver": "whatshap",
+        "vcf_input": "/home/cagysloth/Dev/github/COMP4801/output/poster_depth_dense/depth400_s0.called.vcf.gz",
+        "bam_input": "/home/cagysloth/Dev/github/COMP4801/output/poster_depth_dense/depth400_s0.bam",
+        "vcf_output": "/home/cagysloth/Dev/github/COMP4801/output/poster_depth_dense/depth400_s0.ws.phased.vcf",
+        "max_coverage": 15,
+        "min_mapq": 20,
+        "min_baseq": 20,
+        "variants_total": 728,
+        "het_variants": 566,
+        "num_reads_total": 388,
+        "selected_reads": 327,
+        "num_phase_sets": 1,
+        "time_vcf_parse_sec": 0.0019855060018016957,
+        "time_build_readset_sec": 0.838280770003621,
+        "time_readselection_sec": 0.00453910600481322,
+        "time_solve_sec": 0.18603154700394953,
+        "time_ps_sec": 0.0014185789987095632,
+        "time_write_sec": 0.0025320029963040724,
+        "time_total_sec": 1.0354747460005456,
+        "whatshap_module": "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/__init__.py",
+        "whatshap_core_module": "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/core.cpython-311-x86_64-linux-gnu.so",
+        "whatshap_readselect_module": "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/readselect.cpython-311-x86_64-linux-gnu.so"
+      },
+      "eval": {
+        "shared_total_records": 728,
+        "shared_snp_records": 728,
+        "shared_het_records": 567,
+        "pred_phased_het_records": 565,
+        "pred_unphased_het_records": 2,
+        "num_phase_sets": 1,
+        "phase_accuracy_blockflip": 1.0,
+        "switches": 0,
+        "switch_den": 564,
+        "switch_error_rate": 0.0,
+        "phase_sets": {
+          "1580": {
+            "size": 565,
+            "best_flip": true,
+            "match_no_flip": 0,
+            "match_flip": 565,
+            "best_match": 565
+          }
+        },
+        "truth_snp_records": 800,
+        "pred_snp_records": 728,
+        "shared_exact_records": 728,
+        "notes": ""
+      },
+      "derived": {
+        "truth_het_snps": 638,
+        "shared_het_snps": 567,
+        "phased_het_snps": 565,
+        "correct_phased_het_snps_bestflip": 565,
+        "phasing_rate_on_shared_het": 0.9964726631393298,
+        "effective_phased_recall": 0.8855799373040752,
+        "shared_het_recall": 0.8887147335423198
+      }
+    },
+    "oracle": {
+      "vcf_input": "output/poster_depth_dense/depth400_s0.oracle.vcf.gz",
+      "vcf_input_for_phasing": "output/poster_depth_dense/depth400_s0.oracle.vcf.gz",
+      "phased_vcf": "output/poster_depth_dense/depth400_s0.ws_oracle.phased.vcf",
+      "eval_json": "output/poster_depth_dense/depth400_s0.ws_oracle.eval.json",
+      "summary_json": "output/poster_depth_dense/depth400_s0.ws_oracle.summary.json",
+      "summary": {
+        "algorithm": "diploid_whats_bam",
+        "solver": "whatshap",
+        "vcf_input": "/home/cagysloth/Dev/github/COMP4801/output/poster_depth_dense/depth400_s0.oracle.vcf.gz",
+        "bam_input": "/home/cagysloth/Dev/github/COMP4801/output/poster_depth_dense/depth400_s0.bam",
+        "vcf_output": "/home/cagysloth/Dev/github/COMP4801/output/poster_depth_dense/depth400_s0.ws_oracle.phased.vcf",
+        "max_coverage": 15,
+        "min_mapq": 20,
+        "min_baseq": 20,
+        "variants_total": 800,
+        "het_variants": 638,
+        "num_reads_total": 393,
+        "selected_reads": 331,
+        "num_phase_sets": 1,
+        "time_vcf_parse_sec": 0.002109838998876512,
+        "time_build_readset_sec": 0.9028756480038282,
+        "time_readselection_sec": 0.00444633300503483,
+        "time_solve_sec": 0.1994990070015774,
+        "time_ps_sec": 0.0015035949982120655,
+        "time_write_sec": 0.0017665260020294227,
+        "time_total_sec": 1.1129229180005495,
+        "whatshap_module": "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/__init__.py",
+        "whatshap_core_module": "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/core.cpython-311-x86_64-linux-gnu.so",
+        "whatshap_readselect_module": "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/readselect.cpython-311-x86_64-linux-gnu.so"
+      },
+      "eval": {
+        "shared_total_records": 800,
+        "shared_snp_records": 800,
+        "shared_het_records": 638,
+        "pred_phased_het_records": 625,
+        "pred_unphased_het_records": 13,
+        "num_phase_sets": 1,
+        "phase_accuracy_blockflip": 1.0,
+        "switches": 0,
+        "switch_den": 624,
+        "switch_error_rate": 0.0,
+        "phase_sets": {
+          "753": {
+            "size": 625,
+            "best_flip": false,
+            "match_no_flip": 625,
+            "match_flip": 0,
+            "best_match": 625
+          }
+        },
+        "truth_snp_records": 800,
+        "pred_snp_records": 800,
+        "shared_exact_records": 800,
+        "notes": ""
+      },
+      "derived": {
+        "truth_het_snps": 638,
+        "shared_het_snps": 638,
+        "phased_het_snps": 625,
+        "correct_phased_het_snps_bestflip": 625,
+        "phasing_rate_on_shared_het": 0.9796238244514106,
+        "effective_phased_recall": 0.9796238244514106,
+        "shared_het_recall": 1.0
+      }
+    }
+  },
+  "counts_raw": {
+    "truth_records": 800,
+    "called_records": 728,
+    "oracle_records": 800,
+    "phasing": {
+      "called": {
+        "phased_records": 728
+      },
+      "oracle": {
+        "phased_records": 800
+      }
+    }
+  },
+  "params": {
+    "ref_preset": "plain",
+    "ref_length": 80000,
+    "num_snps": 800,
+    "het_rate": 0.8,
+    "avoid_regions": false,
+    "num_reads": 400,
+    "min_len": 2000,
+    "max_len": 6000,
+    "platform": "ont",
+    "ont_profile": "q20",
+    "map_preset": "map-ont",
+    "call_min_mapq": 20,
+    "call_min_baseq": 15,
+    "max_coverage": 15,
+    "min_mapq": 20,
+    "min_baseq": 20,
+    "dup_segments": 0,
+    "dup_len": 3000,
+    "dup_min_gap": 500,
+    "num_indels": 0,
+    "indel_min_len": 1,
+    "indel_max_len": 5,
+    "indel_het_rate": 0.5,
+    "len_model": "uniform",
+    "ln_mean": null,
+    "ln_sigma": null,
+    "start_model": "uniform",
+    "dropout_fraction": 0.0,
+    "dropout_block_len": null,
+    "burst_prob": 0.0,
+    "burst_count": 1,
+    "burst_len": 200,
+    "burst_mult": 5.0,
+    "phase_snps_only": false,
+    "eval_snps_only": false
+  },
+  "time_total_sec": 4.917091558003449
+}

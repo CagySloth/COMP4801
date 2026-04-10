@@ -46,7 +46,7 @@ To ensure results are traceable to code versions:
 
 - All plots and tables included in the report must be derivable from:
   - the `*.pipeline.json` files produced by the runner, aggregated into
-  - `aggregate.csv` via `benchmark.aggregate_pipeline_reports_full`
+  - `aggregate.csv` via `benchmark.aggregate_pipeline_reports`
 
 This design avoids dependence on ad-hoc terminal logs and makes the report reproducible.
 

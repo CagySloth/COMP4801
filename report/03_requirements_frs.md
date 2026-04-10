@@ -143,7 +143,7 @@ The system shall produce a single machine-readable report per run and provide ag
 **Implementation mapping:**
 - Run-level report: `*.pipeline.json` produced by `benchmark.longread_pipeline_runner`
 - Aggregation:
-  - `python -m benchmark.aggregate_pipeline_reports_full --root <dir> --out <csv>`
+  - `python -m benchmark.aggregate_pipeline_reports --root <dir> --out <csv>`
   - Used by `benchmark.experiment_driver`
 
 The pipeline report shall record:
