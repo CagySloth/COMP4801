@@ -1,0 +1,26 @@
+\usepackage{graphicx}
+\usepackage{etoolbox}
+\usepackage{fvextra}
+\usepackage{xcolor}
+
+\renewcommand{\baselinestretch}{1.5}
+\normalsize
+
+\preto\section{\clearpage}
+
+\definecolor{codeborder}{RGB}{170,170,170}
+\definecolor{codebg}{RGB}{245,245,245}
+
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{
+  commandchars=\\\{\},
+  breaklines=true,
+  breakanywhere=true,
+  breaksymbolleft={},
+  fontsize=\small,
+  frame=single,
+  rulecolor=\color{codeborder},
+  framerule=0.4pt,
+  framesep=2mm
+}
+
+\newenvironment{Shaded}{}{}

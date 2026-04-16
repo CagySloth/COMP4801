@@ -1,7 +1,3 @@
-\clearpage
-\pagenumbering{arabic}
-\setcounter{page}{1}
-
 ## 1. Introduction
 
 Haplotype phasing assigns heterozygous variants to their chromosome of origin, enabling downstream analyses such as compound heterozygosity detection, allele-specific expression, and improved variant interpretation. Long-read sequencing provides reads that span multiple variants and can therefore improve both the contiguity and correctness of phased haplotypes compared to short-read data. In practice, however, phasing quality is not determined by the phasing algorithm alone: it is affected by read alignment quality, variant calling accuracy, and sequencing characteristics such as coverage bias, repetitive/duplicated regions, and structured error patterns.

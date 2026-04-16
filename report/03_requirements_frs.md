@@ -18,6 +18,7 @@ The platform supports two evaluation regimes:
 **Primary user:** a developer/research user running controlled experiments and producing plots/tables for analysis and reporting.
 
 **Operating environment constraints:**
+
 - Python modules are executed via `python -m ...` entrypoints.
 - The end-to-end pipeline requires external tools available on `PATH`:
   - `minimap2`, `samtools`, `bcftools`
@@ -25,10 +26,12 @@ The platform supports two evaluation regimes:
 
 ### 3.3 Naming conventions and artifacts (prefix-based)
 
-Most pipeline outputs are derived from a single `--prefix` argument used consistently by `benchmark.longread_pipeline_runner`. Given `--prefix output/exp1/runA`, the system produces artifacts following this convention:
+Most pipeline outputs are derived from a single `--prefix` argument used consistently by \
+`benchmark.longread_pipeline_runner`. Given `--prefix output/exp1/runA`, the system produces artifacts following this convention:
 
 - Reference: `output/exp1/runA.ref.fasta`, `output/exp1/runA.ref.meta.json`
-- Truth: `output/exp1/runA.truth.vcf`, `output/exp1/runA.truth.vcf.gz` (+ index), `output/exp1/runA.truth.meta.json`
+- Truth: `output/exp1/runA.truth.vcf`, `output/exp1/runA.truth.vcf.gz` (+ index), \
+`output/exp1/runA.truth.meta.json`
 - Oracle VCF: `output/exp1/runA.oracle.vcf`, `output/exp1/runA.oracle.vcf.gz` (+ index)
 - Reads: `output/exp1/runA.reads.fastq`, `output/exp1/runA.reads.truth.tsv`, optional read meta JSON
 - Alignment: `output/exp1/runA.bam` (+ `.bai`)
@@ -37,6 +40,7 @@ Most pipeline outputs are derived from a single `--prefix` argument used consist
 - Pipeline report: `output/exp1/runA.pipeline.json`
 
 Aggregated experiments additionally produce:
+
 - `aggregate.csv` under each experiment directory
 - plots under `plots/` within the experiment directory
 
@@ -46,6 +50,7 @@ Aggregated experiments additionally produce:
 The system shall generate a synthetic reference genome FASTA with configurable realism presets and optional duplicated segments.
 
 **Implementation mapping:**
+
 - CLI: `python -m dataset.longread.reference`
 - Called by: `python -m benchmark.longread_pipeline_runner`
 - Parameters include:
@@ -58,6 +63,7 @@ The system shall generate a synthetic reference genome FASTA with configurable r
 The system shall generate diploid ground-truth variants and two haplotype sequences, and export both a truth VCF and haplotype FASTAs.
 
 **Implementation mapping:**
+
 - CLI: `python -m dataset.longread.truth`
 - Called by: `python -m benchmark.longread_pipeline_runner`
 - Parameters include:
@@ -73,6 +79,7 @@ The system shall generate diploid ground-truth variants and two haplotype sequen
 The system shall simulate long reads from the diploid haplotypes, producing FASTQ with quality strings and read-truth metadata.
 
 **Implementation mapping:**
+
 - CLI: `python -m dataset.longread.readsim`
 - Called by: `python -m benchmark.longread_pipeline_runner`
 - Parameters include:
@@ -90,6 +97,7 @@ The system shall simulate long reads from the diploid haplotypes, producing FAST
 The system shall align simulated reads to the reference and output a sorted, indexed BAM suitable for downstream variant calling and WhatsHap phasing.
 
 **Implementation mapping:**
+
 - Invoked by: `python -m benchmark.longread_pipeline_runner`
 - Tools: `minimap2`, `samtools sort`, `samtools index`
 - Parameter: `--map-preset` (default `map-ont`)
@@ -99,6 +107,7 @@ The system shall align simulated reads to the reference and output a sorted, ind
 The system shall call variants from the aligned BAM against the reference and produce a called VCF.
 
 **Implementation mapping:**
+
 - Invoked by: `python -m benchmark.longread_pipeline_runner`
 - Tools: `bcftools mpileup | bcftools call`
 - Parameters include:
@@ -110,6 +119,7 @@ The system shall call variants from the aligned BAM against the reference and pr
 The system shall phase variants using WhatsHap with BAM+VCF inputs and produce phased VCF output, using the vendored WhatsHap core for controlled benchmarking.
 
 **Implementation mapping:**
+
 - CLI entrypoint: `python -m algorithms.cli.phase diploid-whats-bam`
 - Driver: `algorithms/diploid/whatshap_bam_driver.py`
 - Called by: `python -m benchmark.longread_pipeline_runner`
@@ -124,6 +134,7 @@ The system shall phase variants using WhatsHap with BAM+VCF inputs and produce p
 The system shall evaluate phased output against the truth VCF and output evaluation metrics focused on phasing correctness and fragmentation.
 
 **Implementation mapping:**
+
 - CLI: `python -m benchmark.vcf_phase_eval`
 - Called by: `python -m benchmark.longread_pipeline_runner`
 - Outputs: `*.eval.json` including:
@@ -134,6 +145,7 @@ The system shall evaluate phased output against the truth VCF and output evaluat
 
 **SNP-only policy for indels:**
 When indels are enabled (`--num-indels > 0`), the system supports filtering to biallelic SNPs for phasing and/or evaluation:
+
 - Pipeline runner flags: `--phase-snps-only`, `--eval-snps-only`
 - These ensure evaluations remain valid when indel representations differ across truth/called/predicted VCFs.
 
@@ -141,12 +153,14 @@ When indels are enabled (`--num-indels > 0`), the system supports filtering to b
 The system shall produce a single machine-readable report per run and provide aggregation utilities for experiment directories.
 
 **Implementation mapping:**
+
 - Run-level report: `*.pipeline.json` produced by `benchmark.longread_pipeline_runner`
 - Aggregation:
   - `python -m benchmark.aggregate_pipeline_reports --root <dir> --out <csv>`
   - Used by `benchmark.experiment_driver`
 
 The pipeline report shall record:
+
 - parameter values used for the run
 - file paths for produced artifacts
 - calling precision/recall (when `--vcf-source` includes called)
@@ -156,6 +170,7 @@ The pipeline report shall record:
 The system shall provide a driver to execute predefined experiment suites across multiple seeds, aggregate results, and generate plots.
 
 **Implementation mapping:**
+
 - CLI: `python -m benchmark.experiment_driver --outdir ... --seeds ...`
 - Selective execution: `--only <section1,section2,...>`
 - Outputs per experiment section:

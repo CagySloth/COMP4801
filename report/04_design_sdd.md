@@ -11,6 +11,7 @@ The system is designed to:
 
 2. **Separate error sources**  
    Support both:
+
    - **Oracle VCF** (ground-truth variants; isolates phasing behavior), and
    - **Called VCF** (from bcftools; measures end-to-end caller + phaser performance).
 
@@ -56,6 +57,7 @@ The system is organized as a sequential pipeline with clearly defined stage boun
    Run multiple pipeline instances across seeds/knobs, aggregate reports into CSV, and generate plots.
 
 This pipeline structure supports two evaluation regimes:
+
 - **Oracle regime:** stages 1–4–6–7 using the oracle VCF to isolate phasing behavior.
 - **Called regime:** stages 1–5–6–7 using the called VCF to measure end-to-end behavior.
 
@@ -63,14 +65,14 @@ This pipeline structure supports two evaluation regimes:
 
 | Stage | Primary entrypoint in COMP4801_20 | External tools | Key outputs |
 |------:|-----------------------------------|----------------|-------------|
-| 1 | `python -m dataset.longread.reference` | — | `*.ref.fasta`, `*.ref.meta.json` |
-| 2 | `python -m dataset.longread.truth` | `bcftools view/index` (bgzip+index) | `*.truth.vcf.gz`, `*.oracle.vcf.gz`, `*.hap1.fasta`, `*.hap2.fasta` |
-| 3 | `python -m dataset.longread.readsim` | — | `*.reads.fastq`, `*.reads.truth.tsv`, optional `*.reads.meta.json` |
+| 1 | `dataset.longread.reference` | — | `*.ref.fasta`, `*.ref.meta.json` |
+| 2 | `dataset.longread.truth` | `bcftools view/index` (bgzip+index) | `*.truth.vcf.gz`, `*.oracle.vcf.gz`, `*.hap1.fasta`, `*.hap2.fasta` |
+| 3 | `dataset.longread.readsim` | — | `*.reads.fastq`, `*.reads.truth.tsv`, optional `*.reads.meta.json` |
 | 4 | orchestrated by `benchmark.longread_pipeline_runner` | `minimap2`, `samtools sort/index` | `*.bam`, `*.bam.bai` |
 | 5 | orchestrated by `benchmark.longread_pipeline_runner` | `bcftools mpileup/call`, `bcftools index` | `*.called.vcf.gz`, `*.called.vcf.gz.tbi` |
-| 6 | `python -m algorithms.cli.phase diploid-whats-bam` → `algorithms/diploid/whatshap_bam_driver.py` | (vendored) `whatshap_core` | `*.phased.vcf`, `*.summary.json` |
-| 7 | `python -m benchmark.vcf_phase_eval` + report writer in runner | — | `*.eval.json`, `*.pipeline.json` |
-| 8 | `python -m benchmark.experiment_driver` + `benchmark.aggregate_pipeline_reports` | — | `aggregate.csv`, `plots/*.png` |
+| 6 | `algorithms.cli.phase diploid-whats-bam` → `algorithms/diploid/whatshap_bam_driver.py` | (vendored) `whatshap_core` | `*.phased.vcf`, `*.summary.json` |
+| 7 | `benchmark.vcf_phase_eval` + report writer in runner | — | `*.eval.json`, `*.pipeline.json` |
+| 8 | `benchmark.experiment_driver` + `benchmark.aggregate_pipeline_reports` | — | `aggregate.csv`, `plots/*.png` |
 
 The single-run orchestrator `python -m benchmark.longread_pipeline_runner` is the canonical “glue” that runs stages 1–7 and writes `*.pipeline.json`. The experiment driver is a wrapper that repeatedly invokes the single-run orchestrator and then aggregates outputs.
 
@@ -91,6 +93,7 @@ The single-run orchestrator `python -m benchmark.longread_pipeline_runner` is th
 **Responsibility:** Generate a synthetic reference FASTA with configurable complexity and duplicated segments.
 
 **Outputs:**
+
 - `*.ref.fasta`
 - `*.ref.meta.json` containing:
   - `regions` (complex windows such as homopolymers/STR/GC windows)
@@ -98,6 +101,7 @@ The single-run orchestrator `python -m benchmark.longread_pipeline_runner` is th
   - `coord_note`: **0-based half-open** intervals `[start0, end0)`
 
 **Key extension points:**
+
 - `--preset {plain,toy,realistic}`
 - `--dup-segments`, `--dup-len`, `--dup-min-gap`
 
@@ -108,12 +112,14 @@ The single-run orchestrator `python -m benchmark.longread_pipeline_runner` is th
 **Responsibility:** Generate diploid ground truth variants and haplotypes.
 
 **Outputs:**
+
 - `*.truth.vcf` (+ `*.truth.vcf.gz` + index)
 - `*.hap1.fasta`, `*.hap2.fasta`
 - `*.truth.meta.json`
 - Oracle VCF template (written by pipeline runner; see §4.4)
 
 **Notes:**
+
 - The truth VCF is **phased** when `--phased-truth` is used.
 - Indels can be introduced via `--num-indels` and indel length parameters.
 - If `--avoid-regions` is enabled, truth generation can avoid complex reference regions using `*.ref.meta.json`.
@@ -125,11 +131,13 @@ The single-run orchestrator `python -m benchmark.longread_pipeline_runner` is th
 **Responsibility:** Simulate long reads from haplotypes and emit FASTQ with qualities and read-truth metadata.
 
 **Outputs:**
+
 - `*.reads.fastq` (sequence + ASCII qualities)
 - `*.reads.truth.tsv` (read-level truth such as haplotype origin; used for debugging/validation)
 - optional `*.reads.meta.json` (read simulation parameters/statistics)
 
 **Realism knobs currently supported by the runner:**
+
 - Platform: `--platform {ont,perfect}`
 - ONT profile: `--ont-profile {classic,q20}`
 - Length distribution: `--len-model {uniform,lognormal}`, `--ln-mean`, `--ln-sigma`
@@ -143,6 +151,7 @@ The single-run orchestrator `python -m benchmark.longread_pipeline_runner` is th
 **Responsibility:** Execute the full pipeline for a single run and write a complete run report.
 
 **Workflow steps (as implemented):**
+
 1. Run `dataset.longread.reference`
 2. Run `dataset.longread.truth`
 3. Create and index truth VCF (`bcftools view/index`)
@@ -154,6 +163,7 @@ The single-run orchestrator `python -m benchmark.longread_pipeline_runner` is th
 9. Evaluate phasing using `benchmark.vcf_phase_eval`
 
 **Design details:**
+
 - Uses `_which_or_fail()` to ensure external tools exist on `PATH`.
 - Uses `_piped()` to reliably run piped commands with error propagation.
 - Uses prefix-based naming and writes a single report:
@@ -165,6 +175,7 @@ The single-run orchestrator `python -m benchmark.longread_pipeline_runner` is th
     - `counts_raw` (record counts for sanity checks)
 
 **Indel-aware evaluation policy:**
+
 - When indels are present, the runner supports:
   - `--phase-snps-only`: filter phasing input VCF to biallelic SNPs
   - `--eval-snps-only`: filter truth VCF to biallelic SNPs for evaluation  
@@ -177,6 +188,7 @@ The single-run orchestrator `python -m benchmark.longread_pipeline_runner` is th
 **Responsibility:** Provide a single CLI namespace for all phasing algorithms.
 
 **Relevant command for this project:**
+
 - `diploid-whats-bam`: WhatsHap-core phasing from BAM+VCF using vendored core.
 
 This is the phasing entrypoint called by the pipeline runner.
@@ -188,6 +200,7 @@ This is the phasing entrypoint called by the pipeline runner.
 **Responsibility:** Implement WhatsHap-style phasing on BAM+VCF inputs using the **vendored** WhatsHap core.
 
 **Pipeline inside the driver:**
+
 1. Parse VCF (minimal parser) and keep **biallelic SNP records**; identify heterozygous sites.
 2. Build WhatsHap `ReadSet` from BAM pileups at heterozygous SNP sites:
    - filters by `--min-mapq` and `--min-baseq`
@@ -204,6 +217,7 @@ This is the phasing entrypoint called by the pipeline runner.
    - `*.summary.json` (counts + module provenance)
 
 **Vendored WhatsHap enforcement:**
+
 - `algorithms.vendor.whatshap_vendor.import_whatshap_vendor()` ensures `import whatshap` resolves to `vendor/whatshap_core`, preventing version drift and keeping benchmarking controlled.
 
 ---
@@ -213,6 +227,7 @@ This is the phasing entrypoint called by the pipeline runner.
 **Responsibility:** Compare phased VCF to truth VCF and compute phasing metrics.
 
 **Outputs:**
+
 - `*.eval.json` containing:
   - record overlap counts (shared SNPs, shared hets, phased hets)
   - `num_phase_sets`
@@ -221,6 +236,7 @@ This is the phasing entrypoint called by the pipeline runner.
   - per-phase-set breakdown (`phase_sets`)
 
 **Assumptions:**
+
 - Evaluation focuses on **biallelic SNPs**, and SNP-only filtering is used when indels are enabled.
 
 ---
@@ -238,6 +254,7 @@ This is the “data contract” between experiment execution and plotting.
 **Responsibility:** Run predefined experiment suites across multiple seeds, then aggregate and plot results.
 
 **Key design features:**
+
 - Runs the pipeline runner repeatedly with controlled argument sets.
 - Skips existing runs unless `--force` is used.
 - Automatically enables SNP-only phasing/evaluation when indels are configured.
@@ -274,6 +291,7 @@ Prefix-based naming ensures that all artifacts from a run can be discovered from
 The platform treats “realism knobs” as **configurable stressors**: each knob is a controlled perturbation that (a) approximates a real-world difficulty mode, and (b) is expected to measurably affect either calling metrics, phasing metrics, or both.
 
 These knobs are intentionally:
+
 - **parameterized** (CLI flags),
 - **stage-local** (implemented in the stage where the phenomenon arises), and
 - **fully recorded** in `*.pipeline.json` (so aggregated results are traceable).
@@ -343,10 +361,3 @@ The design supports incremental realism and experimentation:
   - implementing a new driver under `algorithms/`
   - registering a new subcommand in `algorithms.cli.phase`
   - adding calls and metrics extraction in the pipeline runner/driver
-```
-
-**Brief explanation (what this section covered):**
-This design section explains *how the system is structured* (architecture + components) and *how data flows* through your end-to-end pipeline. It also documents key design decisions (oracle vs called, vendored WhatsHap, SNP-only policy for indels, prefix-based artifacts) and describes how experiments are automated and aggregated.
-
-**How it aligns with your codebase (`COMP4801_20.zip`):**
-Every component described is mapped to an actual module and CLI in your repo: `dataset.longread.reference/truth/readsim`, the orchestrator `benchmark.longread_pipeline_runner`, the experiment automation `benchmark.experiment_driver`, the phasing entrypoint `algorithms.cli.phase diploid-whats-bam` and its implementation `algorithms/diploid/whatshap_bam_driver.py`, plus evaluation/aggregation scripts under `benchmark/`. The file contracts listed match the prefix-based artifacts your runner writes (e.g., `*.pipeline.json`, `*.ws*.eval.json`, `*.ref.meta.json`).
