@@ -169,7 +169,7 @@ Under the current parameterization, duplicated regions are a relatively mild str
   - phasing input source `vcf_source = both`
 
 \begin{center}
-\includegraphics[width=0.82\linewidth]{figures/10_experiments/fig_10_3_1_called_effective_phased_recall_dropout.png}
+\includegraphics[width=0.82\linewidth]{figures/10_experiments/fig_10_3_2_4_called_effective_phased_recall_dropout.png}
 \end{center}
 
 **Figure 10.3.2.4 — Called effective phased recall vs dropout fraction.**  
@@ -200,6 +200,7 @@ Coverage dropout is the strongest isolated stressor in this study. Its primary e
 
 #### 10.3.3 Correlated error bursts
 
+##### Results summary
 
 - `call_recall`: 0.663 (`burst_prob = 0.0`) → 0.681 (`0.3`) → 0.676 (`0.6`)
 - `oracle_effective_phased_recall`: 0.925 → 0.926 → 0.921
@@ -209,16 +210,19 @@ Coverage dropout is the strongest isolated stressor in this study. Its primary e
 
 These trends are reflected by Figures 10.3.3.1–10.3.3.5, especially Figures 10.3.3.1 and 10.3.3.2, where the intermediate-burst dip is visible but non-monotonic.
 
-Observations:
+##### Key observations
 
 - Calling recall is largely unaffected, and oracle phasing remains stable.
 - The main visible effect is a dip in called-regime phasing correctness at `burst_prob = 0.3`.
 - The effect is not monotonic, because `burst_prob = 0.6` rebounds close to baseline on most metrics.
 
-Interpretation: under the current parameterization, correlated error bursts are a weak and somewhat noisy called-regime correctness stressor rather than a strong practical failure mode.
+##### Takeaway
+Under the current parameterization, correlated error bursts are a weak and somewhat noisy called-regime correctness stressor rather than a strong practical failure mode.
 
 
 #### 10.3.4 Read length model
+
+##### Results summary
 
 - `call_recall`: 0.663 (uniform) → 0.701 (lognormal)
 - `oracle_effective_phased_recall`: 0.925 → 0.931
@@ -231,13 +235,14 @@ Interpretation: under the current parameterization, correlated error bursts are 
 
 These trends are reflected by Figures 10.3.4.1–10.3.4.5, especially Figure 10.3.4.2 for the continuity gain and Figure 10.3.4.4 for the small net change in called effective phased recall.
 
-Observations:
+##### Key observations
 
 - The lognormal model improves callset overlap and phase-block continuity.
 - End-to-end effective phased recall changes only slightly.
 - The gains in continuity and overlap are largely offset by slightly worse called-regime phasing correctness.
 
-Interpretation: the read length model is informative for mechanism analysis, but under the present parameterization it is a mixed continuity / correctness trade-off rather than a clear optimization lever.
+##### Takeaway
+The read length model is informative for mechanism analysis, but under the present parameterization it is a mixed continuity / correctness trade-off rather than a clear optimization lever.
 
 
 #### 10.3.5 Truth indels and SNP-only policy
@@ -315,7 +320,7 @@ Test whether duplicated regions and coverage dropout compound non-linearly, and 
 These trends are reflected by Figures 10.4.1–10.4.4, especially Figure 10.4.2 for the compounded drop in called effective phased recall and Figure 10.4.3 for the dropout-driven fragmentation pattern
 
 \begin{center}
-\includegraphics[width=0.82\linewidth]{figures/10_experiments/fig_10_4_1_called_effective_phased_recall_interaction.png}
+\includegraphics[width=0.82\linewidth]{figures/10_experiments/fig_10_4_2_called_effective_phased_recall_interaction.png}
 \end{center}
 
 **Figure 10.4.2 — Called effective phased recall across duplication × dropout conditions.**  
@@ -411,7 +416,7 @@ Representative hard-scenario configurations:
   - `max_coverage = 8`
   - `min_mapq = 20`
   - `min_baseq = 10`
-- **`balanced`**
+- **`optimzied`**
   - `call_min_mapq = 20`
   - `call_min_baseq = 10`
   - `max_coverage = 8`
@@ -429,34 +434,34 @@ Representative hard-scenario configurations:
 - `default`: `called_effective_phased_recall = 0.2919`, `called_shared_het_recall = 0.5098`, `called_num_phase_sets = 9.6`, `time_total_sec = 3.9338`
 - `caller_only`: `0.2994`, `0.5181`, `9.0`, `4.0540`
 - `phasing_only`: `0.2964`, `0.5098`, `6.6`, `3.7970`
-- `balanced`: `0.3041`, `0.5181`, `6.6`, `3.8682`
+- `optimzied`: `0.3041`, `0.5181`, `6.6`, `3.8682`
 - `runtime`: `0.3039`, `0.5181`, `6.6`, `3.8504`
 
-These trends are reflected by Figures 10.5.3.1–10.5.3.4, and are reinforced by the final default-vs-balanced confirmation in Figures 10.5.3.5–10.5.3.8.
+These trends are reflected by Figures 10.5.3.1–10.5.3.4, and are reinforced by the final default-vs-optimzied confirmation in Figures 10.5.3.5–10.5.3.8.
 
 \begin{center}
-\includegraphics[width=0.82\linewidth]{figures/10_experiments/fig_10_5_1_called_effective_phased_recall_configs.png}
+\includegraphics[width=0.82\linewidth]{figures/10_experiments/fig_10_5_3_1_called_effective_phased_recall_configs.png}
 \end{center}
 
 **Figure 10.5.3.1 — Called effective phased recall across representative configurations.**  
-The balanced configuration achieves the highest end-to-end phased recall, while the runtime-biased configuration performs almost identically. This shows that combining caller-side and phasing-side tuning yields the strongest practical performance.
+The optimzied configuration achieves the highest end-to-end phased recall, while the runtime-biased configuration performs almost identically. This shows that combining caller-side and phasing-side tuning yields the strongest practical performance.
 
 #### Key observations
 
-- O1 (The balanced configuration provides the best overall trade-off): `balanced` achieves the highest called effective phased recall while also maintaining low fragmentation, very low switch error, and lower runtime than the default configuration.
-- O2 (Default is dominated by the tuned configurations): The default configuration is worse than `balanced` and `runtime` on called effective phased recall, called shared heterozygous recall, switch error, and fragmentation.
+- O1 (The optimzied configuration provides the best overall trade-off): `optimzied` achieves the highest called effective phased recall while also maintaining low fragmentation, very low switch error, and lower runtime than the default configuration.
+- O2 (Default is dominated by the tuned configurations): The default configuration is worse than `optimzied` and `runtime` on called effective phased recall, called shared heterozygous recall, switch error, and fragmentation.
 - O3 (Caller-only and phasing-only tuning recover complementary parts of the gain): `caller_only` improves overlap-related metrics but leaves fragmentation high, whereas `phasing_only` strongly improves continuity and oracle phasing metrics but does not recover additional called-site overlap.
-- O4 (The runtime-biased configuration is a viable alternative): `runtime` performs almost identically to `balanced` on the main called metrics while using slightly lower retained coverage.
+- O4 (The runtime-biased configuration is a viable alternative): `runtime` performs almost identically to `optimzied` on the main called metrics while using slightly lower retained coverage.
 
 #### Takeaway
-The best practical performance comes from combining moderate caller-side and phasing-side tuning rather than optimizing either stage in isolation. The balanced configuration is the preferred general setting, while the runtime-biased configuration is a reasonable alternative when efficiency is prioritized.
+The best practical performance comes from combining moderate caller-side and phasing-side tuning rather than optimizing either stage in isolation. The optimzied configuration is the preferred general setting, while the runtime-biased configuration is a reasonable alternative when efficiency is prioritized.
 
 #### 10.5.4 Robustness across scenarios
 
 Configurations compared:
 
 - `default`
-- `balanced`
+- `optimzied`
 - `runtime`
 
 Scenarios compared:
@@ -470,39 +475,39 @@ Scenarios compared:
 
 - **Baseline**
   - `default`: `called_effective_phased_recall = 0.4364`, `called_shared_het_recall = 0.5902`, `called_num_phase_sets = 3.4`
-  - `balanced`: `0.5448`, `0.6097`, `1.4`
+  - `optimzied`: `0.5448`, `0.6097`, `1.4`
   - `runtime`: `0.5448`, `0.6097`, `1.4`
 - **Dropout**
   - `default`: `0.2694`, `0.5292`, `6.2`
-  - `balanced`: `0.2908`, `0.5420`, `4.2`
+  - `optimzied`: `0.2908`, `0.5420`, `4.2`
   - `runtime`: `0.2908`, `0.5420`, `4.2`
 - **Interaction**
   - `default`: `0.1972`, `0.5014`, `6.2`
-  - `balanced`: `0.2118`, `0.5094`, `5.4`
+  - `optimzied`: `0.2118`, `0.5094`, `5.4`
   - `runtime`: `0.2118`, `0.5094`, `5.4`
 - **Hard**
   - `default`: `0.2919`, `0.5098`, `9.6`
-  - `balanced`: `0.3041`, `0.5181`, `6.6`
+  - `optimzied`: `0.3041`, `0.5181`, `6.6`
   - `runtime`: `0.3039`, `0.5181`, `6.6`
 
 These trends are reflected by Figures 10.5.4.1–10.5.4.4, where the tuned configurations remain above the default across all four scenarios.
 
 \begin{center}
-\includegraphics[width=0.88\linewidth]{figures/10_experiments/fig_10_5_2_called_effective_phased_recall_robustness.png}
+\includegraphics[width=0.88\linewidth]{figures/10_experiments/fig_10_5_4_1_called_effective_phased_recall_robustness.png}
 \end{center}
 
 **Figure 10.5.4.1 — Called effective phased recall across scenarios and representative configurations.**  
-Across all tested scenarios, the balanced and runtime configurations achieve higher end-to-end phased recall than the default configuration, showing that the selected tuning generalizes beyond the hard optimization scenario.
+Across all tested scenarios, the optimzied and runtime configurations achieve higher end-to-end phased recall than the default configuration, showing that the selected tuning generalizes beyond the hard optimization scenario.
 
 #### Key observations
 
-- O1 (The tuned configurations generalize across scenarios): In all four scenarios, both `balanced` and `runtime` outperform `default` on called effective phased recall and called shared heterozygous recall.
-- O2 (The balanced configuration is the safest general recommendation): `balanced` is never worse than `default` and is either best or tied for best on the main called metrics across all scenarios.
-- O3 (The runtime-biased configuration is highly competitive): `runtime` is effectively identical to `balanced` on the main called metrics and remains competitive on runtime.
+- O1 (The tuned configurations generalize across scenarios): In all four scenarios, both `optimzied` and `runtime` outperform `default` on called effective phased recall and called shared heterozygous recall.
+- O2 (The optimzied configuration is the safest general recommendation): `optimzied` is never worse than `default` and is either best or tied for best on the main called metrics across all scenarios.
+- O3 (The runtime-biased configuration is highly competitive): `runtime` is effectively identical to `optimzied` on the main called metrics and remains competitive on runtime.
 - O4 (The gains transfer to both easy and hard cases): The tuned configurations improve performance not only in the hard scenario, but also in the baseline, dropout, and interaction scenarios.
 
 #### Takeaway
-The recommended tuned settings are robust across the representative scenarios tested in this study. The balanced configuration is the cleanest general recommendation because it consistently improves end-to-end phased recall and reduces fragmentation relative to the default.
+The recommended tuned settings are robust across the representative scenarios tested in this study. The optimzied configuration is the cleanest general recommendation because it consistently improves end-to-end phased recall and reduces fragmentation relative to the default.
 
 #### 10.5.5 Runtime breakdown and DP-scaling interpretation
 
@@ -511,12 +516,12 @@ A small runtime breakdown of the called phasing stage was examined for represent
 | Configuration | Build ReadSet (s) | Read Selection (s) | Solve (s) | Called Phasing Total (s) |
 |---|---:|---:|---:|---:|
 | Default | 0.3734 | 0.0023 | 0.0610 | 0.4433 |
-| Balanced (optimized) | 0.3679 | 0.0061 | 0.0056 | 0.3854 |
+| optimzied (optimized) | 0.3679 | 0.0061 | 0.0056 | 0.3854 |
 | Runtime (speed-oriented) | 0.3685 | 0.0050 | 0.0030 | 0.3827 |
 
 This breakdown shows that, in the current research pipeline, the largest share of called phasing runtime is spent in readset construction, while read selection and the downstream solve stage contribute smaller but configuration-dependent fractions. This result should be interpreted cautiously, because the present study uses a custom adaptor rather than the standard production-facing WhatsHap front-end.
 
-A separate SNP-density scaling study compared `default` and `balanced` under the same hard scenario while varying `num_snps ∈ {400, 800, 1200, 1600}`.
+A separate SNP-density scaling study compared `default` and `optimzied` under the same hard scenario while varying `num_snps ∈ {400, 800, 1200, 1600}`.
 
 #### Results summary
 
@@ -534,10 +539,10 @@ A separate SNP-density scaling study compared `default` and `balanced` under the
 These trends are reflected by Figures 10.5.5.1–10.5.5.4, especially Figure 10.5.5.1 for the steeper default solve-time growth and Figure 10.5.5.4 for the corresponding fragmentation difference.
 
 \begin{center}
-\includegraphics[width=0.82\linewidth]{figures/10_experiments/fig_10_5_3_called_time_solve_sec_dp_scaling.png}
+\includegraphics[width=0.82\linewidth]{figures/10_experiments/fig_10_5_5_1_called_time_solve_sec_dp_scaling.png}
 \end{center}
 
-**Figure 10.5.5.1 — Called solve time vs SNP count under default and balanced (optimized) configurations.**  
+**Figure 10.5.5.1 — Called solve time vs SNP count under default and optimzied configurations.**  
 Called solve time increases with SNP density under both configurations, but grows much more steeply under the default setting. This shows that the tuned configuration makes the residual phasing problem easier to solve as variant density increases.
 
 #### Key observations
@@ -593,7 +598,7 @@ Optimization sweeps under the composite hard scenario showed that optimization h
 - **Useful runtime knob:** `max_coverage`. Increasing `max_coverage` beyond 8–10 does not improve phasing performance, while lower values such as 8 preserve full performance with lower runtime.
 - **Weak / negligible knobs:** caller `call_min_mapq`, phasing `min_mapq`, and high `max_coverage` values above the plateau.
 - **Robustness of tuning:** the tuned configurations generalize across baseline, dropout, interaction, and hard scenarios.
-- **Algorithm-facing scaling result:** increasing SNP density makes the solve stage more expensive, but the balanced tuned configuration scales much better than the default configuration.
+- **Algorithm-facing scaling result:** increasing SNP density makes the solve stage more expensive, but the optimzied tuned configuration scales much better than the default configuration.
 
 Based on the optimization sweeps, the recommended practical settings for this pipeline are:
 
