@@ -143,7 +143,8 @@ Calling recall is computed as `shared_snps / truth_snps`, where `shared_snps` ar
 **Figure 10.2.2 — Oracle effective phased recall vs sequencing depth (phasing-only upper bound).**  
 Oracle effective phased recall measures WhatsHap’s phasing performance when the input variants are “oracle” (truth-derived SNP sites), removing variant calling errors from the pipeline. The curve rises with depth and approaches a high plateau, representing the phasing-only capability under the simulated ONT Q20 error model. Points show mean over seeds; error bars show standard deviation.
 
-**Figure 10.2.3 — Called effective phased recall vs sequencing depth (end-to-end performance).**  
+**Figure 10.2.3 — Called effective phased recall vs sequencing depth (end-to-end performance).**
+![Figure 10.2.3 — Called effective phased recall vs sequencing depth (end-to-end performance).](figures/10_experiments/fig_10_2_3_called_effective_phased_recall.png) 
 Called effective phased recall measures the fraction of truth heterozygous SNPs that end up *both present in the called set and correctly phased* (after best block flip). This curve is substantially lower than the oracle curve at low depth, demonstrating that variant calling recall (and callset composition) dominates end-to-end phasing performance early on. Points show mean over seeds; error bars show standard deviation.
 
 **Figure 10.2.4 — Oracle number of phase sets vs sequencing depth (block fragmentation, phasing-only).**  
@@ -290,16 +291,17 @@ This experiment isolates coverage dropout as a single realism stressor while kee
 - **Figure 10.4.4 — Called effective phased recall vs dropout fraction.**
 - **Figure 10.4.5 — Variant calling recall vs dropout fraction.**
 
-**Figure 10.4.1 — Oracle number of phase sets vs dropout fraction.**  
+**Figure 10.4.1 — Oracle number of phase sets vs dropout fraction.**
 The number of oracle phase sets increases strongly with dropout fraction, showing that localized coverage gaps fragment haplotype blocks even when correct variant sites are supplied to the phaser.
 
-**Figure 10.4.2 — Called number of phase sets vs dropout fraction.**  
+**Figure 10.4.2 — Called number of phase sets vs dropout fraction.**
 End-to-end phase fragmentation increases at low-to-moderate dropout levels, but phase-set count alone becomes harder to interpret at severe dropout because many heterozygous sites are no longer called or phased.
 
-**Figure 10.4.3 — Oracle effective phased recall vs dropout fraction.**  
+**Figure 10.4.3 — Oracle effective phased recall vs dropout fraction.**
 Oracle effective phased recall decreases as dropout increases, indicating that coverage gaps directly reduce phasing completeness by breaking read connectivity between heterozygous sites.
 
-**Figure 10.4.4 — Called effective phased recall vs dropout fraction.**  
+**Figure 10.4.4 — Called effective phased recall vs dropout fraction.**
+![Figure 10.4.4 — Called effective phased recall vs dropout fraction.](figures/10_experiments/fig_10_4_4_called_effective_phased_recall.png)
 Called effective phased recall declines much more steeply than oracle effective phased recall, showing that dropout affects both phasing connectivity and, at stronger dropout levels, variant recovery in the called regime.
 
 **Figure 10.4.5 — Variant calling recall vs dropout fraction.**  
@@ -604,7 +606,8 @@ This experiment tests whether two realistic stressors that were individually int
 **Figure 10.8.1 — Variant calling recall across duplication × dropout conditions.**  
 Calling recall is only mildly affected by duplication alone, but decreases further when duplication is combined with coverage dropout. This shows that ambiguous mapping compounds the loss of callable sites under low-coverage conditions.
 
-**Figure 10.8.2 — Called effective phased recall across duplication × dropout conditions.**  
+**Figure 10.8.2 — Called effective phased recall across duplication × dropout conditions.**
+![Figure 10.8.2 — Called effective phased recall across duplication × dropout conditions.](figures/10_experiments/fig_10_8_2_called_effective_phased_recall.png)
 The combined duplication + dropout condition produces the lowest end-to-end phased recall, showing that the two stressors interact to create a substantially more difficult phasing problem than either one alone.
 
 **Figure 10.8.3 — Called number of phase sets across duplication × dropout conditions.**  
@@ -1148,10 +1151,11 @@ All other hard-scenario stressors were kept fixed.
 - **Figure 10.9.8.3 — Called number of phase sets across representative configurations.**
 - **Figure 10.9.8.4 — Total pipeline runtime across representative configurations.**
 
-**Figure 10.9.8.1 — Called effective phased recall across representative configurations.**  
+**Figure 10.9.8.1 — Called effective phased recall across representative configurations.**
+![Figure 10.9.8.1 — Called effective phased recall across representative configurations.](figures/10_experiments/fig_10_9_8_1_called_effective_phased_recall.png)
 The balanced configuration achieves the highest end-to-end phased recall, while the runtime-biased configuration performs almost identically. This shows that combining caller-side and phasing-side tuning yields the strongest practical performance.
 
-**Figure 10.9.8.2 — Called shared heterozygous recall across representative configurations.**  
+**Figure 10.9.8.2 — Called shared heterozygous recall across representative configurations.**
 Called shared heterozygous recall is highest for the configurations that use the improved caller threshold, confirming that part of the overall gain comes from recovering more true heterozygous sites before phasing.
 
 **Figure 10.9.8.3 — Called number of phase sets across representative configurations.**  
@@ -1259,7 +1263,8 @@ The aim was to determine whether the recommended tuning is broadly useful or onl
 - **Figure 10.9.9.3 — Called number of phase sets across scenarios and representative configurations.**
 - **Figure 10.9.9.4 — Total pipeline runtime across scenarios and representative configurations.**
 
-**Figure 10.9.9.1 — Called effective phased recall across scenarios and representative configurations.**  
+**Figure 10.9.9.1 — Called effective phased recall across scenarios and representative configurations.**
+![Figure 10.9.9.1 — Called effective phased recall across scenarios and representative configurations.](figures/10_experiments/fig_10_9_9_1_called_effective_phased_recall_heatmap.png)
 Across all tested scenarios, the balanced and runtime configurations achieve higher end-to-end phased recall than the default configuration, showing that the selected tuning generalizes beyond the hard optimization scenario.
 
 **Figure 10.9.9.2 — Called shared heterozygous recall across scenarios and representative configurations.**  
@@ -1409,7 +1414,8 @@ All other hard-scenario stressors were kept fixed.
 - **Figure 10.9.11.3 — Called effective phased recall vs SNP count under default and optimized configurations.**
 - **Figure 10.9.11.4 — Called number of phase sets vs SNP count under default and optimized configurations.**
 
-**Figure 10.9.11.1 — Called solve time vs SNP count under default and optimized configurations.**  
+**Figure 10.9.11.1 — Called solve time vs SNP count under default and optimized configurations.**
+![Figure 10.9.11.1 — Called solve time vs SNP count under default and optimized configurations.](figures/10_experiments/fig_10_9_11_1_called_time_solve_sec.png)
 Called solve time increases with SNP density under both configurations, but grows much more steeply under the default setting. This shows that the tuned configuration makes the residual phasing problem easier to solve as variant density increases.
 
 **Figure 10.9.11.2 — Oracle solve time vs SNP count under default and optimized configurations.**  
