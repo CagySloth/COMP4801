@@ -21,4 +21,4 @@ This project aims to:
 
 ### 1.3 Report organization
 
-Section 2 introduces background on long-read phasing, WhatsHap, and evaluation metrics. Sections 3–6 describe requirements, design, implementation, and validation. Section 10 presents experimental results and optimization investigations, followed by discussion and conclusions.
+Section 2 introduces background on long-read phasing, WhatsHap, and evaluation metrics. Sections 3–9 describe requirements, design, implementation, validation, configuration management, quality assurance, and project management. Section 10 presents experimental results and optimization investigations, followed by discussion and conclusions.

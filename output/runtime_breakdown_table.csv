@@ -1,0 +1,4 @@
+Configuration,Build ReadSet (s),Read Selection (s),Solve (s),Called Phasing Total (s)
+Optimized,0.3679,0.0061,0.0056,0.3854
+Default,0.3734,0.0023,0.061,0.4433
+Speed-oriented,0.3685,0.005,0.003,0.3827

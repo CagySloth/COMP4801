@@ -3,9 +3,9 @@
 ### 10.1 Experimental methodology and common setup
 
 #### 10.1.1 Environment and toolchain
-- OS/CPU: MacOS/M2 Max
+- OS / CPU: macOS / Apple M2 Max
 - Python version: 3.12.12
-- minimap2 versions: 2.30-r1287
+- minimap2 version: 2.30-r1287
 - samtools version: 1.23
 - bcftools version: 1.23
 - Vendored WhatsHap core path: `vendor/whatshap_core/whatshap/core.<platform-specific extension>`
@@ -130,7 +130,12 @@ Establish baseline performance curves as sequencing depth increases, and attribu
 - Fixed: ONT-like simulation profile (q20), reference length 80 kb, 800 truth SNPs (het rate 0.8), read length range 2–6 kb, calling thresholds (mapQ/baseQ), and phasing thresholds (max_coverage, min_mapq, min_baseq) as specified in §10.1.
 
 #### Figures to include
-- 
+- **Figure 10.2.1 — Variant calling recall vs sequencing depth.**
+- **Figure 10.2.2 — Oracle effective phased recall vs sequencing depth (phasing-only upper bound).**
+- **Figure 10.2.3 — Called effective phased recall vs sequencing depth (end-to-end performance).**
+- **Figure 10.2.4 — Oracle number of phase sets vs sequencing depth (block fragmentation, phasing-only).**
+- **Figure 10.2.5 — Called number of phase sets vs sequencing depth (block fragmentation, end-to-end).**
+- **Figure 10.2.6 — Called switch error rate vs sequencing depth.**
 
 **Figure 10.2.1 — Variant calling recall vs sequencing depth.**  
 Calling recall is computed as `shared_snps / truth_snps`, where `shared_snps` are SNP records present in both the truth VCF and the called VCF (exact-position matching in the pipeline’s callset summary). As read depth increases (num_reads), recall increases sharply, indicating that *variant discovery* is the main limiter at low coverage. Points show mean over seeds; error bars show standard deviation.
@@ -204,11 +209,11 @@ Measure how duplicated reference segments affect end-to-end phasing by increasin
 This experiment isolates duplicated sequence as a single realism stressor while keeping all other baseline conditions unchanged.
 
 #### Figures to include
-- `call_recall` vs `dup_segments`
-- `called_effective_phased_recall` vs `dup_segments`
-- `called_switch_error` vs `dup_segments`
-- `oracle_effective_phased_recall` vs `dup_segments`
-- `called_num_phase_sets` vs `dup_segments` (secondary / interpret with caution)
+- **Figure 10.3.1 — Variant calling recall vs duplicated-region count.**
+- **Figure 10.3.2 — Called effective phased recall vs duplicated-region count.**
+- **Figure 10.3.3 — Called switch error rate vs duplicated-region count.**
+- **Figure 10.3.4 — Oracle effective phased recall vs duplicated-region count.**
+- **Figure 10.3.5 — Called number of phase sets vs duplicated-region count.**
 
 **Figure 10.3.1 — Variant calling recall vs duplicated-region count.**  
 Calling recall remains nearly unchanged across duplication levels, indicating that the duplicated-region stressor does not substantially reduce SNP site recovery under the current alignment and calling settings.
@@ -279,11 +284,11 @@ Evaluate how localized coverage dropout affects phase-block continuity and effec
 This experiment isolates coverage dropout as a single realism stressor while keeping the remaining baseline conditions unchanged.
 
 #### Figures to include
-- `oracle_num_phase_sets` vs `dropout_fraction`
-- `called_num_phase_sets` vs `dropout_fraction` (secondary; interpret with completeness metrics)
-- `oracle_effective_phased_recall` vs `dropout_fraction`
-- `called_effective_phased_recall` vs `dropout_fraction`
-- `call_recall` vs `dropout_fraction` (supporting evidence for severe-dropout calling loss)
+- **Figure 10.4.1 — Oracle number of phase sets vs dropout fraction.**
+- **Figure 10.4.2 — Called number of phase sets vs dropout fraction.**
+- **Figure 10.4.3 — Oracle effective phased recall vs dropout fraction.**
+- **Figure 10.4.4 — Called effective phased recall vs dropout fraction.**
+- **Figure 10.4.5 — Variant calling recall vs dropout fraction.**
 
 **Figure 10.4.1 — Oracle number of phase sets vs dropout fraction.**  
 The number of oracle phase sets increases strongly with dropout fraction, showing that localized coverage gaps fragment haplotype blocks even when correct variant sites are supplied to the phaser.
@@ -358,11 +363,11 @@ Assess how localized high-error segments within reads affect variant calling and
 This experiment isolates correlated error bursts as a single realism stressor while keeping the remaining baseline conditions unchanged.
 
 #### Figures to include
-- `called_switch_error` vs `burst_prob`
-- `called_effective_phased_recall` vs `burst_prob`
-- `call_recall` vs `burst_prob`
-- `called_num_phase_sets` vs `burst_prob` (secondary)
-- `oracle_effective_phased_recall` vs `burst_prob` (optional attribution figure or reported in text/table)
+- **Figure 10.5.1 — Called switch error rate vs burst probability.**
+- **Figure 10.5.2 — Called effective phased recall vs burst probability.**
+- **Figure 10.5.3 — Variant calling recall vs burst probability.**
+- **Figure 10.5.4 — Called number of phase sets vs burst probability.**
+- **Figure 10.5.5 — Oracle effective phased recall vs burst probability.**
 
 **Figure 10.5.1 — Called switch error rate vs burst probability.**  
 Called switch error shows a modest increase at the intermediate burst setting, suggesting that correlated high-error segments can destabilize local phase relationships in the end-to-end called regime. However, the effect is not monotonic across the burst sweep.
@@ -436,11 +441,11 @@ Compare uniform and lognormal read length distributions to assess how read-lengt
 This experiment isolates the read length distribution as a single realism stressor while keeping the remaining baseline conditions unchanged.
 
 #### Figures to include
-- `oracle_num_phase_sets` by read length model
-- `called_num_phase_sets` by read length model
-- `oracle_effective_phased_recall` by read length model
-- `called_effective_phased_recall` by read length model
-- `call_recall` by read length model
+- **Figure 10.6.1 — Oracle number of phase sets by read length model.**
+- **Figure 10.6.2 — Called number of phase sets by read length model.**
+- **Figure 10.6.3 — Oracle effective phased recall by read length model.**
+- **Figure 10.6.4 — Called effective phased recall by read length model.**
+- **Figure 10.6.5 — Variant calling recall by read length model.**
 
 **Figure 10.6.1 — Oracle number of phase sets by read length model.**  
 The lognormal read length model reduces the number of oracle phase sets relative to the uniform baseline, indicating improved long-range connectivity between heterozygous sites when correct variant sites are supplied.
@@ -516,10 +521,10 @@ Show that introducing indels into the truth set does not invalidate SNP phasing 
 This experiment isolates the effect of adding indels to truth generation while preserving SNP-only phasing and evaluation comparability.
 
 #### Figures to include
-- `oracle_effective_phased_recall` vs `num_indels`
-- `called_effective_phased_recall` vs `num_indels`
-- `call_recall` vs `num_indels`
-- `called_num_phase_sets` vs `num_indels` (secondary)
+- **Figure 10.7.1 — Oracle effective phased recall vs number of truth indels.**
+- **Figure 10.7.2 — Called effective phased recall vs number of truth indels.**
+- **Figure 10.7.3 — Variant calling recall vs number of truth indels.**
+- **Figure 10.7.4 — Called number of phase sets vs number of truth indels.**
 
 **Figure 10.7.1 — Oracle effective phased recall vs number of truth indels.**  
 Oracle SNP-phasing performance remains essentially unchanged as truth indels are introduced, showing that SNP-only phasing and evaluation preserve a stable phasing-only benchmark in indel-containing truth sets.
@@ -728,8 +733,8 @@ Adjusting `max_coverage` does not provide a meaningful optimization benefit unde
 ##### Figures to include
 - **Figure 10.9.2.1 — Called effective phased recall across the `min_mapq × min_baseq` grid.**
 - **Figure 10.9.2.2 — Called switch error across the `min_mapq × min_baseq` grid.**
-- **Figure 10.9.2.3 — Called number of phase sets across the `min_mapq × min_baseq` grid.**
-- **Figure 10.9.2.4 — Oracle effective phased recall across the `min_mapq × min_baseq` grid.**
+- **Figure 10.9.2.3 — Called number of phase sets across the phasing quality-threshold grid (heatmap).**
+- **Figure 10.9.2.4 — Oracle effective phased recall across the phasing quality-threshold grid (heatmap).**
 
 **Figure 10.9.2.1 — Called effective phased recall across the `min_mapq × min_baseq` grid.**  
 Called effective phased recall is consistently higher when `min_baseq = 0` or `10` than when `min_baseq = 20`, while `min_mapq` has little visible effect. This shows that overly strict base-quality filtering reduces usable phasing evidence.
@@ -787,7 +792,7 @@ Phasing quality thresholds provide a limited but real optimization lever under t
     - `min_baseq = 10`
 
 ##### Figures to include
-- **Figure 10.9.3.1 — Calling recall across the `call_min_mapq × call_min_baseq` grid.**
+- **Figure 10.9.3.1 — Variant calling recall across the caller-threshold grid (heatmap).**
 - **Figure 10.9.3.2 — Called effective phased recall across the `call_min_mapq × call_min_baseq` grid.**
 - **Figure 10.9.3.3 — Called shared heterozygous recall across the `call_min_mapq × call_min_baseq` grid.**
 - **Figure 10.9.3.4 — Call precision across the `call_min_mapq × call_min_baseq` grid.**
@@ -968,7 +973,7 @@ Called switch error remains very low and stable from `min_baseq = 0` to `15`, bu
 ##### Takeaway
 The fine phasing `min_baseq` sweep confirms that performance is stable across `min_baseq = 0–15` and degrades only when the threshold becomes too strict (`20`). A moderate phasing base-quality threshold such as `min_baseq = 10` is therefore the most practical recommendation: it retains full performance while avoiding unnecessary permissiveness and clearly outperforming the overly strict setting.
 
-#### 10.9.6 Final confirmation: default vs optimized
+#### 10.9.6 Default vs optimized comparison
 
 ##### Setup
 A final confirmation run compared the default hard-scenario configuration against the best practical tuned configuration identified from the preceding optimization sweeps.
@@ -1050,7 +1055,7 @@ A focused local search was performed around the current best practical threshold
   - hard-scenario stressors unchanged
 
 ##### Figures to include
-- **Figure 10.9.7.1 — Called effective phased recall across the local caller/phasing base-quality grid.**
+- **Figure 10.9.7.1 — Called effective phased recall across the local joint base-quality grid (heatmap).**
 - **Figure 10.9.7.2 — Called shared heterozygous recall across the local caller/phasing base-quality grid.**
 - **Figure 10.9.7.3 — Calling recall across the local caller/phasing base-quality grid.**
 - **Figure 10.9.7.4 — Total pipeline runtime across the local caller/phasing base-quality grid.**
@@ -1249,7 +1254,7 @@ Scenarios compared:
 The aim was to determine whether the recommended tuning is broadly useful or only beneficial in the hard scenario used for parameter selection.
 
 ##### Figures to include
-- **Figure 10.9.9.1 — Called effective phased recall across scenarios and representative configurations.**
+- **Figure 10.9.9.1 — Called effective phased recall across scenarios and representative configurations (heatmap).**
 - **Figure 10.9.9.2 — Called shared heterozygous recall across scenarios and representative configurations.**
 - **Figure 10.9.9.3 — Called number of phase sets across scenarios and representative configurations.**
 - **Figure 10.9.9.4 — Total pipeline runtime across scenarios and representative configurations.**
@@ -1399,27 +1404,27 @@ Two configurations were compared:
 All other hard-scenario stressors were kept fixed.
 
 ##### Figures to include
-- **Figure 10.9.11.1 — Called solve time vs SNP count under default and balanced configurations.**
-- **Figure 10.9.11.2 — Oracle solve time vs SNP count under default and balanced configurations.**
-- **Figure 10.9.11.3 — Called effective phased recall vs SNP count under default and balanced configurations.**
-- **Figure 10.9.11.4 — Called number of phase sets vs SNP count under default and balanced configurations.**
+- **Figure 10.9.11.1 — Called solve time vs SNP count under default and optimized configurations.**
+- **Figure 10.9.11.2 — Oracle solve time vs SNP count under default and optimized configurations.**
+- **Figure 10.9.11.3 — Called effective phased recall vs SNP count under default and optimized configurations.**
+- **Figure 10.9.11.4 — Called number of phase sets vs SNP count under default and optimized configurations.**
 
-**Figure 10.9.11.1 — Called solve time vs SNP count under default and balanced configurations.**  
+**Figure 10.9.11.1 — Called solve time vs SNP count under default and optimized configurations.**  
 Called solve time increases with SNP density under both configurations, but grows much more steeply under the default setting. This shows that the tuned configuration makes the residual phasing problem easier to solve as variant density increases.
 
-**Figure 10.9.11.2 — Oracle solve time vs SNP count under default and balanced configurations.**  
-Oracle solve time also increases with SNP density, confirming that the solver becomes more expensive as the phasing-only problem grows. The balanced configuration remains substantially faster, indicating that its benefit is not solely due to changes in the called callset.
+**Figure 10.9.11.2 — Oracle solve time vs SNP count under default and optimized configurations.**  
+Oracle solve time also increases with SNP density, confirming that the solver becomes more expensive as the phasing-only problem grows. The optimized configuration remains substantially faster, indicating that its benefit is not solely due to changes in the called callset.
 
-**Figure 10.9.11.3 — Called effective phased recall vs SNP count under default and balanced configurations.**  
-Across the scaling range, the balanced configuration maintains slightly higher end-to-end phased recall than the default configuration, showing that its runtime benefit is not obtained by sacrificing phasing quality.
+**Figure 10.9.11.3 — Called effective phased recall vs SNP count under default and optimized configurations.**  
+Across the scaling range, the optimized configuration maintains slightly higher end-to-end phased recall than the default configuration, showing that its runtime benefit is not obtained by sacrificing phasing quality.
 
-**Figure 10.9.11.4 — Called number of phase sets vs SNP count under default and balanced configurations.**  
-The balanced configuration generally produces fewer phase sets than the default configuration as SNP density increases, indicating better phase-block continuity and a less fragmented residual phasing problem.
+**Figure 10.9.11.4 — Called number of phase sets vs SNP count under default and optimized configurations.**  
+The optimized configuration generally produces fewer phase sets than the default configuration as SNP density increases, indicating better phase-block continuity and a less fragmented residual phasing problem.
 
 ##### Results summary
 Means over 3 seeds:
 
-- **Balanced**
+- **optimized**
   - `called_time_solve_sec`: `0.0026 → 0.0046 → 0.0051 → 0.0067`
   - `oracle_time_solve_sec`: `0.0044 → 0.0066 → 0.0091 → 0.0114`
   - `called_effective_phased_recall`: `0.3071 → 0.3705 → 0.3295 → 0.3280`
@@ -1434,14 +1439,14 @@ Means over 3 seeds:
 ##### Key observations
 - O1 (Solve time increases with SNP density): In both oracle and called regimes, solve time increases as `num_snps` increases from 400 to 1600, showing that the downstream phasing problem becomes more expensive as variant density rises.
 
-- O2 (The balanced configuration scales much better than default): The growth in solve time is much steeper under the default configuration than under the balanced configuration. At `num_snps = 1600`, default solve time is substantially higher than balanced in both oracle and called regimes, indicating that the tuned settings make the residual phasing problem easier to solve.
+- O2 (The optimized configuration scales much better than default): The growth in solve time is much steeper under the default configuration than under the optimized configuration. At `num_snps = 1600`, default solve time is substantially higher than optimized in both oracle and called regimes, indicating that the tuned settings make the residual phasing problem easier to solve.
 
-- O3 (Balanced remains better on phasing continuity as the problem grows): Across the scaling range, the balanced configuration generally maintains fewer phase sets and slightly better phased recall than the default configuration. This suggests that the tuning improves not only final phasing output but also the structure of the instance presented to the solver.
+- O3 (optimized remains better on phasing continuity as the problem grows): Across the scaling range, the optimized configuration generally maintains fewer phase sets and slightly better phased recall than the default configuration. This suggests that the tuning improves not only final phasing output but also the structure of the instance presented to the solver.
 
 - O4 (Solve time still does not dominate total runtime end-to-end): Although solve time grows with SNP density, total phasing runtime remains dominated by preprocessing/readset construction in the current research pipeline. Therefore, the main value of this result is algorithmic interpretation rather than end-to-end runtime engineering.
 
 ##### Takeaway
-The DP-scaling study shows that increasing SNP density makes the phasing solve stage progressively more expensive, but also that the balanced tuned configuration scales substantially better than the default configuration. This suggests that practical tuning can improve not only phased output quality but also the difficulty of the residual wMEC-style problem faced by the solver.
+The DP-scaling study shows that increasing SNP density makes the phasing solve stage progressively more expensive, but also that the optimized tuned configuration scales substantially better than the default configuration. This suggests that practical tuning can improve not only phased output quality but also the difficulty of the residual wMEC-style problem faced by the solver.
 
 #### Overall takeaway
 Under the current hard scenario, optimization headroom exists but is uneven across knobs. WhatsHap-side tuning provides only limited gains: increasing `max_coverage` does not help, and the main useful phasing-side adjustment is to avoid overly strict `min_baseq` filtering. In contrast, caller-side tuning is more impactful: lowering `call_min_baseq` from 20 to a moderate value such as 10 improves variant recovery, shared heterozygous overlap, and end-to-end phased recall without materially reducing precision. Taken together, these results indicate that practical optimization in this pipeline is not purely a WhatsHap parameter problem; meaningful gains are more likely to come from a combination of permissive phasing evidence retention and improved upstream variant recovery.
@@ -1493,7 +1498,15 @@ with the indel study serving primarily as an evaluation-robustness check rather 
 
 Optimization sweeps under the composite hard scenario showed that optimization headroom exists, but is uneven across knobs.
 
-Runtime profiling of the research pipeline indicated that the largest share of phasing time is spent in the custom readset-construction adaptor that feeds the vendored WhatsHap core. Excluding this adaptor, the remaining runtime is configuration-dependent: in default-like settings the solve stage dominates the residual cost, whereas in the tuned settings read selection and solving are more balanced. Since the dominant end-to-end bottleneck is a property of the project-specific experimental interface rather than necessarily of the core WhatsHap solver, adaptor-level runtime optimization was not pursued further as a main contribution. The study therefore focused on optimization directions more directly relevant to practical WhatsHap-based phasing workflows, including caller-side filtering, phasing-side filtering, retained coverage, and robustness across scenarios.
+A small runtime breakdown of the called phasing stage was also examined for representative configurations under the hard scenario:
+
+| Configuration | Build ReadSet (s) | Read Selection (s) | Solve (s) | Called Phasing Total (s) |
+|---|---:|---:|---:|---:|
+| Optimized | 0.3679 | 0.0061 | 0.0056 | 0.3854 |
+| Default | 0.3734 | 0.0023 | 0.0610 | 0.4433 |
+| Speed-oriented | 0.3685 | 0.0050 | 0.0030 | 0.3827 |
+
+This runtime breakdown shows that, in the current research pipeline, the largest share of called phasing runtime is spent in readset construction, while read selection and the downstream solve stage contribute smaller but configuration-dependent fractions. In particular, the default configuration has a noticeably larger solve-stage cost than the tuned configurations, whereas the optimized and speed-oriented settings are dominated even more strongly by readset construction. This result should be interpreted cautiously, because the present study uses a custom adaptor to support oracle/called benchmarking and unified reporting rather than the standard production-facing WhatsHap front-end. Nevertheless, it suggests that evidence extraction can be a significant practical cost in WhatsHap-based phasing workflows, and that the tuned configurations improve runtime mainly through a better overall phasing setup rather than through a large reduction in the core solve stage alone.
 
 The main optimization findings are:
 
