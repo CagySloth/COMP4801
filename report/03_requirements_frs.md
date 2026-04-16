@@ -1,6 +1,6 @@
 ## 3. Functional Requirements (FRS-style)
 
-This section specifies the functional requirements for the implemented benchmarking platform.
+This section specifies the functional requirements of the implemented benchmarking platform.
 
 ### 3.1 Product perspective and scope
 
@@ -10,176 +10,101 @@ The system is a reproducible benchmarking platform for evaluating WhatsHap in an
 
 The platform supports two evaluation regimes:
 
-- **Oracle (ground-truth) VCF**: isolates phasing performance given the correct variant set.
-- **Called VCF**: measures end-to-end performance including variant calling limitations.
+- **Oracle (ground-truth) VCF:** isolates phasing performance given the correct variant set.
+- **Called VCF:** measures end-to-end performance including variant-calling limitations.
 
 ### 3.2 Users and operating environment
 
-**Primary user:** a developer/research user running controlled experiments and producing plots/tables for analysis and reporting.
+**Primary user:** a developer or research user running controlled experiments and producing plots and tables for analysis and reporting.
 
 **Operating environment constraints:**
 
 - Python modules are executed via `python -m ...` entrypoints.
-- The end-to-end pipeline requires external tools available on `PATH`:
-  - `minimap2`, `samtools`, `bcftools`
-- The pipeline runner checks tool availability at runtime (and fails early if missing).
+- The end-to-end pipeline requires external tools on `PATH`:
+  - `minimap2`
+  - `samtools`
+  - `bcftools`
+- The pipeline runner checks tool availability at runtime and fails early if dependencies are missing.
 
 ### 3.3 Naming conventions and artifacts (prefix-based)
 
-Most pipeline outputs are derived from a single `--prefix` argument used consistently by \
-`benchmark.longread_pipeline_runner`. Given `--prefix output/exp1/runA`, the system produces artifacts following this convention:
+Most pipeline outputs are derived from a single `--prefix` argument used by `benchmark.longread_pipeline_runner`. Given `--prefix output/exp1/runA`, the system produces a consistent family of artifacts, including:
 
-- Reference: `output/exp1/runA.ref.fasta`, `output/exp1/runA.ref.meta.json`
-- Truth: `output/exp1/runA.truth.vcf`, `output/exp1/runA.truth.vcf.gz` (+ index), \
-`output/exp1/runA.truth.meta.json`
-- Oracle VCF: `output/exp1/runA.oracle.vcf`, `output/exp1/runA.oracle.vcf.gz` (+ index)
-- Reads: `output/exp1/runA.reads.fastq`, `output/exp1/runA.reads.truth.tsv`, optional read meta JSON
-- Alignment: `output/exp1/runA.bam` (+ `.bai`)
-- Called variants: `output/exp1/runA.called.vcf.gz` (+ `.tbi`)
-- WhatsHap outputs (called/oracle runs): `*.ws*.phased.vcf`, `*.ws*.eval.json`, `*.ws*.summary.json`
-- Pipeline report: `output/exp1/runA.pipeline.json`
+- reference artifacts: `*.ref.fasta`, `*.ref.meta.json`
+- truth artifacts: `*.truth.vcf`, `*.truth.vcf.gz`, `*.truth.meta.json`
+- oracle VCF artifacts: `*.oracle.vcf`, `*.oracle.vcf.gz`
+- simulated reads: `*.reads.fastq`, `*.reads.truth.tsv`
+- alignment artifacts: `*.bam`, `*.bam.bai`
+- called variants: `*.called.vcf.gz`, `*.called.vcf.gz.tbi`
+- WhatsHap outputs: `*.ws*.phased.vcf`, `*.ws*.eval.json`, `*.ws*.summary.json`
+- run-level report: `*.pipeline.json`
 
-Aggregated experiments additionally produce:
+Aggregated experiment directories additionally produce:
 
-- `aggregate.csv` under each experiment directory
-- plots under `plots/` within the experiment directory
+- `aggregate.csv`
+- plots under `plots/`
+
+This prefix-based scheme is a functional requirement because it allows single-run reproducibility, experiment aggregation, and straightforward discovery of related artifacts.
 
 ### 3.4 Functional requirements
 
 #### FR-1 Reference generation
 The system shall generate a synthetic reference genome FASTA with configurable realism presets and optional duplicated segments.
 
-**Implementation mapping:**
-
-- CLI: `python -m dataset.longread.reference`
-- Called by: `python -m benchmark.longread_pipeline_runner`
-- Parameters include:
-  - `--ref-preset {plain,toy,realistic}`
-  - `--ref-length`
-  - duplication knobs: `--dup-segments`, `--dup-len`, `--dup-min-gap`
-- Outputs: `*.ref.fasta`, `*.ref.meta.json`
+**Implementation mapping:** implemented by `dataset.longread.reference`, invoked through `benchmark.longread_pipeline_runner`, producing `*.ref.fasta` and `*.ref.meta.json`.
 
 #### FR-2 Ground-truth variant and haplotype generation
 The system shall generate diploid ground-truth variants and two haplotype sequences, and export both a truth VCF and haplotype FASTAs.
 
-**Implementation mapping:**
-
-- CLI: `python -m dataset.longread.truth`
-- Called by: `python -m benchmark.longread_pipeline_runner`
-- Parameters include:
-  - SNP knobs: `--num-snps`, `--het-rate`
-  - optional indel knobs: `--num-indels`, `--indel-min-len`, `--indel-max-len`, `--indel-het-rate`
-- Outputs:
-  - `*.truth.vcf` (+ `.gz` and index)
-  - `*.hap1.fasta`, `*.hap2.fasta`
-  - `*.truth.meta.json`
-  - `*.oracle.vcf` (+ `.gz` and index)
+**Implementation mapping:** implemented by `dataset.longread.truth`, invoked through `benchmark.longread_pipeline_runner`, producing `*.truth.vcf`, `*.truth.vcf.gz`, `*.hap1.fasta`, `*.hap2.fasta`, `*.truth.meta.json`, and `*.oracle.vcf.gz`.
 
 #### FR-3 ONT-like read simulation
 The system shall simulate long reads from the diploid haplotypes, producing FASTQ with quality strings and read-truth metadata.
 
-**Implementation mapping:**
-
-- CLI: `python -m dataset.longread.readsim`
-- Called by: `python -m benchmark.longread_pipeline_runner`
-- Parameters include:
-  - `--num-reads`, `--min-len`, `--max-len`
-  - `--platform {ont,perfect}`, `--ont-profile {classic,q20}`
-  - length model knobs: `--len-model {uniform,lognormal}`, `--ln-mean`, `--ln-sigma`
-  - start/coverage model knobs: `--start-model {uniform,dropout}`, `--dropout-fraction`, `--dropout-block-len`
-  - burst error knobs (passed via pipeline runner): `--burst-prob`, `--burst-count`, `--burst-len`, `--burst-mult`
-- Outputs:
-  - `*.reads.fastq`
-  - `*.reads.truth.tsv` (read origin / truth mapping)
-  - optional `*.reads.meta.json` if enabled by the generator
+**Implementation mapping:** implemented by `dataset.longread.readsim`, invoked through `benchmark.longread_pipeline_runner`, producing `*.reads.fastq` and `*.reads.truth.tsv`, with support for configurable read-length, coverage, and burst-error models.
 
 #### FR-4 Read alignment
 The system shall align simulated reads to the reference and output a sorted, indexed BAM suitable for downstream variant calling and WhatsHap phasing.
 
-**Implementation mapping:**
-
-- Invoked by: `python -m benchmark.longread_pipeline_runner`
-- Tools: `minimap2`, `samtools sort`, `samtools index`
-- Parameter: `--map-preset` (default `map-ont`)
-- Outputs: `*.bam`, `*.bam.bai`
+**Implementation mapping:** performed by `benchmark.longread_pipeline_runner` using `minimap2` and `samtools`, producing `*.bam` and `*.bam.bai`.
 
 #### FR-5 Variant calling
 The system shall call variants from the aligned BAM against the reference and produce a called VCF.
 
-**Implementation mapping:**
-
-- Invoked by: `python -m benchmark.longread_pipeline_runner`
-- Tools: `bcftools mpileup | bcftools call`
-- Parameters include:
-  - `--call-min-mapq` (bcftools `-q`)
-  - `--call-min-baseq` (bcftools `-Q`)
-- Outputs: `*.called.vcf.gz`, `*.called.vcf.gz.tbi`
+**Implementation mapping:** performed by `benchmark.longread_pipeline_runner` using `bcftools mpileup | bcftools call`, producing `*.called.vcf.gz` and its index.
 
 #### FR-6 WhatsHap phasing (vendored integration)
 The system shall phase variants using WhatsHap with BAM+VCF inputs and produce phased VCF output, using the vendored WhatsHap core for controlled benchmarking.
 
-**Implementation mapping:**
-
-- CLI entrypoint: `python -m algorithms.cli.phase diploid-whats-bam`
-- Driver: `algorithms/diploid/whatshap_bam_driver.py`
-- Called by: `python -m benchmark.longread_pipeline_runner`
-- Parameters include:
-  - `--bam`, `--vcf`, `--output-vcf`, `--output-prefix`
-  - `--max-coverage`, `--min-mapq`, `--min-baseq`
-- Outputs:
-  - `*.phased.vcf`
-  - `*.summary.json` (instrumentation + counts)
+**Implementation mapping:** exposed through `algorithms.cli.phase diploid-whats-bam`, implemented by `algorithms.diploid.whatshap_bam_driver`, and invoked through `benchmark.longread_pipeline_runner`, producing phased VCFs and run summaries.
 
 #### FR-7 Phasing evaluation against truth
 The system shall evaluate phased output against the truth VCF and output evaluation metrics focused on phasing correctness and fragmentation.
 
-**Implementation mapping:**
+**Implementation mapping:** implemented by `benchmark.vcf_phase_eval`, invoked through `benchmark.longread_pipeline_runner`, producing `*.eval.json` with metrics such as phase accuracy, switch error rate, phase-set count, and shared-site counts.
 
-- CLI: `python -m benchmark.vcf_phase_eval`
-- Called by: `python -m benchmark.longread_pipeline_runner`
-- Outputs: `*.eval.json` including:
-  - `phase_accuracy_blockflip`
-  - `switch_error_rate`
-  - `num_phase_sets`
-  - counts of shared/het/phased records
-
-**SNP-only policy for indels:**
-When indels are enabled (`--num-indels > 0`), the system supports filtering to biallelic SNPs for phasing and/or evaluation:
-
-- Pipeline runner flags: `--phase-snps-only`, `--eval-snps-only`
-- These ensure evaluations remain valid when indel representations differ across truth/called/predicted VCFs.
+**SNP-only policy for indels:** when indels are enabled, the system shall support `--phase-snps-only` and `--eval-snps-only` so that SNP phasing evaluation remains valid despite possible indel-representation mismatches.
 
 #### FR-8 End-to-end reporting and aggregation
 The system shall produce a single machine-readable report per run and provide aggregation utilities for experiment directories.
 
-**Implementation mapping:**
-
-- Run-level report: `*.pipeline.json` produced by `benchmark.longread_pipeline_runner`
-- Aggregation:
-  - `python -m benchmark.aggregate_pipeline_reports --root <dir> --out <csv>`
-  - Used by `benchmark.experiment_driver`
+**Implementation mapping:** `benchmark.longread_pipeline_runner` produces `*.pipeline.json`; `benchmark.aggregate_pipeline_reports` converts many run reports into `aggregate.csv` for downstream analysis and plotting.
 
 The pipeline report shall record:
 
 - parameter values used for the run
 - file paths for produced artifacts
-- calling precision/recall (when `--vcf-source` includes called)
+- calling precision and recall when called-mode evaluation is enabled
 - phasing evaluation metrics for oracle and/or called runs
 
 #### FR-9 Experiment driver for systematic studies
 The system shall provide a driver to execute predefined experiment suites across multiple seeds, aggregate results, and generate plots.
 
-**Implementation mapping:**
+**Implementation mapping:** implemented by `benchmark.experiment_driver`, which runs seeded experiment suites and produces per-experiment `aggregate.csv` files and report-ready plots.
 
-- CLI: `python -m benchmark.experiment_driver --outdir ... --seeds ...`
-- Selective execution: `--only <section1,section2,...>`
-- Outputs per experiment section:
-  - per-seed run artifacts
-  - `aggregate.csv` and `plots/` for report-ready figures
-
-### 3.5 Non-functional requirements (supporting the FYP goals)
+### 3.5 Non-functional requirements
 
 - **Reproducibility:** runs must be seed-controlled and record parameters in `pipeline.json`.
-- **Traceability:** all plots/tables must be derived from stored machine-readable outputs (`pipeline.json`, `aggregate.csv`).
-- **Maintainability:** core evaluation and aggregation logic must be unit tested; legacy scripts/tests should be isolated from the main pipeline.
+- **Traceability:** all plots and tables must be derived from stored machine-readable outputs (`pipeline.json`, `aggregate.csv`).
+- **Maintainability:** core evaluation and aggregation logic must be testable and separated from legacy or exploratory scripts.
 - **Portability:** code must run on a standard Linux environment with documented external tool dependencies.

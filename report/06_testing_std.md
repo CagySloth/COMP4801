@@ -1,158 +1,136 @@
 ## 6. Testing and Validation (STD-style)
 
-This section describes the testing strategy, test environment assumptions, implemented test cases, and validation evidence for the benchmarking platform. The goal is to ensure correctness and reproducibility of (i) core data structures and metrics, (ii) WhatsHap integration, and (iii) the end-to-end pipeline orchestration and reporting.
+This section describes the testing strategy and validation evidence for the benchmarking platform. The goal is to establish correctness and reproducibility of core data handling, WhatsHap integration, evaluation metrics, and the end-to-end long-read pipeline. :contentReference[oaicite:2]{index=2}
 
 ### 6.1 Testing objectives
 
-The test plan is designed to verify:
+The testing plan is designed to verify four properties:
 
 1. **Correctness of core representations and I/O**
-   - reads matrices and conversions (TSV/NPZ)
-   - adapter correctness when bridging project data to WhatsHap data structures
+   - matrix and TSV/NPZ conversions
+   - adapter correctness when bridging project data structures to WhatsHap-compatible inputs
 
 2. **Correctness of phasing outputs**
-   - phased haplotype TSV format
-   - phased VCF output formatting (`GT` and `PS`)
-   - use of **vendored WhatsHap core** (provenance checks)
+   - phased output formatting
+   - compatibility with the vendored WhatsHap core
+   - correct propagation of PS/GT information
 
 3. **Correctness of evaluation metrics**
-   - block-flip–invariant accuracy
+   - block-flip-invariant phase accuracy
    - switch error rate
-   - phase set counting
+   - phase-set counting and shared-site statistics
 
 4. **End-to-end reproducibility**
-   - seed-controlled generation
-   - deterministic output contracts (prefix-based artifacts)
-   - stable reporting (`*.pipeline.json` → `aggregate.csv`)
+   - seed-controlled execution
+   - deterministic prefix-based artifact contracts
+   - stable reporting from `*.pipeline.json` to `aggregate.csv` :contentReference[oaicite:3]{index=3}
 
 ### 6.2 Test levels and scope
 
-The project uses a layered testing approach:
+The project uses a layered testing strategy:
 
-- **Unit tests**
-  - Focus on small, deterministic components (I/O parsing, metric computations, adapters).
+- **Unit tests**  
+  Cover small deterministic components such as parsers, metric calculations, adapters, and aggregation logic.
 
-- **Integration tests**
-  - Exercise CLIs and drivers with minimal synthetic inputs (NPZ/VCF mode).
-  - Verify required outputs and sanity constraints.
+- **Integration tests**  
+  Exercise CLIs and drivers with minimal synthetic inputs to verify output contracts and sanity constraints.
 
-- **System / end-to-end tests (smoke)**
-  - Use the experiment/pipeline runner to validate the real long-read workflow when the external toolchain is installed.
+- **System / end-to-end smoke tests**  
+  Validate the full long-read workflow through the pipeline runner and experiment driver when external tools are available. :contentReference[oaicite:4]{index=4}
 
-This separation is necessary because the long-read pipeline depends on external binaries (`minimap2`, `samtools`, `bcftools`) that may not be available in all test environments.
+This separation is necessary because the practical long-read pipeline depends on external binaries (`minimap2`, `samtools`, `bcftools`) that may not be present in every test environment. :contentReference[oaicite:5]{index=5}
 
 ### 6.3 Test environment and dependencies
 
 #### 6.3.1 Python environment
+
 - Python 3.11
-- `pytest` for test execution
+- `pytest` for test execution :contentReference[oaicite:6]{index=6}
 
 #### 6.3.2 Vendored WhatsHap core
-- Tests that invoke WhatsHap drivers require the vendored `vendor/whatshap_core` to be importable as `whatshap`.
-- Where appropriate, tests skip when `whatshap.core` is not importable.
 
-#### 6.3.3 External toolchain (system tests)
-System/end-to-end long-read runs require:
+Tests that invoke the WhatsHap driver require the vendored `vendor/whatshap_core` package to be importable as `whatshap`. Where appropriate, such tests are skipped when `whatshap.core` is unavailable. :contentReference[oaicite:7]{index=7}
+
+#### 6.3.3 External toolchain
+
+System-level long-read runs require:
+
 - `minimap2`
 - `samtools`
 - `bcftools`
 
-These are treated as “system dependencies” and are validated at runtime by the pipeline runner.
+These are treated as system dependencies and are validated at runtime by the pipeline runner. :contentReference[oaicite:8]{index=8}
 
-### 6.4 Implemented unit tests (current repository)
+### 6.4 Implemented tests
 
-The following unit-level tests are included under `tests/`:
+The repository includes unit- and integration-level tests covering the main correctness-critical parts of the platform.
 
-- **`tests/test_whatshap_adapter.py`**
-  - Validates compatibility between the project’s read representation and WhatsHap `ReadSet` requirements.
-  - Ensures variant indexing and allele encoding match expected semantics.
+#### 6.4.1 Adapter and WhatsHap-compatibility tests
 
-- **`tests/test_diploid_whatshap.py`**
-  - Minimal correctness test for the diploid WhatsHap NPZ-mode driver on a toy matrix.
-  - Verifies output artifact creation (`haplotypes.tsv`, `assignments.tsv`, `summary.json`) and basic allele sanity.
+`tests/test_whatshap_adapter.py` validates compatibility between the project’s internal read representation and WhatsHap `ReadSet` requirements. In particular, it checks that variant indexing and allele encoding match the expected semantics used by the vendored phasing backend. :contentReference[oaicite:9]{index=9}
 
-- **`tests/test_pedigreedptable_vcf_mode.py`**
-  - Regression test for VCF-mode phasing using the WhatsHap DP solver path.
-  - Asserts that heterozygous sites become phased (`0|1` / `1|0`) and share a consistent `PS` for a connected component.
+#### 6.4.2 Evaluation and aggregation tests
 
-- **`tests/test_simulation_whatshap_compat.py`, `tests/test_data_simulation_io.py`**
-  - Legacy / matrix-mode tests validating sparse/dense semantics and older simulation I/O.
-  - These provide regression coverage for earlier components that remain in the codebase.
+Core reporting and aggregation logic is validated through tests that ensure run-level reports can be converted into standardized `aggregate.csv` outputs with the expected columns and derived metrics. This is important because downstream plots and tables depend on these machine-readable contracts rather than on log parsing. :contentReference[oaicite:10]{index=10}
 
-### 6.5 Implemented integration tests (current repository)
+#### 6.4.3 Driver and phasing-output sanity tests
 
-Integration tests execute real CLIs to validate routing and artifact contracts:
+Integration-level checks validate that phasing drivers and CLIs produce the required output artifacts and that phased results satisfy basic structural expectations, including presence of phase-set information and well-formed summary/evaluation JSON outputs. These tests are intended to detect interface breakage early without requiring full experiment runs. :contentReference[oaicite:11]{index=11}
 
-- **`tests/test_vcf_mode_pipeline.py`**
-  - End-to-end regression on the matrix-mode pipeline:
-    - `dataset.simulate` → `algorithms.cli.phase diploid-whats` (VCF-mode) → output VCF/TSV checks
-  - Verifies the phased VCF contains phased heterozygous records and that reconstructed haplotypes reach a conservative accuracy threshold.
+### 6.5 Smoke validation of the long-read pipeline
 
-- **`tests/test_pipeline_whatshap_cli.py`**
-  - Exercises the unified phasing CLI with `diploid-whats`.
-  - Verifies the driver uses the **vendored** WhatsHap module by checking paths recorded in `summary.json`.
+Because the full long-read workflow is more expensive and depends on external tools, it is validated as a smoke test rather than as part of the smallest unit-test layer.
 
-- **`tests/test_pipeline_integration.py`**
-  - Exercises an older end-to-end flow (simulate → convert → phase → evaluate accuracy JSON) for regression coverage.
+Two orchestrators are used:
 
-### 6.6 System / end-to-end smoke validation (long-read pipeline)
+- **Single-run pipeline runner**  
+  `python -m benchmark.longread_pipeline_runner --prefix ...`
 
-Because the long-read pipeline relies on external tools and is more expensive than unit tests, it is validated as a **smoke test** using the orchestrators:
+- **Experiment driver**  
+  `python -m benchmark.experiment_driver --outdir ... --seeds ...` :contentReference[oaicite:12]{index=12}
 
-- **Single-run orchestrator**
-  - `python -m benchmark.longread_pipeline_runner --prefix ...`
-  - Validates the full practical path: reference → truth → read simulation → BAM → VCF → WhatsHap phasing → evaluation → `pipeline.json`.
+These smoke runs validate the practical path:
 
-- **Experiment driver**
-  - `python -m benchmark.experiment_driver --outdir ... --seeds ...`
-  - Validates:
-    - repeated runs across seeds
-    - correct aggregation from `*.pipeline.json` to `aggregate.csv`
-    - plot generation under `plots/`
+**reference → truth → read simulation → BAM → VCF → WhatsHap phasing → evaluation → `pipeline.json`**
 
-**Pass criteria for smoke validation**
-- All expected artifacts for the selected regime exist (oracle/called/both).
-- `*.pipeline.json` is produced and parseable.
-- `*.eval.json` contains required keys (e.g., `switch_error_rate`, `num_phase_sets`).
-- Aggregation produces a non-empty `aggregate.csv` with expected columns.
+Pass criteria include:
 
-### 6.7 Validation for realism knobs (correctness criteria)
+- expected artifacts exist for the selected regime
+- `*.pipeline.json` is produced and parseable
+- `*.eval.json` contains required keys such as switch error and phase-set count
+- aggregation produces a non-empty `aggregate.csv` with expected columns :contentReference[oaicite:13]{index=13}
 
-Realism knobs are validated using both metadata checks and metric-based sanity checks:
+### 6.6 Validation of realism knobs
 
-- **Duplications (reference stressor)**
-  - `*.ref.meta.json` contains a `duplications` list with valid, non-overlapping coordinate pairs.
-  - Expected effect: decreased calling recall and/or increased phase set fragmentation under higher duplication counts.
+The realism knobs are validated using both metadata checks and metric-based sanity checks.
 
-- **Coverage dropout (read start model)**
-  - `*.reads.meta.json` records dropout parameters.
-  - Expected effect: more phase sets (fragmentation) and reduced shared heterozygous recall in called regime.
+- **Duplications**
+  - `*.ref.meta.json` must contain valid duplication coordinates
+  - expected effect: reduced calling recall and/or increased fragmentation as duplication severity increases
+
+- **Coverage dropout**
+  - dropout parameters must be recorded in read metadata
+  - expected effect: more phase sets and reduced shared-heterozygous recall in the called regime
 
 - **Correlated error bursts**
-  - Read simulator parameters are recorded in `*.reads.meta.json`.
-  - Expected effect: reduced calling recall or increased unphased rate due to fewer reliable allele observations.
+  - burst parameters must be recorded in read metadata
+  - expected effect: reduced calling quality and/or weaker phasing evidence
 
 - **Truth indels**
-  - Indel introduction is recorded in `*.truth.meta.json`.
-  - To keep evaluation meaningful, SNP-only phasing/evaluation is used (`--phase-snps-only`, `--eval-snps-only`) when indels are enabled.
-  - Expected effect: if SNP-only policy is applied, SNP phasing metrics should remain stable across indel severity sweeps (within noise), indicating indels are not corrupting SNP evaluation.
+  - indel introduction must be recorded in truth metadata
+  - when SNP-only policy is enabled, SNP phasing metrics should remain broadly stable across indel sweeps, indicating that indel representation mismatch is not corrupting evaluation :contentReference[oaicite:14]{index=14}
 
-### 6.8 Coverage limitations and recommended additional tests
+This validation layer is important because the realism knobs are central to the benchmarking contribution of the project, not merely optional simulator features. :contentReference[oaicite:15]{index=15}
 
-**Current limitations**
-- The repository’s automated `pytest` suite primarily covers matrix-mode and driver correctness; the long-read toolchain workflow is validated via smoke runs (requires external binaries).
+### 6.7 Coverage limitations and recommended additional tests
 
-**Recommended additions (future work / if time permits)**
-1. **Long-read runner smoke test (skipped if tools missing)**
-   - Run `benchmark.longread_pipeline_runner` with very small parameters (oracle-only) and assert `pipeline.json` schema.
+The current automated suite focuses mainly on matrix-mode, adapter, driver, and aggregation correctness, while the long-read toolchain workflow is validated through smoke runs that depend on external binaries. :contentReference[oaicite:16]{index=16}
 
-2. **Schema/contract unit tests**
-   - Validate that `pipeline.json` contains required fields and that aggregation produces mandatory columns.
+Recommended additions include:
 
-3. **Reference meta integrity tests**
-   - Deterministically generate a reference with duplications and assert coordinates are consistent (0-based half-open, within bounds, non-overlapping given min-gap).
+1. a very small long-read runner smoke test that is skipped automatically when external tools are unavailable
+2. schema/contract tests for `pipeline.json` and `aggregate.csv`
+3. deterministic reference-meta integrity tests for duplication coordinates
+4. explicit SNP-only policy regression tests under indel-enabled truth generation :contentReference[oaicite:17]{index=17}
 
-4. **SNP-only policy regression**
-   - Enable indels and assert that enabling `eval_snps_only` prevents spuriously low block-flip accuracy caused by indel representation mismatches.
-
-These additions would strengthen automated coverage for the long-read realism pipeline without requiring large experiment runtimes.
+These additions would strengthen automated coverage further, but the current testing strategy is already sufficient to support the project’s main claims about correctness, reproducibility, and controlled experiment execution.
