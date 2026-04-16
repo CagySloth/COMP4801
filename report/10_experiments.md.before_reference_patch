@@ -102,8 +102,9 @@ Called phasing (end-to-end):
 - `called_switch_error`: high variance at 100–200 reads, near 0 at 400 reads
 - `called_num_phase_sets`: 5.0 → 7.7 → 3.0 → 1.0
 
-These trends are reflected by Figures 10.2.1–10.2.6, especially Figure 10.2.1 for the depth-limited rise in calling recall, Figure 10.2.3 for the large oracle-vs-called gap at low depth, and Figures 10.2.4–10.2.5 for the reduction in fragmentation with increasing coverage
+These summary numbers are visually consistent with Figure 10.2.1, where called effective phased recall rises sharply with depth but remains below the oracle upper bound until high coverage.
 
+These summary numbers are reflected by Figures 10.2.1–10.2.6, especially Figure 10.2.3 for the oracle-vs-called gap and Figure 10.2.1 for the depth-limited rise in calling recall.
 #### Key observations
 
 - O1 (Calling is depth-limited): Calling recall increases strongly with `num_reads` (0.224 → 0.877), while precision remains 1.0 in this controlled setup. Errors therefore appear mainly as missed sites rather than false positives.
@@ -144,8 +145,6 @@ Assess how individual realism knobs affect calling recall, phasing completeness,
 - `called_num_phase_sets`: 3.4 → 3.4 → 3.4 → 2.6
 - `oracle_effective_phased_recall`: 0.925 → 0.932 → 0.924 → 0.918
 
-These trends are reflected by Figures 10.3.1.1–10.3.1.5, especially Figure 10.3.1.2 for the drop in called effective phased recall only at the strongest duplication setting and Figure 10.3.1.3 for the corresponding switch-error increase.
-
 ##### Key observations
 
 - O1 (Calling recall is largely unaffected by duplication): Across `dup_segments ∈ {0,1,3,5}`, calling recall remains nearly flat and call precision stays at 1.0.
@@ -185,8 +184,6 @@ Called effective phased recall declines much more steeply than oracle effective 
 - `called_phasing_rate_shared_het`: 0.819 → 0.704 → 0.514 → 0.239
 - `called_num_phase_sets`: 3.4 → 5.0 → 6.2 → 4.0
 
-These trends are reflected by Figures 10.3.2.1–10.3.2.5, especially Figure 10.3.2.4 for the steep decline in called effective phased recall and Figure 10.3.2.1 for the strong rise in oracle phase-set count.
-
 ##### Key observations
 
 - O1 (Coverage dropout strongly increases fragmentation): In the oracle regime, the number of phase sets rises from 1.8 at `dropout_fraction = 0.00` to 10.0 at `0.20`, while oracle switch error remains near zero.
@@ -198,16 +195,15 @@ These trends are reflected by Figures 10.3.2.1–10.3.2.5, especially Figure 10.
 ##### Takeaway
 Coverage dropout is the strongest isolated stressor in this study. Its primary effect is to create low-coverage gaps that prevent reads from connecting heterozygous sites into long phase blocks, reducing phasing completeness even in the oracle regime. In the called regime, this effect is amplified, and at severe dropout levels both phase connectivity and variant recovery deteriorate substantially.
 
-#### 10.3.3 Correlated error bursts
+#### 10.3.3 Secondary stressors: correlated bursts and read length model
 
+##### Correlated error bursts
 
 - `call_recall`: 0.663 (`burst_prob = 0.0`) → 0.681 (`0.3`) → 0.676 (`0.6`)
 - `oracle_effective_phased_recall`: 0.925 → 0.926 → 0.921
 - `called_effective_phased_recall`: 0.436 → 0.369 → 0.455
 - `called_phase_accuracy`: 0.890 → 0.766 → 0.887
 - `called_switch_error`: 0.122 → 0.142 → 0.108
-
-These trends are reflected by Figures 10.3.3.1–10.3.3.5, especially Figures 10.3.3.1 and 10.3.3.2, where the intermediate-burst dip is visible but non-monotonic.
 
 Observations:
 
@@ -217,8 +213,9 @@ Observations:
 
 Interpretation: under the current parameterization, correlated error bursts are a weak and somewhat noisy called-regime correctness stressor rather than a strong practical failure mode.
 
+These trends are reflected by Figures 10.3.3.1–10.3.3.5, especially Figures 10.3.3.1 and 10.3.3.2, where the intermediate-burst dip is visible but non-monotonic.
 
-#### 10.3.4 Read length model
+##### Read length model
 
 - `call_recall`: 0.663 (uniform) → 0.701 (lognormal)
 - `oracle_effective_phased_recall`: 0.925 → 0.931
@@ -229,8 +226,6 @@ Interpretation: under the current parameterization, correlated error bursts are 
 - `called_switch_error`: 0.122 → 0.165
 - `called_num_phase_sets`: 3.4 → 1.6
 
-These trends are reflected by Figures 10.3.4.1–10.3.4.5, especially Figure 10.3.4.2 for the continuity gain and Figure 10.3.4.4 for the small net change in called effective phased recall.
-
 Observations:
 
 - The lognormal model improves callset overlap and phase-block continuity.
@@ -239,8 +234,9 @@ Observations:
 
 Interpretation: the read length model is informative for mechanism analysis, but under the present parameterization it is a mixed continuity / correctness trade-off rather than a clear optimization lever.
 
+These trends are reflected by Figures 10.3.4.1–10.3.4.5, especially Figure 10.3.4.2 for the continuity gain and Figure 10.3.4.4 for the small net change in called effective phased recall.
 
-#### 10.3.5 Truth indels and SNP-only policy
+#### 10.3.4 Truth indels and SNP-only policy
 
 ##### Setup
 
@@ -260,8 +256,6 @@ Interpretation: the read length model is informative for mechanism analysis, but
 - `called_effective_phased_recall`: 0.436 → 0.573 → 0.493
 - `called_shared_het_recall`: 0.590 → 0.623 → 0.577
 - `called_num_phase_sets`: 3.4 → 2.4 → 4.0
-
-These trends are reflected by Figures 10.3.5.1–10.3.5.4, which show that the main result is evaluation robustness rather than a monotonic degradation trend.
 
 ##### Key observations
 
@@ -292,6 +286,13 @@ Test whether duplicated regions and coverage dropout compound non-linearly, and 
   - no bursts, no truth indels
   - phasing input source `vcf_source = both`
 
+\begin{center}
+\includegraphics[width=0.82\linewidth]{figures/10_experiments/fig_10_4_1_called_effective_phased_recall_interaction.png}
+\end{center}
+
+**Figure 10.4.2 — Called effective phased recall across duplication × dropout conditions.**  
+The combined duplication + dropout condition produces the lowest end-to-end phased recall, showing that the two stressors interact to create a substantially more difficult phasing problem than either one alone.
+
 #### Results summary
 
 - `call_recall`:
@@ -312,15 +313,17 @@ Test whether duplicated regions and coverage dropout compound non-linearly, and 
 - `called_num_phase_sets`:
   - 3.4 → 6.2 → 2.6 → 6.2
 
-These trends are reflected by Figures 10.4.1–10.4.4, especially Figure 10.4.2 for the compounded drop in called effective phased recall and Figure 10.4.3 for the dropout-driven fragmentation pattern
+These summary numbers are visually consistent with Figure 10.3.1, where called effective phased recall declines steadily and then sharply as dropout increases.
 
-\begin{center}
-\includegraphics[width=0.82\linewidth]{figures/10_experiments/fig_10_4_1_called_effective_phased_recall_interaction.png}
-\end{center}
+These summary numbers are visually consistent with Figure 10.4.1, where the combined duplication + dropout condition is clearly the worst end-to-end setting.
 
-**Figure 10.4.2 — Called effective phased recall across duplication × dropout conditions.**  
-The combined duplication + dropout condition produces the lowest end-to-end phased recall, showing that the two stressors interact to create a substantially more difficult phasing problem than either one alone.
+These summary numbers are reflected by Figures 10.3.1.1–10.3.1.5, especially Figure 10.3.1.2 for the drop in called effective phased recall only at the strongest duplication setting and Figure 10.3.1.3 for the corresponding switch-error increase.
 
+These summary numbers are reflected by Figures 10.3.2.1–10.3.2.5, especially Figure 10.3.2.4 for the steep decline in called effective phased recall and Figure 10.3.2.1 for the strong rise in oracle phase-set count.
+
+These summary numbers are reflected by Figures 10.3.5.1–10.3.5.4, which show that the main effect is evaluation robustness rather than a systematic performance trend.
+
+These summary numbers are reflected by Figures 10.4.1–10.4.4, especially Figure 10.4.2 for the compounded drop in called effective phased recall and Figure 10.4.3 for the dropout-driven fragmentation pattern.
 #### Key observations
 
 - O1 (The combined condition is the worst end-to-end setting): Called effective phased recall decreases from `0.436` in the baseline to `0.269` with dropout alone, `0.373` with duplication alone, and `0.197` when both stressors are combined.
@@ -359,8 +362,6 @@ The purpose of this setting was to test whether practical parameter tuning can r
 - Increasing `max_coverage` from 10 to 40 does not improve called effective phased recall, switch error, or phase-set count, but increases runtime substantially.
 - A lower-coverage sweep shows that performance plateaus by `max_coverage = 8–10`; `max_coverage = 4` is slightly too aggressive, while `15` is unnecessarily expensive.
 
-These trends are reflected by Figures 10.5.2.1–10.5.2.4 for the coarse sweep and Figures 10.5.2.13–10.5.2.16 for the lower-coverage refinement, which together show a clear performance plateau with increasing runtime at higher retained coverage.
-
 ##### Phasing thresholds
 
 - The phasing quality-threshold grid separates into two regimes:
@@ -369,22 +370,16 @@ These trends are reflected by Figures 10.5.2.1–10.5.2.4 for the coarse sweep a
 - `min_mapq` has negligible effect across the tested range.
 - A fine sweep confirms that performance is effectively flat for `min_baseq = 0–15` and degrades only at `20`.
 
-These trends are reflected by Figures 10.5.2.5–10.5.2.8 for the coarse phasing-threshold grid and Figures 10.5.2.17–10.5.2.20 for the fine `min_baseq` sweep, which together show that performance is stable across moderate settings and degrades only when filtering becomes too strict.
-
 ##### Caller thresholds
 
 - `call_min_baseq` is the strongest caller-side optimization lever.
 - Lowering `call_min_baseq` from `20` to `10` or `5` substantially improves `call_recall`, `called_shared_het_recall`, and `called_effective_phased_recall`, while call precision remains ~0.9995.
 - `call_min_mapq` has only weak effects and does not provide meaningful optimization headroom.
 
-These trends are reflected by Figures 10.5.2.9–10.5.2.12 for the caller-threshold grid and Figures 10.5.2.25–10.5.2.28 for the `call_min_mapq` rule-out sweep, showing that caller base-quality is the stronger optimization lever.
-
 ##### Local confirmation
 
 - A focused local search around `call_min_baseq ∈ {5, 10, 15}` and `min_baseq ∈ {5, 10, 15}` confirms that the recommended setting lies on a stable local plateau.
 - The decisive local sensitivity remains caller base-quality; phasing base-quality is effectively flat once overly strict filtering has been avoided.
-
-These trends are reflected by Figures 10.5.2.21–10.5.2.24, which show that the recommended threshold pair lies on a stable local performance plateau.
 
 ##### Takeaway
 Optimization headroom exists, but it is uneven across knobs. The strongest useful signal is moderate caller-side base-quality filtering (`call_min_baseq = 10`), followed by avoiding overly strict phasing base-quality filtering (`min_baseq = 10`). By contrast, `min_mapq`, `call_min_mapq`, and high `max_coverage` values above the plateau are weak or negligible knobs.
@@ -424,6 +419,13 @@ Representative hard-scenario configurations:
   - `min_mapq = 20`
   - `min_baseq = 10`
 
+\begin{center}
+\includegraphics[width=0.82\linewidth]{figures/10_experiments/fig_10_5_1_called_effective_phased_recall_configs.png}
+\end{center}
+
+**Figure 10.5.3.1 — Called effective phased recall across representative configurations.**  
+The balanced configuration achieves the highest end-to-end phased recall, while the runtime-biased configuration performs almost identically. This shows that combining caller-side and phasing-side tuning yields the strongest practical performance.
+
 #### Results summary
 
 - `default`: `called_effective_phased_recall = 0.2919`, `called_shared_het_recall = 0.5098`, `called_num_phase_sets = 9.6`, `time_total_sec = 3.9338`
@@ -432,15 +434,9 @@ Representative hard-scenario configurations:
 - `balanced`: `0.3041`, `0.5181`, `6.6`, `3.8682`
 - `runtime`: `0.3039`, `0.5181`, `6.6`, `3.8504`
 
-These trends are reflected by Figures 10.5.3.1–10.5.3.4, and are reinforced by the final default-vs-balanced confirmation in Figures 10.5.3.5–10.5.3.8.
+These summary numbers are visually consistent with Figure 10.5.1, where the balanced and runtime configurations sit above default and where caller-only and phasing-only recover complementary parts of the gain.
 
-\begin{center}
-\includegraphics[width=0.82\linewidth]{figures/10_experiments/fig_10_5_1_called_effective_phased_recall_configs.png}
-\end{center}
-
-**Figure 10.5.3.1 — Called effective phased recall across representative configurations.**  
-The balanced configuration achieves the highest end-to-end phased recall, while the runtime-biased configuration performs almost identically. This shows that combining caller-side and phasing-side tuning yields the strongest practical performance.
-
+These summary numbers are reflected by Figures 10.5.3.1–10.5.3.4, with Figure 10.5.3.1 showing the small but consistent advantage of the balanced and runtime configurations.
 #### Key observations
 
 - O1 (The balanced configuration provides the best overall trade-off): `balanced` achieves the highest called effective phased recall while also maintaining low fragmentation, very low switch error, and lower runtime than the default configuration.
@@ -466,6 +462,13 @@ Scenarios compared:
 - interaction
 - hard
 
+\begin{center}
+\includegraphics[width=0.88\linewidth]{figures/10_experiments/fig_10_5_2_called_effective_phased_recall_robustness.png}
+\end{center}
+
+**Figure 10.5.4.1 — Called effective phased recall across scenarios and representative configurations.**  
+Across all tested scenarios, the balanced and runtime configurations achieve higher end-to-end phased recall than the default configuration, showing that the selected tuning generalizes beyond the hard optimization scenario.
+
 #### Results summary
 
 - **Baseline**
@@ -485,15 +488,9 @@ Scenarios compared:
   - `balanced`: `0.3041`, `0.5181`, `6.6`
   - `runtime`: `0.3039`, `0.5181`, `6.6`
 
-These trends are reflected by Figures 10.5.4.1–10.5.4.4, where the tuned configurations remain above the default across all four scenarios.
+These summary numbers are visually consistent with Figure 10.5.2, where the tuned configurations outperform the default across all four scenarios.
 
-\begin{center}
-\includegraphics[width=0.88\linewidth]{figures/10_experiments/fig_10_5_2_called_effective_phased_recall_robustness.png}
-\end{center}
-
-**Figure 10.5.4.1 — Called effective phased recall across scenarios and representative configurations.**  
-Across all tested scenarios, the balanced and runtime configurations achieve higher end-to-end phased recall than the default configuration, showing that the selected tuning generalizes beyond the hard optimization scenario.
-
+These summary numbers are reflected by Figures 10.5.4.1–10.5.4.4, where the tuned configurations remain above the default across all four scenarios.
 #### Key observations
 
 - O1 (The tuned configurations generalize across scenarios): In all four scenarios, both `balanced` and `runtime` outperform `default` on called effective phased recall and called shared heterozygous recall.
@@ -518,6 +515,13 @@ This breakdown shows that, in the current research pipeline, the largest share o
 
 A separate SNP-density scaling study compared `default` and `balanced` under the same hard scenario while varying `num_snps ∈ {400, 800, 1200, 1600}`.
 
+\begin{center}
+\includegraphics[width=0.82\linewidth]{figures/10_experiments/fig_10_5_3_called_time_solve_sec_dp_scaling.png}
+\end{center}
+
+**Figure 10.5.3 — Called solve time vs SNP count under default and balanced (optimized) configurations.**  
+Called solve time increases with SNP density under both configurations, but grows much more steeply under the default setting. This shows that the tuned configuration makes the residual phasing problem easier to solve as variant density increases.
+
 #### Results summary
 
 - **optimized**
@@ -531,15 +535,9 @@ A separate SNP-density scaling study compared `default` and `balanced` under the
   - `called_effective_phased_recall`: `0.2935 → 0.3539 → 0.3164 → 0.3141`
   - `called_num_phase_sets`: `8.3 → 10.7 → 10.0 → 7.7`
 
-These trends are reflected by Figures 10.5.5.1–10.5.5.4, especially Figure 10.5.5.1 for the steeper default solve-time growth and Figure 10.5.5.4 for the corresponding fragmentation difference.
+These summary numbers are visually consistent with Figure 10.5.3, where default solve time grows much more steeply than the balanced (optimized) configuration as SNP density increases.
 
-\begin{center}
-\includegraphics[width=0.82\linewidth]{figures/10_experiments/fig_10_5_3_called_time_solve_sec_dp_scaling.png}
-\end{center}
-
-**Figure 10.5.5.1 — Called solve time vs SNP count under default and balanced (optimized) configurations.**  
-Called solve time increases with SNP density under both configurations, but grows much more steeply under the default setting. This shows that the tuned configuration makes the residual phasing problem easier to solve as variant density increases.
-
+These summary numbers are reflected by Figures 10.5.5.1–10.5.5.4, especially Figure 10.5.5.1 for the steeper default solve-time growth and Figure 10.5.5.4 for the corresponding fragmentation difference.
 #### Key observations
 
 - O1 (Solve time increases with SNP density): In both oracle and called regimes, solve time increases as `num_snps` increases from 400 to 1600.
