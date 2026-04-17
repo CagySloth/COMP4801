@@ -347,7 +347,7 @@ Test whether duplicated regions and coverage dropout compound non-linearly, and 
 - `called_num_phase_sets`:
   - 3.4 → 6.2 → 2.6 → 6.2
 
-These trends are reflected by Figures 10.4.1–10.4.4, especially Figure 10.4.2 for the compounded drop in called effective phased recall and Figure 10.4.3 for the dropout-driven fragmentation pattern
+These trends are reflected by Figures 10.4.1–10.4.4, especially Figure 10.4.2 for the compounded drop in called effective phased recall and Figure 10.4.3 for the dropout-driven fragmentation pattern.
 
 \begin{center}
 \includegraphics[width=0.82\linewidth]{figures/10_experiments/fig_10_4_2_called_effective_phased_recall_interaction.png}
@@ -399,27 +399,27 @@ These trends are reflected by Figures 10.5.2.1–10.5.2.4 for the coarse sweep a
 ##### Phasing thresholds
 
 - The phasing quality-threshold grid is separated into two regions:
-  - At `min_baseq` = 0-10: Better called effective phased recall, lower switch error, fewer phase sets
-  - At `min_baseq` = 20: Worse called and oracle phasing, more fragmentation
-- `min_mapq` has negligible effect across the tested range.
-- A fine sweep confirms that performance is effectively flat for `min_baseq` = 0–15 and degrades only at 20.
+  - At `min_baseq` = 0-10: In called regime, effective phased recall is better, switch error is lower, less phase sets are constructed.
+  - At `min_baseq` = 20: In both called and oracle frameworks, phasing is less accurate, fragmentation is increased.
+- Across the tested range, `min_mapq` has negligible impact.
+- Through a more detailed sweep, it is observed that phasing performance is effectively flat for `min_baseq` = 0–15 and degrades only at 20.
 
-These trends are reflected by Figures 10.5.2.5–10.5.2.8 for the coarse phasing-threshold grid and Figures 10.5.2.17–10.5.2.20 for the fine `min_baseq` sweep, which together show that performance is stable across moderate settings and degrades only when filtering becomes too strict.
+These trends are reflected by Figures 10.5.2.5–10.5.2.8 for the coarse phasing-threshold grid, and Figures 10.5.2.17–10.5.2.20 for the more detailed `min_baseq` sweep. Together, these figures indicate that, across moderate settings, phasing performance is stable. Degradation occurs only when filtering becomes too strict at high `min_baseq`.
 
-##### Caller thresholds
+##### Variant-caller thresholds
 
-- `call_min_baseq` is the strongest caller-side optimization lever.
-- Lowering `call_min_baseq` from 20 to 10 or 5 substantially improves `call_recall`, `called_shared_het_recall`, and `called_effective_phased_recall`, while call precision remains ~0.9995.
-- `call_min_mapq` has only weak effects and does not provide meaningful optimization headroom.
+- The strongest caller-side optimization lever is `call_min_baseq`.
+- `call_recall`, `called_shared_het_recall`, and `called_effective_phased_recall` improves significantly when `call_min_baseq` is lowered from 20 to 10 or 5, while call precision stayed around 0.9995.
+- `call_min_mapq` has only limited impacts, and does not offer much potential for optimization.
 
-These trends are reflected by Figures 10.5.2.9–10.5.2.12 for the caller-threshold grid and Figures 10.5.2.25–10.5.2.28 for the `call_min_mapq` rule-out sweep, showing that caller base-quality is the stronger optimization lever.
+These trends are reflected by Figures 10.5.2.9–10.5.2.12 for the caller-threshold grid, and Figures 10.5.2.25–10.5.2.28 for the `call_min_mapq` rule-out sweep. These figures indicate that `call_min_baseq` is the stronger optimization lever with more optimization potential.
 
-##### Local confirmation
+##### Local performance plateau confirmation
 
-- A focused local search around `call_min_baseq ∈ {5, 10, 15}` and `min_baseq ∈ {5, 10, 15}` confirms that the recommended setting lies on a stable local plateau.
-- The decisive local sensitivity remains caller base-quality; phasing base-quality is effectively flat once overly strict filtering has been avoided.
+- Through a more focused local search around `call_min_baseq ∈ {5, 10, 15}` and `min_baseq ∈ {5, 10, 15}`, it is observed that the recommended settings lie on a stable local optimum.
+- Caller base quality remains to be the more decision parameter. Without overly strict filtering, phasing base-quality is effectively irrelevant.
 
-These trends are reflected by Figures 10.5.2.21–10.5.2.24, which show that the recommended threshold pair lies on a stable local performance plateau.
+These trends are reflected by Figures 10.5.2.21–10.5.2.24, indicating that the recommended threshold pair is lying on a stable local performance plateau.
 
 ##### Takeaway\\
 Optimization headroom exists, but it is uneven across knobs. The strongest useful signal is moderate caller-side base-quality filtering (`call_min_baseq` = 10), followed by avoiding overly strict phasing base-quality filtering (`min_baseq` = 10). By contrast, `min_mapq`, `call_min_mapq`, and high `max_coverage` values above the plateau are weak or negligible knobs.
@@ -478,13 +478,13 @@ The optimzied configuration achieves the highest end-to-end phased recall, while
 
 #### Key observations
 
-- O1 (The optimzied configuration provides the best overall trade-off): `optimzied` achieves the highest called effective phased recall while also maintaining low fragmentation, very low switch error, and lower runtime than the default configuration.
-- O2 (Default is dominated by the tuned configurations): The default configuration is worse than `optimzied` and `runtime` on called effective phased recall, called shared heterozygous recall, switch error, and fragmentation.
-- O3 (Caller-only and phasing-only tuning recover complementary parts of the gain): `caller_only` improves overlap-related metrics but leaves fragmentation high, whereas `phasing_only` strongly improves continuity and oracle phasing metrics but does not recover additional called-site overlap.
-- O4 (The runtime-biased configuration is a viable alternative): `runtime` performs almost identically to `optimzied` on the main called metrics while using slightly lower retained coverage.
+- **O1** The optimzied configuration provides the best overall trade-off: `optimzied` achieves the highest called effective phased recall while also maintaining low fragmentation, very low switch error, and lower runtime than the default configuration.
+- **O2** Default is dominated by the tuned configurations: The default configuration is worse than `optimzied` and `runtime` on called effective phased recall, called shared heterozygous recall, switch error, and fragmentation.
+- **O3** Caller-only and phasing-only tuning recover complementary parts of the gain: `caller_only` improves overlap-related metrics but leaves fragmentation high, whereas `phasing_only` strongly improves continuity and oracle phasing metrics but does not recover additional called-site overlap.
+- **O4** The runtime-biased configuration is a viable alternative: `runtime` performs almost identically to `optimzied` on the main called metrics while using slightly lower retained coverage.
 
 #### Takeaway
-The best practical performance comes from combining moderate caller-side and phasing-side tuning rather than optimizing either stage in isolation. The optimzied configuration is the preferred general setting, while the runtime-biased configuration is a reasonable alternative when efficiency is prioritized.
+By combining moderate caller-side and phaser-side parameter tuning, the best practical performance can be achieved. The optimzied configuration is the preferred setup in general, however, the runtime-oriented configuration can serve as a viable alternative when prioritizing computational efficiency.
 
 #### 10.5.4 Robustness across scenarios
 
@@ -531,10 +531,10 @@ Across all tested scenarios, the optimzied and runtime configurations achieve hi
 
 #### Key observations
 
-- O1 (The tuned configurations generalize across scenarios): In all four scenarios, both `optimzied` and `runtime` outperform `default` on called effective phased recall and called shared heterozygous recall.
-- O2 (The optimzied configuration is the safest general recommendation): `optimzied` is never worse than `default` and is either best or tied for best on the main called metrics across all scenarios.
-- O3 (The runtime-biased configuration is highly competitive): `runtime` is effectively identical to `optimzied` on the main called metrics and remains competitive on runtime.
-- O4 (The gains transfer to both easy and hard cases): The tuned configurations improve performance not only in the hard scenario, but also in the baseline, dropout, and interaction scenarios.
+- **O1** The tuned configurations generalize across scenarios: In all four scenarios, both `optimzied` and `runtime` outperform `default` on called effective phased recall and called shared heterozygous recall.
+- **O2** The optimzied configuration is the safest general recommendation: `optimzied` is never worse than `default` and is either best or tied for best on the main called metrics across all scenarios.
+- **O3** The runtime-biased configuration is highly competitive: `runtime` is effectively identical to `optimzied` on the main called metrics and remains competitive on runtime.
+- **O4** The gains transfer to both easy and hard cases: The tuned configurations improve performance not only in the hard scenario, but also in the baseline, dropout, and interaction scenarios.
 
 #### Takeaway
 The recommended tuned settings are robust across the representative scenarios tested in this study. The optimzied configuration is the cleanest general recommendation because it consistently improves end-to-end phased recall and reduces fragmentation relative to the default.
@@ -577,10 +577,10 @@ Called solve time increases with SNP density under both configurations, but grow
 
 #### Key observations
 
-- O1 (Solve time increases with SNP density): In both oracle and called regimes, solve time increases as `num_snps` increases from 400 to 1600.
-- O2 (The optimized configuration scales much better than default): The growth in solve time is much steeper under the default configuration than under the optimized configuration.
-- O3 (Optimized remains better on phasing continuity as the problem grows): Across the scaling range, the optimized configuration generally maintains fewer phase sets and slightly better phased recall than the default configuration.
-- O4 (Solve time still does not dominate total runtime end-to-end): Although solve time grows with SNP density, total phasing runtime remains dominated by preprocessing / readset construction in the current research pipeline.
+- **O1** Solve time increases with SNP density: In both oracle and called regimes, solve time increases as `num_snps` increases from 400 to 1600.
+- **O2** The optimized configuration scales much better than default: The growth in solve time is much steeper under the default configuration than under the optimized configuration.
+- **O3** Optimized remains better on phasing continuity as the problem grows: Across the scaling range, the optimized configuration generally maintains fewer phase sets and slightly better phased recall than the default configuration.
+- **O4** Solve time still does not dominate total runtime end-to-end: Although solve time grows with SNP density, total phasing runtime remains dominated by preprocessing / readset construction in the current research pipeline.
 
 #### Takeaway
 Optimization improves not only final phased output but also the difficulty of the residual phasing problem faced by the solver. In the current research pipeline, end-to-end runtime remains dominated by preprocessing, but the tuned configuration substantially improves solve-stage scaling as SNP density increases.
@@ -624,19 +624,19 @@ If stressors are ranked by effect on the main end-to-end metric (`called_effecti
 Optimization sweeps under the composite hard scenario showed that optimization headroom exists, but is uneven across knobs.
 
 - **Useful caller-side knob:** `call_min_baseq`. Lowering the caller base-quality threshold from 20 to a moderate value such as 10 substantially improves calling recall, shared heterozygous overlap, and end-to-end phased recall without materially harming precision.
-- **Useful phasing-side knob:** `min_baseq`, mainly as a rule-out of overly strict filtering. Phasing performance is stable for `min_baseq = 0–15`, but degrades at `20`.
+- **Useful phasing-side knob:** `min_baseq`, mainly as a rule-out of overly strict filtering. Phasing performance is stable for `min_baseq` = 0–15, but degrades at 20.
 - **Useful runtime knob:** `max_coverage`. Increasing `max_coverage` beyond 8–10 does not improve phasing performance, while lower values such as 8 preserve full performance with lower runtime.
-- **Weak / negligible knobs:** caller `call_min_mapq`, phasing `min_mapq`, and high `max_coverage` values above the plateau.
-- **Robustness of tuning:** the tuned configurations generalize across baseline, dropout, interaction, and hard scenarios.
-- **Algorithm-facing scaling result:** increasing SNP density makes the solve stage more expensive, but the optimzied tuned configuration scales much better than the default configuration.
+- **Weak / negligible knobs:** Caller `call_min_mapq`, phasing `min_mapq`, and high `max_coverage` values above the optimum.
+- **Robustness of tuning:** The optimized configurations are applicable across baseline, dropout, interaction, and hard scenarios.
+- **Algorithm-facing scaling result:** Solve stage is more expensive computationally due to increasing SNP density, however, the optimized configurations offers superior scalability when compared to the default configuration.
 
-Based on the optimization sweeps, the recommended practical settings for this pipeline are:
+Based on the optimization sweeps, the recommended configuration for practical usage for this pipeline are:
 
 - **Recommended `max_coverage`:** `8`
 - **Recommended phasing thresholds:** `min_mapq = 20`, `min_baseq = 10`
 - **Recommended calling thresholds:** `call_min_mapq = 20` (or leave at default, as the effect is negligible), `call_min_baseq = 10`
 
-A slightly more runtime-biased alternative (`max_coverage = 6`, with the same caller/phasing quality thresholds) performs almost identically on the main accuracy metrics and may be acceptable when efficiency is prioritized.
+An alternative configuration which is more runtime-oriented, with `max_coverage` = 6 and other caller and phasing quality thresholds remain unchanged, maintains almost identical phasing accuracy. This alternative configuration maybe useful when efficiency is prioritized.
 
 #### Final takeaway
-The overall picture is consistent. End-to-end long-read phasing performance in this pipeline is limited primarily by the recovery and preservation of useful heterozygous variant evidence, not by a failure of WhatsHap to phase correctly once good sites are available. Coverage dropout is the strongest isolated realism stressor, duplication × dropout is the clearest compounded weakness, and the most useful practical optimization is to combine moderate caller-side and phasing-side thresholds rather than relying on a single WhatsHap parameter alone.
+The overall picture showed by the experiments is consistent. The recovery and preservation of useful heterozygous variant information is the primary limiting factor in end-to-end phasing performance, with good variant sites available, WhatsHap's phasing capability is near perfect. While coverage dropout is the strongest isolated realism stressor, the clearest compounded vulnerability is duplication combined with dropout. Instead of relying on tuning WhatsHap parameters, combining moderate variant-caller-side and phasing-side thresholds is the most effective practical optimization.
