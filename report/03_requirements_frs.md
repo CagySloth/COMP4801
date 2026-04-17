@@ -1,21 +1,21 @@
 ## 3. Functional Requirements (FRS-style)
 
-This section specifies the functional requirements of the implemented benchmarking platform.
+The functional requirements of the implemented benchamrking platform are covered in this section.
 
-### 3.1 Product perspective and scope
+### 3.1 Perspective and scope
 
-The system is a reproducible benchmarking platform for evaluating WhatsHap in an ONT-like long-read phasing workflow. The pipeline targets the practical path:
+The system serves as a benchmarking platform for analysing WhatsHap's phasing capabilities in an ONT-like long-read phasing workflow. The pipeline follows this practical sequencing and phasing workflow:
 
 **Reference FASTA → reads FASTQ → alignment BAM → variants VCF → phased VCF → evaluation reports**
 
-The platform supports two evaluation regimes:
+The platform supports two evaluation frameworks:
 
-- **Oracle (ground-truth) VCF:** isolates phasing performance given the correct variant set.
+- **Oracle (ground-truth) VCF:** isolates phasing performance by using the truth variant set.
 - **Called VCF:** measures end-to-end performance including variant-calling limitations.
 
 ### 3.2 Users and operating environment
 
-**Primary user:** a developer or research user running controlled experiments and producing plots and tables for analysis and reporting.
+**Primary users:** developers or reserchers conducting controlled experiments for WhatsHap and generating plots and tables for analysis.
 
 **Operating environment constraints:**
 

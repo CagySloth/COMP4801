@@ -1,24 +1,24 @@
 ## 4. System Design (SDD-style)
 
-This section describes the design of the WhatsHap benchmarking platform, focusing on the architecture, component responsibilities, interfaces, and design decisions that support reproducible end-to-end long-read phasing experiments.
+The design of the WhatsHap benchmarking platform, including architecture, component decomposition, interfaces, design decisions, and extensibility, are covered in this section.
 
 ### 4.1 Design objectives
 
 The system is designed to satisfy five main objectives.
 
-1. **Benchmark WhatsHap in practical workflows**  
+1. **Benchmark WhatsHap in practical workflows**
    Evaluate phasing in an end-to-end long-read pipeline (`FASTA → FASTQ → BAM → VCF → phased VCF`), not only on idealized matrices.
 
-2. **Separate error sources**  
+2. **Separate error sources**
    Support both oracle and called variant regimes so that phasing-limited behaviour can be distinguished from end-to-end caller-limited behaviour.
 
-3. **Be reproducible and traceable**  
+3. **Be reproducible and traceable**
    Ensure that every run is seed-controlled and produces a machine-readable report (`*.pipeline.json`) recording parameters, file paths, and metrics.
 
-4. **Be modular and scriptable**  
+4. **Be modular and scriptable**
    Implement each pipeline stage as a dedicated `python -m ...` entrypoint so stages can be run independently or orchestrated through runners and experiment drivers.
 
-5. **Support realism knobs and systematic sweeps**  
+5. **Support realism knobs and systematic sweeps**
    Expose configurable stressors such as duplicated regions, coverage dropout, burst errors, and indels so they can be varied independently in controlled experiments. :contentReference[oaicite:2]{index=2}
 
 ### 4.2 High-level pipeline structure
@@ -27,60 +27,58 @@ The system is organized as a sequential pipeline with clearly defined stage boun
 
 #### 4.2.1 Conceptual pipeline stages
 
-1. **Reference synthesis**  
+1. **Reference synthesis**
    Generate a synthetic reference FASTA with optional complexity presets and duplicated segments.
 
-2. **Truth synthesis**  
+2. **Truth synthesis**
    Generate phased truth variants, haplotypes, and an oracle VCF.
 
-3. **Read simulation**  
+3. **Read simulation**
    Simulate ONT-like reads with configurable length, coverage, and error models.
 
-4. **Alignment and preprocessing**  
+4. **Alignment and preprocessing**
    Align reads to the reference and produce a sorted, indexed BAM.
 
-5. **Variant calling**  
+5. **Variant calling**
    Produce a called VCF from the aligned BAM.
 
-6. **Phasing**  
+6. **Phasing**
    Phase oracle and/or called variants using the vendored WhatsHap core.
 
-7. **Evaluation and reporting**  
-   Compare phased output to truth and record metrics and provenance.
+7. **Evaluation and reporting**
+   Compare phased VCF output against truth VCF and measure performance metrics.
 
-8. **Experiment orchestration**  
-   Run controlled sweeps across seeds and realism knobs, aggregate per-run reports, and generate CSV summaries and plots. 
+8. **Experiment orchestration**
+   Conduct controlled experiments that systematically sweeps across realism settings and seed, then build reports for each benchmarking run and generate summary tables and plots.
 
 #### 4.2.2 Codebase mapping
 
-The conceptual pipeline is implemented through three main repository areas:
+The pipeline is implemented through three primary areas:
 
-- `dataset/longread/`  
-  Reference generation, truth generation, and ONT-like read simulation.
+- `dataset/longread/`
+  Generation of reference genome and truth files, and simulation of ONT-like long-read sequencing.
 
-- `algorithms/`  
-  Unified phasing CLI and WhatsHap-based phasing drivers.
+- `algorithms/`
+  Command line interface for phasing and phasing drivers for WhatsHap.
 
-- `benchmark/`  
-  End-to-end orchestration, evaluation, aggregation, and experiment control. 
+- `benchmark/`
+  End-to-end organization, evaluation, summarization, and experiment control.
 
-This separation keeps data generation, phasing, and benchmarking concerns distinct while still allowing the full workflow to be executed through a single pipeline runner.
+This separation of the pipeline maintain independency and modularity of data generation, phasing, and benchmarking, while pipeline runners are still able to execute the full pipeline.
 
-### 4.3 Component decomposition and responsibilities
-
-The main components and their roles are as follows.
+### 4.3 Component decomposition
 
 #### 4.3.1 `dataset.longread.reference`
-Generates the synthetic reference FASTA and reference metadata, including optional complexity presets and duplicated-region annotations.
+Generates synthetic reference FASTA metadata where optional complexity presets and duplicated-region indications can be included for simulating realism.
 
 #### 4.3.2 `dataset.longread.truth`
-Generates truth variants, haplotype FASTAs, truth metadata, and the oracle VCF used to isolate phasing behaviour.
+Generates truth variants, haplotype FASTAs and truth metadata for performance evaluation, and oracle VCFs that allows isolation of phasing performance from variant-caller.
 
 #### 4.3.3 `dataset.longread.readsim`
-Simulates ONT-like reads and supports configurable realism knobs including length distribution, coverage dropout, and correlated error bursts.
+Simulates ONT-like long-read sequencing with fully configurable realism knobs, including length distribution, coverage dropout, and correlated error bursts.
 
 #### 4.3.4 `benchmark.longread_pipeline_runner`
-Acts as the canonical single-run orchestrator. It validates external dependencies, executes the full workflow from reference generation through evaluation, and writes the final `*.pipeline.json` report.
+Single-run end-to-end pipeline runner. Validates reqruired external dependencies, executes the full pipeline from data generation to phasing performance evaluation and create a summarised `*.pipeline.json` report.
 
 #### 4.3.5 `algorithms.cli.phase`
 Provides a unified CLI entrypoint for phasing backends so that phasing can be invoked in a consistent way from the runner.
@@ -101,19 +99,19 @@ Runs predefined experiment suites across multiple seeds and parameter settings, 
 
 The design relies on stable file contracts between stages. The main exchanged artifact types are:
 
-- **FASTA** for reference and haplotypes  
+- **FASTA** for reference and haplotypes
   (`*.ref.fasta`, `*.hap1.fasta`, `*.hap2.fasta`)
 
-- **FASTQ** for simulated reads  
+- **FASTQ** for simulated reads
   (`*.reads.fastq`)
 
-- **BAM** for sorted and indexed alignments  
+- **BAM** for sorted and indexed alignments
   (`*.bam`, `*.bam.bai`)
 
-- **VCF** for truth, oracle, called, and phased variant sets  
+- **VCF** for truth, oracle, called, and phased variant sets
   (`*.truth.vcf.gz`, `*.oracle.vcf.gz`, `*.called.vcf.gz`, `*.ws*.phased.vcf`)
 
-- **JSON** for metadata and machine-readable reports  
+- **JSON** for metadata and machine-readable reports
   (`*.ref.meta.json`, `*.truth.meta.json`, `*.summary.json`, `*.eval.json`, `*.pipeline.json`) :contentReference[oaicite:7]{index=7}
 
 Prefix-based naming ensures that all artifacts from a run can be discovered from a single run identifier, which simplifies orchestration, aggregation, and cleanup. :contentReference[oaicite:8]{index=8}
@@ -158,35 +156,33 @@ Increasing stressor severity is expected to affect the pipeline in different way
   - possible switch-error increases when fewer reliable allele observations survive
 
 - **End-to-end effects**
-  - the strongest visible degradation is usually in effective phased recall, because it depends on both variant overlap and phasing completeness :contentReference[oaicite:10]{index=10}
+  - the strongest performance degradation is in effective phased recall, which depends on both variant overlap and phasing completeness
 
-These expectations justify treating realism knobs as independently testable stressors before combining them in interaction and optimization studies.
+Realism knobs will be constructed as independently variable and testable stressors to validate these assumptions, before combining them for interaction and optimization studies.
 
 ### 4.6 Key design decisions
 
-Several design decisions are central to the system.
+1. **Prefix-based artifact naming**
+   To simplify discovery, cleanup and aggreation, a single prefix determines the artifact family of each run.
 
-1. **Prefix-based artifact naming**  
-   A single prefix determines the artifact family of one run, simplifying discovery, cleanup, and aggregation.
+2. **Oracle vs called framework**
+   To enable attribution and breakdown of phasing performance loss from variant calling and phasing, the platform separates phaser-limited behavior from end-to-end behavior.
 
-2. **Oracle vs called regimes**  
-   The platform explicitly separates phaser-limited from end-to-end behaviour, enabling attribution of performance loss to calling vs phasing.
+3. **Vendored WhatsHap core**
+   To maintain full control and understanding over benchmarking behavior and avoid dependency drift, the core algorithms of WhatsHap are vendored instead of imported.
 
-3. **Vendored WhatsHap core**  
-   The WhatsHap core is vendored to avoid dependency drift and to keep benchmarking behaviour controlled and reproducible.
+4. **SNP-only phasing and evaluation when indels are present**
+   To better evaluate the performance on SNP-phasing, the pipeline prevents indel representation differences from dominating phasing evaluation.
 
-4. **SNP-only phasing/evaluation when indels are present**  
-   This prevents indel representation differences from dominating SNP phasing evaluation.
-
-5. **Machine-readable single-run report as the source of truth**  
-   Aggregation and plotting are driven from `*.pipeline.json`, not from logs, which improves traceability and reproducibility. :contentReference[oaicite:11]{index=11}
+5. **Machine-readable single-run report as the source of truth**
+   To ensure traceability and reproducibility, aggregation and plotting are driven from `*.pipeline.json` summaries rather than logs.
 
 ### 4.7 Extensibility
 
-The design supports incremental extension in two main directions.
+Two main incremental extension directions are supported by the platform design.
 
-- **New realism knobs** can be added in the relevant data-generation stage, surfaced through the pipeline runner, and then exposed to the experiment driver and aggregation layer.
+- **New realism knobs** can be implemented in the any data-generation stage, accessible through the CLI and pipeline runner.
 
-- **Alternative phasers** can be integrated by adding a new driver under `algorithms/`, registering a new subcommand in `algorithms.cli.phase`, and extending the pipeline runner to collect the corresponding outputs and metrics. :contentReference[oaicite:12]{index=12}
+- **Alternative phasers** can be integrated and evaluated by building drivers or adaptors under the `algorithms/` module and registering new subcommands in `algorithms.cli.phase`.
 
-This makes the platform suitable not only for the present WhatsHap study, but also for future controlled comparisons across stress conditions, phasing backends, and evaluation policies.
+The extensibility of this platform makes the platform capable of future evaluation and analsysis beyond WhatsHap, with additional realism knobs and evaluation policies.
