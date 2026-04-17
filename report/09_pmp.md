@@ -1,65 +1,66 @@
 ## 9. Project Management Plan (PMP-style)
 
-This section summarizes the project’s deliverables, milestones, and risk management approach, focusing on the work completed toward the final report and experimental study.
+This project's deliverables, milestones, and risk management approach, will be covered in this section.
 
 ### 9.1 Deliverables
 
-The final deliverables of this project are:
+The expected final deliverables of this project includes:
 
-1. **Benchmarking platform implementation**
+1. **Implementation of the benchmarking platform**
    - End-to-end pipeline:
-     - reference → truth/oracle → read simulation → alignment → calling → phasing → evaluation → report
-   - Vendored WhatsHap integration for controlled benchmarking
+     - Reference → Truth/oracle → Read simulation → Alignment → Variant-calling → Phasing → Evaluation → Visualization
+   - Vendored WhatsHap integration for controlled benchmarking and experimenting.
 
 2. **Realism knob implementations**
-   - Reference-level stressors (e.g., duplications / complexity presets)
-   - Read-level stressors (dropout, length models, correlated error bursts)
-   - Truth-level stressors (indels) with SNP-only policy for meaningful evaluation
+   - Reference-level stressors, such as duplications and complexity presets.
+   - Read-level stressors, such as dropout, length models, and correlated error bursts.
+   - Truth-level stressors, such as indel insertion, with SNP-only policy for meaningful evaluation.
 
 3. **Experiment infrastructure**
-   - Experiment driver for running systematic studies across seeds and knobs
-   - Aggregation and plotting utilities producing report-ready figures and CSVs
+   - Experiment driver to facilitate systematic investigation on phasing performance across seeds, setups, and realism configurations.
+   - Aggregation and visualization tools to produce report-ready figures and tables.
 
 4. **Validation artifacts**
-   - Unit/integration tests and smoke-run outputs
-   - `*.pipeline.json` reports and aggregated `aggregate.csv` datasets used by the report
+   - Outputs from unit tests, integration tests, and end-to-end smoke-runs.
+   - `*.pipeline.json` reports and aggregated `aggregate.csv` datasets used by this report.
 
 5. **Final report**
-   - Documentation of requirements, design, implementation, testing, experiments, and conclusions
+   - A detailed documentation of requirements, design, implementation, testing, experiments, findings, and conclusions for this project.
 
-### 9.2 Work plan and milestones (final-phase focus)
+### 9.2 Work plan and milestones
 
-A practical final-phase work plan:
+A practical work plan for the second-phase (semester 2):
 
 - **M1: Platform stabilization**
-  - ensure smoke validation passes on target environment
-  - confirm `pipeline.json` and `aggregate.csv` contain required columns for report tables/plots
+  - Ensure that the platform operates correctly on passes on target environment through smoke runs.
+  - Ensure that output from the platform contain required information for report plots and tables.
 
-- **M2: Realism knob completion and validation**
-  - validate each realism knob with targeted runs and sanity checks
-  - ensure SNP-only policy is consistently applied when indels are enabled
+- **M2: Realism knob implementation and validation**
+  - Validation of each realism knob through targeted tests and sanity checks.
+  - Confirm that the SNP-only policy is applied when indels are enabled.
 
 - **M3: Experiment execution**
-  - run the planned experiment suites (oracle vs called regimes)
-  - aggregate results and generate plots
+  - Execute the designed experiment suites.
+  - Aggregate and visualize results, and explore optimization opportunity.
 
 - **M4: Report completion**
-  - integrate experiment plots/tables into the report
-  - finalize discussion of optimization opportunities and limitations
+  - Incorporation of experiment plots and tables into the final report.
+  - Finalization of findings on optimization opportunities and limitations.
 
 ### 9.3 Risks and mitigations
 
 | Risk | Impact | Mitigation |
 |---|---|---|
-| External toolchain not available / inconsistent versions | prevents end-to-end experiments | document dependencies; fail early in runner; test on target machine |
-| Evaluation artifacts due to indel representation mismatch | misleading accuracy/switch metrics | SNP-only phasing/evaluation flags; validate with indel sweeps |
-| Time constraints in final phase | reduced experiment coverage | prioritize experiments that directly support report claims; use smaller parameter sweeps |
-| Overfitting to synthetic data | reduced realism | use realism knobs to approximate failure modes; discuss threats to validity |
-| Codebase complexity | harder to maintain | cleanup branch; isolate legacy scripts/tests; keep `pipeline.json` schema stable |
+| Inconsistent availability and versioning of external tools | Inability and inconsistency in end-to-end experiments | Document external tools dependencies; Validation on targeted environment |
+| Mismatch in indel representations leading to inaccurate evaluation | Misleading metrics | SNP-only phasing and evaluation flags; Validation with indel sweep experiment runs |
+| Time constraints in final phase | Reduced experiment coverage; Immature optimization findings | Design experimentation plan; Prioritize critical experiments; Reduce parameter sweep size |
+| Overfitting to synthetic data | Reduced realism | Approximate failure modes through realism knobs; Ensure randomness in experiments |
+| Codebase complexity | Harder to maintain | Regular cleanup and refactoring; Isolate legacy scripts; Maintain consistency in `pipeline.json` schema |
 
 ### 9.4 Tracking and reporting
 
-Progress is tracked through:
-- Git commits and branch history for code changes
-- prefix-scoped outputs and `pipeline.json` reports for experiment evidence
-- aggregated CSVs and plots for report integration
+The research process can be tracked through:
+
+- Git commits and branch history documenting code modifications and feature implementations.
+- Experiment outputs and `pipeline.json` reports for research traceability.
+- Aggregated CSVs and plots for report integration.
