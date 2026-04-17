@@ -9,13 +9,13 @@
 - minimap2 version: 2.30-r1287
 - samtools version: 1.23
 - bcftools version: 1.23
-- Vendored WhatsHap core path: `vendor/whatshap_core/whatshap/core.<platform-specific extension>`
+- Vendored WhatsHap core path: `vendor/whatshap_core/whatshap/core.<extension>`
 
 #### 10.1.2 Pipeline regimes and evaluation policy
 
-- **Oracle regime:** phase using `*.oracle.vcf.gz` to measure phaser-limited performance under correct variant sites
-- **Called regime:** phase using `*.called.vcf.gz` to measure end-to-end performance including calling limitations
-- **Indel policy:** when truth indels are enabled, use SNP-only phasing/evaluation (`phase_snps_only`, `eval_snps_only`) to avoid representation-induced distortion in SNP phasing metrics
+- **Oracle regime:** phase using `*.oracle.vcf.gz` to measure phaser-limited performance under correct variant sites.
+- **Called regime:** phase using `*.called.vcf.gz` to measure end-to-end performance including calling limitations.
+- **Indel policy:** when truth indels are enabled, use SNP-only phasing/evaluation (`phase_snps_only`, `eval_snps_only`) to avoid representation-induced distortion in SNP phasing metrics.
 
 A custom adaptor layer was used to construct the `ReadSet` consumed by the vendored WhatsHap core. This adaptor was necessary to support oracle-vs-called benchmarking, unified JSON provenance, and controlled SNP-only phasing/evaluation under indel-containing truth sets. It is therefore part of the project’s benchmarking infrastructure rather than a direct reproduction of the standard production-facing WhatsHap front-end.
 
@@ -78,7 +78,7 @@ Establish baseline performance curves as sequencing depth increases, and attribu
 - Varied: `num_reads ∈ {50, 100, 200, 400}` (3 seeds each)
 - Fixed: ONT-like simulation profile (`q20`), reference length `80 kb`, `800` truth SNPs (`het_rate = 0.8`), read length range `2–6 kb`, and the baseline calling/phasing thresholds
 
-**Figure 10.2.3 — Called effective phased recall vs sequencing depth (end-to-end performance).**  
+**Figure 10.2.3 — Called effective phased recall vs sequencing depth (end-to-end performance).**
 Called effective phased recall measures the fraction of truth heterozygous SNPs that end up both present in the called set and correctly phased (after best block flip). The curve is substantially lower than the oracle upper bound at low depth, showing that end-to-end performance is dominated early by limited variant recovery and callset overlap.
 
 #### Results summary (means over seeds)
@@ -154,6 +154,7 @@ These trends are reflected by Figures 10.3.1.1–10.3.1.5, especially Figure 10.
 - O4 (Main loss is in phasing completeness/correctness on surviving sites): The strongest duplication setting reduces `called_phasing_rate_shared_het` and `called_phase_accuracy`, indicating that duplicated regions mainly weaken the consistency of phasing evidence in the called regime.
 
 ##### Takeaway
+
 Under the current parameterization, duplicated regions are a relatively mild stressor for variant recovery and for oracle phasing. Their main impact appears only at the highest duplication level, where end-to-end phasing becomes less complete and less accurate despite largely unchanged callset overlap.
 
 #### 10.3.2 Coverage dropout
@@ -172,7 +173,7 @@ Under the current parameterization, duplicated regions are a relatively mild str
 \includegraphics[width=0.82\linewidth]{figures/10_experiments/fig_10_3_2_4_called_effective_phased_recall_dropout.png}
 \end{center}
 
-**Figure 10.3.2.4 — Called effective phased recall vs dropout fraction.**  
+**Figure 10.3.2.4 — Called effective phased recall vs dropout fraction.**
 Called effective phased recall declines much more steeply than oracle effective phased recall, showing that dropout affects both phasing connectivity and, at stronger dropout levels, variant recovery in the called regime.
 
 ##### Results summary
@@ -196,6 +197,7 @@ These trends are reflected by Figures 10.3.2.1–10.3.2.5, especially Figure 10.
 - O5 (Severe dropout becomes a mixed calling + phasing bottleneck): At `dropout_fraction = 0.20`, `call_recall` drops sharply to 0.432, `called_shared_het_recall` falls to 0.362, and `called_phasing_rate_shared_het` falls to 0.239.
 
 ##### Takeaway
+
 Coverage dropout is the strongest isolated stressor in this study. Its primary effect is to create low-coverage gaps that prevent reads from connecting heterozygous sites into long phase blocks, reducing phasing completeness even in the oracle regime. In the called regime, this effect is amplified, and at severe dropout levels both phase connectivity and variant recovery deteriorate substantially.
 
 #### 10.3.3 Correlated error bursts
@@ -242,6 +244,7 @@ These trends are reflected by Figures 10.3.4.1–10.3.4.5, especially Figure 10.
 - The gains in continuity and overlap are largely offset by slightly worse called-regime phasing correctness.
 
 ##### Takeaway
+
 The read length model is informative for mechanism analysis, but under the present parameterization it is a mixed continuity / correctness trade-off rather than a clear optimization lever.
 
 
@@ -323,7 +326,7 @@ These trends are reflected by Figures 10.4.1–10.4.4, especially Figure 10.4.2 
 \includegraphics[width=0.82\linewidth]{figures/10_experiments/fig_10_4_2_called_effective_phased_recall_interaction.png}
 \end{center}
 
-**Figure 10.4.2 — Called effective phased recall across duplication × dropout conditions.**  
+**Figure 10.4.2 — Called effective phased recall across duplication × dropout conditions.**
 The combined duplication + dropout condition produces the lowest end-to-end phased recall, showing that the two stressors interact to create a substantially more difficult phasing problem than either one alone.
 
 #### Key observations
@@ -392,6 +395,7 @@ These trends are reflected by Figures 10.5.2.9–10.5.2.12 for the caller-thresh
 These trends are reflected by Figures 10.5.2.21–10.5.2.24, which show that the recommended threshold pair lies on a stable local performance plateau.
 
 ##### Takeaway
+
 Optimization headroom exists, but it is uneven across knobs. The strongest useful signal is moderate caller-side base-quality filtering (`call_min_baseq = 10`), followed by avoiding overly strict phasing base-quality filtering (`min_baseq = 10`). By contrast, `min_mapq`, `call_min_mapq`, and high `max_coverage` values above the plateau are weak or negligible knobs.
 
 #### 10.5.3 Representative configuration comparison
@@ -443,7 +447,7 @@ These trends are reflected by Figures 10.5.3.1–10.5.3.4, and are reinforced by
 \includegraphics[width=0.82\linewidth]{figures/10_experiments/fig_10_5_3_1_called_effective_phased_recall_configs.png}
 \end{center}
 
-**Figure 10.5.3.1 — Called effective phased recall across representative configurations.**  
+**Figure 10.5.3.1 — Called effective phased recall across representative configurations.**
 The optimzied configuration achieves the highest end-to-end phased recall, while the runtime-biased configuration performs almost identically. This shows that combining caller-side and phasing-side tuning yields the strongest practical performance.
 
 #### Key observations
@@ -496,7 +500,7 @@ These trends are reflected by Figures 10.5.4.1–10.5.4.4, where the tuned confi
 \includegraphics[width=0.88\linewidth]{figures/10_experiments/fig_10_5_4_1_called_effective_phased_recall_robustness.png}
 \end{center}
 
-**Figure 10.5.4.1 — Called effective phased recall across scenarios and representative configurations.**  
+**Figure 10.5.4.1 — Called effective phased recall across scenarios and representative configurations.**
 Across all tested scenarios, the optimzied and runtime configurations achieve higher end-to-end phased recall than the default configuration, showing that the selected tuning generalizes beyond the hard optimization scenario.
 
 #### Key observations
@@ -542,7 +546,7 @@ These trends are reflected by Figures 10.5.5.1–10.5.5.4, especially Figure 10.
 \includegraphics[width=0.82\linewidth]{figures/10_experiments/fig_10_5_5_1_called_time_solve_sec_dp_scaling.png}
 \end{center}
 
-**Figure 10.5.5.1 — Called solve time vs SNP count under default and optimzied configurations.**  
+**Figure 10.5.5.1 — Called solve time vs SNP count under default and optimzied configurations.**
 Called solve time increases with SNP density under both configurations, but grows much more steeply under the default setting. This shows that the tuned configuration makes the residual phasing problem easier to solve as variant density increases.
 
 #### Key observations
@@ -584,9 +588,9 @@ Across the isolated and interaction studies, the realism knobs differ substantia
 
 If stressors are ranked by effect on the main end-to-end metric (`called_effective_phased_recall`), the most important findings are:
 
-1. coverage dropout  
-2. duplication × dropout interaction  
-3. strong duplication / read-length trade-off effects  
+1. coverage dropout
+2. duplication × dropout interaction
+3. strong duplication / read-length trade-off effects
 4. bursts (weak / noisy)
 
 #### 10.6.3 Optimization summary
