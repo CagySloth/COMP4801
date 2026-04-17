@@ -30,14 +30,14 @@ The platform supports two evaluation frameworks:
 
 Most pipeline outputs are derived from a single `--prefix` argument used by `benchmark.longread_pipeline_runner`. Given `--prefix output/exp1/runA`, the system produces a consistent family of artifacts, including:
 
-- reference artifacts: `*.ref.fasta`, `*.ref.meta.json`
-- truth artifacts: `*.truth.vcf`, `*.truth.vcf.gz`, `*.truth.meta.json`
-- oracle VCF artifacts: `*.oracle.vcf`, `*.oracle.vcf.gz`
-- simulated reads: `*.reads.fastq`, `*.reads.truth.tsv`
-- alignment artifacts: `*.bam`, `*.bam.bai`
-- called variants: `*.called.vcf.gz`, `*.called.vcf.gz.tbi`
-- WhatsHap outputs: `*.ws*.phased.vcf`, `*.ws*.eval.json`, `*.ws*.summary.json`
-- run-level report: `*.pipeline.json`
+- Reference artifacts: `*.ref.fasta`, `*.ref.meta.json`.
+- Truth artifacts: `*.truth.vcf`, `*.truth.vcf.gz`, `*.truth.meta.json`.
+- Oracle VCF artifacts: `*.oracle.vcf`, `*.oracle.vcf.gz`.
+- Simulated reads: `*.reads.fastq`, `*.reads.truth.tsv`.
+- Alignment artifacts: `*.bam`, `*.bam.bai`.
+- Called variants: `*.called.vcf.gz`, `*.called.vcf.gz.tbi`.
+- WhatsHap outputs: `*.ws*.phased.vcf`, `*.ws*.eval.json`, `*.ws*.summary.json`.
+- Run-level report: `*.pipeline.json`.
 
 Aggregated experiment directories additionally produce:
 
@@ -92,10 +92,10 @@ The system shall produce a single machine-readable report per run and provide ag
 
 The pipeline report shall record:
 
-- parameter values used for the run
-- file paths for produced artifacts
-- calling precision and recall when called-mode evaluation is enabled
-- phasing evaluation metrics for oracle and/or called runs
+- Parameter values used for the run.
+- File paths for produced artifacts.
+- Calling precision and recall when called-mode evaluation is enabled.
+- Phasing evaluation metrics for oracle and/or called runs.
 
 #### FR-9 Experiment driver for systematic studies
 The system shall provide a driver to execute predefined experiment suites across multiple seeds, aggregate results, and generate plots.

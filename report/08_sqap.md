@@ -1,59 +1,60 @@
 ## 8. Software Quality Assurance Plan (SQAP-style)
 
-This section describes the quality assurance activities used to ensure that the platform is correct, maintainable, and suitable for generating report-grade experimental results.
+Quality assurance activites used to ensure the correctness and maintability of the platform will be covered in this section.
 
-### 8.1 Quality goals
+### 8.1 Quality assurance goals
 
-The system targets the following quality properties:
+The following quality properties are targeted by the quality assurance plan:
 
-- **Correctness:** Metrics, phasing outputs, and run reports reflect the true pipeline behavior.
-- **Reproducibility:** Runs are seed-controlled and configurations are recorded in `*.pipeline.json`.
-- **Traceability:** Report plots/tables are derived from stored machine-readable artifacts.
-- **Maintainability:** The codebase is modular (stage-based) and supports incremental addition of realism knobs and experiments.
-- **Robustness:** Failures in external tools are detected early and surfaced clearly.
+- **Correctness:** Evaluated metrics, phased outputs, and reports represent actual pipeline behavior accurately.
+- **Reproducibility:** Seed and parameter configurations of experiment runs are recorded in `*.pipeline.json`.
+- **Traceability:** Plots and tables in the report are generated from archived machine-readable data.
+- **Maintainability:** The codebase is modularized and incremental implementation of realism knobs and experiments are supported.
+- **Robustness:** Failures in external tools are detected and presented clearly.
 
 ### 8.2 Standards and conventions
 
-- Code follows a consistent CLI-driven structure using `python -m <module>` entrypoints.
-- Outputs follow prefix-based naming conventions, enabling deterministic file discovery.
-- Module-level documentation is maintained under `docs/` and updated when new knobs/drivers are introduced.
+- A consistent CLI-driven structure with `python -m <module>` entrypoints are followed.
+- A prefix-based naming system is followed in output generation, ensuring deterministic file searching.
+- Module-level documentation, under `docs/`, is maintained and updated regularly.
 
 ### 8.3 Verification activities
 
 The following verification activities are used:
 
-1. **Unit and integration tests (`pytest`)**
-   - Validate metric computation, adapter correctness, and CLI routing.
-   - Provide regression coverage for core evaluation logic.
+1. **Unit and integration tests using `pytest`**
+   - Validation of metric computation, adapter correctness, and CLI routing.
+   - Regression coverage for core evaluation logic is provided.
 
 2. **System smoke validation**
    - Validates the full long-read workflow through:
-     - `benchmark.longread_pipeline_runner` (single-run)
-     - `benchmark.experiment_driver` (multi-run)
-   - Confirms that expected artifacts exist and that JSON/CSV contracts are satisfied.
+     - `benchmark.longread_pipeline_runner` (single-run).
+     - `benchmark.experiment_driver` (multi-run).
+   - Existence of expected files and JSON/CSV contracts are verified.
 
 3. **Realism knob validation**
-   - Each realism knob is validated using:
-     - metadata integrity checks (`*.ref.meta.json`, `*.reads.meta.json`, `*.truth.meta.json`)
-     - sanity expectations on metrics (e.g., duplication tends to reduce calling recall and/or increase fragmentation)
+   - Validation of each realism knob is performed through:
+     - Integrity check for metadata (`*.ref.meta.json`, `*.reads.meta.json`, `*.truth.meta.json`).
+     - Sanity check on output metrics.
 
-### 8.4 Defect handling and regression prevention
+### 8.4 Management of defects and prevention of regression
 
 - Defects are addressed by:
-  - reproducing with a fixed seed and saving the failing run’s `*.pipeline.json`
-  - adding a regression test when feasible (unit test or small integration test)
-- A change is not considered complete until it:
-  - passes the relevant tests, and
-  - preserves the reporting contract (pipeline JSON schema and aggregation columns)
+  - Replicating with a fixed seed and saving the configuration `*.pipeline.json` of the failed run.
+  - A regression test (unit test or small integration test) will be added when feasible.
+- Changes and implementations are considered complete when:
+  - Relevant tests are passed.
+  - Reporting contract is preserved.
 
 ### 8.5 Documentation QA
 
-Documentation is kept consistent with the codebase by:
-- referencing runnable CLIs (`python -m ...`) rather than informal scripts
-- documenting new flags when new realism knobs are added
-- ensuring docs describe both oracle and called evaluation regimes
+Documentation is kept up-to-date with the codebase by:
+
+- Runnable CLIs are referenced.
+- New CLI flags are documented when new features are implemented.
+- Ensuring documentation describe both oracle and called evaluation frameworks.
 
 ### 8.6 Limitations
 
-- Full system validation requires external binaries (`minimap2/samtools/bcftools`), so CI-style testing may only cover unit/integration tests.
-- Some realism properties are approximations; validation focuses on correctness of implementation and expected qualitative effects rather than perfect biological fidelity.
+- As full system validation would require validation of external tools, such as `minimap2`, `samtools`, and `bcftools`, only unit and integration tests are covered in CI-style testing.
+- Some realism knobs are approximations of real genome sequencing characteristics. Validation of these realism features will focuses on correctness of implementation and expected effects, rather than biological truth.

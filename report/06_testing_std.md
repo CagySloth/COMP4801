@@ -7,23 +7,23 @@ The testing strategy and validation evidence for the platform, with the aim of a
 The testing plan aims to validate these follow characteristics:
 
 1. **Correctness of core representations and I/O**
-   - matrix representation and TSV/NPZ conversions
-   - correctness of adapter(s) for converting data representations between project-specific format to WhatsHap-compatible inputs
+   - Matrix representation and TSV/NPZ conversions.
+   - Correctness of adapter(s) for converting data representations between project-specific format to WhatsHap-compatible inputs.
 
 2. **Correctness of phasing outputs**
-   - phased output formatting
-   - vendored WhatsHap core compatiblity
-   - correct propagation of phase set and genotype (PS/GT) information
+   - Phased output formatting.
+   - Vendored WhatsHap core compatiblity.
+   - Correct propagation of phase set and genotype (PS/GT) information.
 
 3. **Correctness of evaluation metrics**
-   - block-flip-invariant phase accuracy
-   - switch error rate
-   - phase-set counting and shared-site metrics
+   - Block-flip-invariant phase accuracy.
+   - Switch error rate.
+   - Phase-set counting and shared-site metrics.
 
 4. **End-to-end reproducibility**
-   - seed-controlled execution
-   - deterministic prefix-based artifact naming and file generation
-   - standardized reporting from `*.pipeline.json` to `aggregate.csv`
+   - Seed-controlled execution.
+   - Deterministic prefix-based artifact naming and file generation.
+   - Standardized reporting from `*.pipeline.json` to `aggregate.csv`.
 
 ### 6.2 Test levels and scope
 
@@ -59,7 +59,7 @@ System-level long-read runs require:
 - `samtools`
 - `bcftools`
 
-These are treated as system dependencies and are validated at runtime by the pipeline runner.{index=8}
+These are treated as system dependencies and are validated at runtime by the pipeline runner.
 
 ### 6.4 Implemented tests
 
@@ -95,30 +95,30 @@ These smoke runs validate the practical path:
 
 Pass criteria include:
 
-- expected artifacts exist for the selected regime
-- `*.pipeline.json` is produced and parseable
-- `*.eval.json` contains required keys such as switch error and phase-set count
-- aggregation produces a non-empty `aggregate.csv` with expected columns
+- Expected artifacts exist for the selected regime.
+- `*.pipeline.json` is produced and parseable.
+- `*.eval.json` contains required keys such as switch error and phase-set count.
+- Aggregation produces a non-empty `aggregate.csv` with expected columns.
 
 ### 6.6 Validation of realism knobs
 
 The realism knobs are validated using both metadata checks and metric-based sanity checks.
 
 - **Duplications**
-  - `*.ref.meta.json` must contain valid duplication coordinates
-  - expected effect: reduced calling recall and/or increased fragmentation as duplication severity increases
+  - `*.ref.meta.json` must contain valid duplication coordinates.
+  - Expected effect: reduced calling recall and/or increased fragmentation as duplication severity increases.
 
 - **Coverage dropout**
-  - dropout parameters must be recorded in read metadata
-  - expected effect: more phase sets and reduced shared-heterozygous recall in the called regime
+  - Dropout parameters must be recorded in read metadata.
+  - Expected effect: more phase sets and reduced shared-heterozygous recall in the called regime.
 
 - **Correlated error bursts**
-  - burst parameters must be recorded in read metadata
-  - expected effect: reduced calling quality and/or weaker phasing evidence
+  - Burst parameters must be recorded in read metadata.
+  - Expected effect: reduced calling quality and/or weaker phasing evidence.
 
 - **Truth indels**
-  - indel introduction must be recorded in truth metadata
-  - when SNP-only policy is enabled, SNP phasing metrics should remain broadly stable across indel sweeps, indicating that indel representation mismatch is not corrupting evaluation
+  - Indel introduction must be recorded in truth metadata.
+  - When SNP-only policy is enabled, SNP phasing metrics should remain broadly stable across indel sweeps, indicating that indel representation mismatch is not corrupting evaluation.
 
 This validation layer is important because the realism knobs are central to the benchmarking contribution of the project, not merely optional simulator features.
 
@@ -128,9 +128,9 @@ The current automated suite focuses mainly on matrix-mode, adapter, driver, and 
 
 Recommended additions include:
 
-1. a very small long-read runner smoke test that is skipped automatically when external tools are unavailable
-2. schema/contract tests for `pipeline.json` and `aggregate.csv`
-3. deterministic reference-meta integrity tests for duplication coordinates
-4. explicit SNP-only policy regression tests under indel-enabled truth generation
+1. A very small long-read runner smoke test that is skipped automatically when external tools are unavailable.
+2. Contract tests for `pipeline.json` and `aggregate.csv`.
+3. Deterministic reference-meta integrity tests for duplication coordinates.
+4. Explicit SNP-only policy regression tests under indel-enabled truth generation.
 
 These additions would strengthen automated coverage further, but the current testing strategy is already sufficient to support the project’s main claims about correctness, reproducibility, and controlled experiment execution.

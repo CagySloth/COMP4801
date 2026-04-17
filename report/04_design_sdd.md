@@ -19,7 +19,7 @@ The system is designed to satisfy five main objectives.
    Implement each pipeline stage as a dedicated `python -m ...` entrypoint so stages can be run independently or orchestrated through runners and experiment drivers.
 
 5. **Support realism knobs and systematic sweeps**
-   Expose configurable stressors such as duplicated regions, coverage dropout, burst errors, and indels so they can be varied independently in controlled experiments. :contentReference[oaicite:2]{index=2}
+   Expose configurable stressors such as duplicated regions, coverage dropout, burst errors, and indels so they can be varied independently in controlled experiments.
 
 ### 4.2 High-level pipeline structure
 
@@ -84,7 +84,7 @@ Single-run end-to-end pipeline runner. Validates reqruired external dependencies
 Provides a unified CLI entrypoint for phasing backends so that phasing can be invoked in a consistent way from the runner.
 
 #### 4.3.6 `algorithms.diploid.whatshap_bam_driver`
-Implements WhatsHap-based phasing from BAM + VCF using the vendored core. It performs readset construction, read selection, solving, PS assignment, and phased VCF writing. Reads covering fewer than two variants are excluded to satisfy WhatsHap read-selection requirements. :contentReference[oaicite:5]{index=5}
+Implements WhatsHap-based phasing from BAM + VCF using the vendored core. It performs readset construction, read selection, solving, PS assignment, and phased VCF writing. Reads covering fewer than two variants are excluded to satisfy WhatsHap read-selection requirements.
 
 #### 4.3.7 `benchmark.vcf_phase_eval`
 Compares phased VCF output against truth and computes correctness, completeness, and fragmentation metrics.
@@ -93,28 +93,28 @@ Compares phased VCF output against truth and computes correctness, completeness,
 Converts many per-run `*.pipeline.json` files into a single `aggregate.csv`, which acts as the standard interface between experiment execution and downstream plotting.
 
 #### 4.3.9 `benchmark.experiment_driver`
-Runs predefined experiment suites across multiple seeds and parameter settings, then aggregates results and generates report-ready plots. :contentReference[oaicite:6]{index=6}
+Runs predefined experiment suites across multiple seeds and parameter settings, then aggregates results and generates report-ready plots.
 
 ### 4.4 Data contracts and file-level interfaces
 
 The design relies on stable file contracts between stages. The main exchanged artifact types are:
 
-- **FASTA** for reference and haplotypes
+- **FASTA** for reference and haplotypes.
   (`*.ref.fasta`, `*.hap1.fasta`, `*.hap2.fasta`)
 
-- **FASTQ** for simulated reads
+- **FASTQ** for simulated reads.
   (`*.reads.fastq`)
 
-- **BAM** for sorted and indexed alignments
+- **BAM** for sorted and indexed alignments.
   (`*.bam`, `*.bam.bai`)
 
-- **VCF** for truth, oracle, called, and phased variant sets
+- **VCF** for truth, oracle, called, and phased variant sets.
   (`*.truth.vcf.gz`, `*.oracle.vcf.gz`, `*.called.vcf.gz`, `*.ws*.phased.vcf`)
 
-- **JSON** for metadata and machine-readable reports
-  (`*.ref.meta.json`, `*.truth.meta.json`, `*.summary.json`, `*.eval.json`, `*.pipeline.json`) :contentReference[oaicite:7]{index=7}
+- **JSON** for metadata and machine-readable reports.
+  (`*.ref.meta.json`, `*.truth.meta.json`, `*.summary.json`, `*.eval.json`, `*.pipeline.json`)
 
-Prefix-based naming ensures that all artifacts from a run can be discovered from a single run identifier, which simplifies orchestration, aggregation, and cleanup. :contentReference[oaicite:8]{index=8}
+Prefix-based naming ensures that all artifacts from a run can be discovered from a single run identifier, which simplifies orchestration, aggregation, and cleanup.
 
 ### 4.5 Realism knobs as configurable stressors
 
@@ -148,15 +148,15 @@ These knobs are intentionally parameterized, stage-local, and fully recorded in 
 Increasing stressor severity is expected to affect the pipeline in different ways:
 
 - **Caller-focused effects**
-  - lower `call_recall`
-  - possible precision changes depending on thresholding and error severity
+  - Lower `call_recall`.
+  - Possible precision changes depending on thresholding and error severity.
 
 - **Phaser-focused effects**
-  - more phase sets under fragmentation-heavy stressors
-  - possible switch-error increases when fewer reliable allele observations survive
+  - More phase sets under fragmentation-heavy stressors.
+  - Possible switch-error increases when fewer reliable allele observations survive.
 
 - **End-to-end effects**
-  - the strongest performance degradation is in effective phased recall, which depends on both variant overlap and phasing completeness
+  - The strongest performance degradation is in effective phased recall, which depends on both variant overlap and phasing completeness.
 
 Realism knobs will be constructed as independently variable and testable stressors to validate these assumptions, before combining them for interaction and optimization studies.
 
@@ -182,7 +182,6 @@ Realism knobs will be constructed as independently variable and testable stresso
 Two main incremental extension directions are supported by the platform design.
 
 - **New realism knobs** can be implemented in the any data-generation stage, accessible through the CLI and pipeline runner.
-
 - **Alternative phasers** can be integrated and evaluated by building drivers or adaptors under the `algorithms/` module and registering new subcommands in `algorithms.cli.phase`.
 
 The extensibility of this platform makes the platform capable of future evaluation and analsysis beyond WhatsHap, with additional realism knobs and evaluation policies.
