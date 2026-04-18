@@ -28,7 +28,7 @@ The platform supports two evaluation frameworks:
 
 ### 3.3 Naming conventions and artifacts (prefix-based)
 
-Most pipeline outputs are derived from a single `--prefix` argument used by `benchmark.longread_pipeline_runner`. Given `--prefix output/exp1/runA`, the system produces a consistent family of artifacts, including:
+Most pipeline outputs are derived from a single `--prefix` argument used by `benchmark.longread_pipeline_runn` `er`. Given `--prefix output/exp1/runA`, the system produces a consistent family of artifacts, including:
 
 - Reference artifacts: `*.ref.fasta`, `*.ref.meta.json`.
 - Truth artifacts: `*.truth.vcf`, `*.truth.vcf.gz`, `*.truth.meta.json`.
@@ -56,7 +56,7 @@ The system shall generate a synthetic reference genome FASTA with configurable r
 #### FR-2 Ground-truth variant and haplotype generation
 The system shall generate diploid ground-truth variants and two haplotype sequences, and export both a truth VCF and haplotype FASTAs.
 
-**Implementation mapping:** implemented by `dataset.longread.truth`, invoked through `benchmark.longread_` `pipeline_runner`, producing `*.truth.vcf`, `*.truth.vcf.gz`, `*.hap1.fasta`, `*.hap2.fasta`, `*.truth.meta.json`, and `*.oracle.vcf.gz`.
+**Implementation mapping:** implemented by `dataset.longread.truth`, invoked through `benchmark.longread_` `pipeline_runner`, producing `*.truth.vcf`, `*.truth.vcf.gz`, `*.hap1.fasta`, `*.hap2.fasta`, `*.truth.meta.` `json`, and `*.oracle.vcf.gz`.
 
 #### FR-3 ONT-like read simulation
 The system shall simulate long reads from the diploid haplotypes, producing FASTQ with quality strings and read-truth metadata.
@@ -81,7 +81,7 @@ The system shall phase variants using WhatsHap with BAM+VCF inputs and produce p
 #### FR-7 Phasing evaluation against truth
 The system shall evaluate phased output against the truth VCF and output evaluation metrics focused on phasing correctness and fragmentation.
 
-**Implementation mapping:** implemented by `benchmark.vcf_phase_eval`, invoked through `benchmark.longread_pipeline_runner`, producing `*.eval.json` with metrics such as phase accuracy, switch error rate, phase-set count, and shared-site counts.
+**Implementation mapping:** implemented by `benchmark.vcf_phase_eval`, invoked through `benchmark.longrea` `d_pipeline_runner`, producing `*.eval.json` with metrics such as phase accuracy, switch error rate, phase-set count, and shared-site counts.
 
 **SNP-only policy for indels:** when indels are enabled, the system shall support `--phase-snps-only` and `--eval-snps-only` so that SNP phasing evaluation remains valid despite possible indel-representation mismatches.
 
