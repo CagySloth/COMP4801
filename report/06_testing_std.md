@@ -12,7 +12,7 @@ The testing plan aims to validate these follow characteristics:
 
 2. **Correctness of phasing outputs**
    - Phased output formatting.
-   - Vendored WhatsHap core compatiblity.
+   - Vendored WhatsHap core compatibility.
    - Correct propagation of phase set and genotype (PS/GT) information.
 
 3. **Correctness of evaluation metrics**
@@ -44,7 +44,7 @@ This separation is necessary because the practical long-read pipeline depends on
 
 #### 6.3.1 Python environment
 
-- Python 3.11
+- Python 3.12.12
 - `pytest` for test execution
 
 #### 6.3.2 Vendored WhatsHap core
@@ -67,7 +67,7 @@ The repository includes unit- and integration-level tests covering the main corr
 
 #### 6.4.1 Adapter and WhatsHap-compatibility tests
 
-`tests/test_whatshap_adapter.py` validates compatibility between the project’s internal read representation and WhatsHap `ReadSet` requirements. In particular, it checks that variant indexing and allele encoding match the expected semantics used by the vendored phasing backend.
+`tests/test_whatshap_adapter.py` validates compatibility from the project’s internal read representation and WhatsHap `ReadSet` requirements. In particular, it checks that variant indexing and allele encoding match the expected semantics used by the vendored phasing backend.
 
 #### 6.4.2 Evaluation and aggregation tests
 
