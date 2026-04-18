@@ -1,6 +1,6 @@
 ## 6. Testing and Validation (STD-style)
 
-The testing strategy and validation evidence for the platform, with the aim of achieving correctness and reproducibility of data generation, WhatsHap integration, evaluation, and end-to-end pipeline execution, will be covered by this section.
+The testing strategy and validation evidence for the platform, with the aim of achieving correctness and reproducibility of data generation, WhatsHap integration, evaluation, and end-to-end pipeline execution, are covered by this section.
 
 ### 6.1 Testing objectives
 
