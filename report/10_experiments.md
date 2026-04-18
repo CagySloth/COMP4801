@@ -416,7 +416,7 @@ These trends are reflected by Figures 10.5.2.9–10.5.2.12 for the caller-thresh
 
 ##### Local performance plateau confirmation
 
-- Through a more focused local search around `call_min_baseq ∈ {5, 10, 15}` and `min_baseq ∈ {5, 10, 15}`, it is observed that the recommended settings lie on a stable local optimum.
+- Through a more focused local search around `call_min_baseq ∈ {5, 10, 15}` and `min_baseq ∈ {5, 10, ` `15}`, it is observed that the recommended settings lie on a stable local optimum.
 - Caller base quality remains to be the more decision parameter. Without overly strict filtering, phasing base-quality is effectively irrelevant.
 
 These trends are reflected by Figures 10.5.2.21–10.5.2.24, indicating that the recommended threshold pair is lying on a stable local performance plateau.

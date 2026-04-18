@@ -112,7 +112,7 @@ The design relies on stable file contracts between stages. The main exchanged ar
   (`*.truth.vcf.gz`, `*.oracle.vcf.gz`, `*.called.vcf.gz`, `*.ws*.phased.vcf`)
 
 - **JSON** for metadata and machine-readable reports.
-  (`*.ref.meta.json`, `*.truth.meta.json`, `*.summary.json`, `*.eval.json`, `*.pipeline.json`)
+  (`*.ref.meta.json`, `*.truth.meta.json`, `*.summary.` `json`, `*.eval.json`, `*.pipeline.json`)
 
 Prefix-based naming ensures that all artifacts from a run can be discovered from a single run identifier, which simplifies orchestration, aggregation, and cleanup.
 

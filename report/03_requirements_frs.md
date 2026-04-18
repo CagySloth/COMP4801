@@ -51,17 +51,17 @@ This prefix-based scheme is a functional requirement because it allows single-ru
 #### FR-1 Reference generation
 The system shall generate a synthetic reference genome FASTA with configurable realism presets and optional duplicated segments.
 
-**Implementation mapping:** implemented by `dataset.longread.reference`, invoked through `benchmark.longread_pipeline_runner`, producing `*.ref.fasta` and `*.ref.meta.json`.
+**Implementation mapping:** implemented by `dataset.longread.reference`, invoked through `benchmark.long` `read_pipeline_runner`, producing `*.ref.fasta` and `*.ref.meta.json`.
 
 #### FR-2 Ground-truth variant and haplotype generation
 The system shall generate diploid ground-truth variants and two haplotype sequences, and export both a truth VCF and haplotype FASTAs.
 
-**Implementation mapping:** implemented by `dataset.longread.truth`, invoked through `benchmark.longread_pipeline_runner`, producing `*.truth.vcf`, `*.truth.vcf.gz`, `*.hap1.fasta`, `*.hap2.fasta`, `*.truth.meta.json`, and `*.oracle.vcf.gz`.
+**Implementation mapping:** implemented by `dataset.longread.truth`, invoked through `benchmark.longread_` `pipeline_runner`, producing `*.truth.vcf`, `*.truth.vcf.gz`, `*.hap1.fasta`, `*.hap2.fasta`, `*.truth.meta.json`, and `*.oracle.vcf.gz`.
 
 #### FR-3 ONT-like read simulation
 The system shall simulate long reads from the diploid haplotypes, producing FASTQ with quality strings and read-truth metadata.
 
-**Implementation mapping:** implemented by `dataset.longread.readsim`, invoked through `benchmark.longread_pipeline_runner`, producing `*.reads.fastq` and `*.reads.truth.tsv`, with support for configurable read-length, coverage, and burst-error models.
+**Implementation mapping:** implemented by `dataset.longread.readsim`, invoked through `benchmark.longrea` `d_pipeline_runner`, producing `*.reads.fastq` and `*.reads.truth.tsv`, with support for configurable read-length, coverage, and burst-error models.
 
 #### FR-4 Read alignment
 The system shall align simulated reads to the reference and output a sorted, indexed BAM suitable for downstream variant calling and WhatsHap phasing.
@@ -71,7 +71,7 @@ The system shall align simulated reads to the reference and output a sorted, ind
 #### FR-5 Variant calling
 The system shall call variants from the aligned BAM against the reference and produce a called VCF.
 
-**Implementation mapping:** performed by `benchmark.longread_pipeline_runner` using `bcftools mpileup | bcftools call`, producing `*.called.vcf.gz` and its index.
+**Implementation mapping:** performed by `benchmark.longread_pipeline_runner` using `bcftools mpileup | ` `bcftools call`, producing `*.called.vcf.gz` and its index.
 
 #### FR-6 WhatsHap phasing (vendored integration)
 The system shall phase variants using WhatsHap with BAM+VCF inputs and produce phased VCF output, using the vendored WhatsHap core for controlled benchmarking.
@@ -88,7 +88,7 @@ The system shall evaluate phased output against the truth VCF and output evaluat
 #### FR-8 End-to-end reporting and aggregation
 The system shall produce a single machine-readable report per run and provide aggregation utilities for experiment directories.
 
-**Implementation mapping:** `benchmark.longread_pipeline_runner` produces `*.pipeline.json`; `benchmark.aggregate_pipeline_reports` converts many run reports into `aggregate.csv` for downstream analysis and plotting.
+**Implementation mapping:** `benchmark.longread_pipeline_runner` produces `*.pipeline.json`; `benchmark.` `aggregate_pipeline_reports` converts many run reports into `aggregate.csv` for downstream analysis and plotting.
 
 The pipeline report shall record:
 
