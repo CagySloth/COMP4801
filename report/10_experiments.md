@@ -535,9 +535,10 @@ Across all tested scenarios, the optimzied and runtime configurations achieve hi
 - **O2** The optimzied configuration is the safest general recommendation: `optimzied` is never worse than `default` and is either best or tied for best on the main called metrics across all scenarios.
 - **O3** The runtime-biased configuration is highly competitive: `runtime` is effectively identical to `optimzied` on the main called metrics and remains competitive on runtime.
 - **O4** The gains transfer to both easy and hard cases: The tuned configurations improve performance not only in the hard scenario, but also in the baseline, dropout, and interaction scenarios.
+- **O5** The performance difference between the `default` configuration, and the optimized (`optimized` and `runtime`) configurations, is smaller as the phasing difficulty increases.
 
 #### Takeaway
-The recommended tuned settings are robust across the representative scenarios tested in this study. The optimzied configuration is the cleanest general recommendation because it consistently improves end-to-end phased recall and reduces fragmentation relative to the default.
+The recommended tuned settings are robust across the representative scenarios tested in this study. By loosening the filtering thresholds, inaccurate variant site information is passed into WhatsHap in harsher scenarios, thus reducing the phasing performance edge of the optimized configurations. The optimzied configuration is the cleanest general recommendation because it consistently improves end-to-end phased recall and reduces fragmentation relative to the default.
 
 #### 10.5.5 Runtime breakdown and DP-scaling interpretation
 
@@ -581,9 +582,10 @@ Called solve time increases with SNP density under both configurations, but grow
 - **O2** The optimized configuration scales much better than default: The growth in solve time is much steeper under the default configuration than under the optimized configuration.
 - **O3** Optimized remains better on phasing continuity as the problem grows: Across the scaling range, the optimized configuration generally maintains fewer phase sets and slightly better phased recall than the default configuration.
 - **O4** Solve time still does not dominate total runtime end-to-end: Although solve time grows with SNP density, total phasing runtime remains dominated by preprocessing / readset construction in the current research pipeline.
+- **O5** Computational workload is transferred to other processes: Despite the significant improvement in runtime scalability, there is a slight increase in runtime for read selection.
 
 #### Takeaway
-Optimization improves not only final phased output but also the difficulty of the residual phasing problem faced by the solver. In the current research pipeline, end-to-end runtime remains dominated by preprocessing, but the tuned configuration substantially improves solve-stage scaling as SNP density increases.
+Optimization improves not only final phased output but also the difficulty of the residual phasing problem faced by the solver. In the current research pipeline, end-to-end runtime remains dominated by preprocessing due to a readset construction adapter, but the tuned configuration substantially improves solve-stage scaling as SNP density increases. However, it is observed that, by loosening the filtering thresholds, some of the computational worklaod is transferred from the solver, to other processes, such as read selection and very possibly variant calling. In order to pin down the exact end-to-end runtime improvement from the optimized configurations, further analysis on runtime profiling in other processes, including alignment and variant calling, need to be done.
 
 ---
 
