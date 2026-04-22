@@ -1,0 +1,39 @@
+{
+  "prefix": "output/exp_demo/demo",
+  "seed": 0,
+  "steps": {
+    "ref_fasta": "output/exp_demo/demo.ref.fasta",
+    "truth_vcf_gz": "output/exp_demo/demo.truth.vcf.gz",
+    "reads_fastq": "output/exp_demo/demo.reads.fastq",
+    "bam": "output/exp_demo/demo.bam",
+    "called_vcf_gz": "output/exp_demo/demo.called.vcf.gz",
+    "phased_vcf": "output/exp_demo/demo.ws.phased.vcf",
+    "eval_json": "output/exp_demo/demo.ws.eval.json"
+  },
+  "callset": {
+    "truth_snps": 200,
+    "called_snps": 200,
+    "shared_snps": 200,
+    "precision": 1.0,
+    "recall": 1.0
+  },
+  "counts_raw": {
+    "truth_records": 200,
+    "called_records": 200,
+    "phased_records": 200
+  },
+  "params": {
+    "ref_length": 20000,
+    "num_snps": 200,
+    "het_rate": 0.8,
+    "avoid_regions": false,
+    "num_reads": 200,
+    "min_len": 2000,
+    "max_len": 6000,
+    "map_preset": "map-ont",
+    "max_coverage": 15,
+    "min_mapq": 20,
+    "min_baseq": 20
+  },
+  "time_total_sec": 1.0915407050015347
+}

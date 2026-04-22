@@ -1,0 +1,20 @@
+{
+  "ref": "output/experiments_draft/08_optimize_whatshap/qual_threshold_grid/mq0_bq10_s4.ref.fasta",
+  "contig": "chr1",
+  "length": 120000,
+  "seed": 4,
+  "num_snps": 1200,
+  "het_rate": 0.8,
+  "het_count": 949,
+  "hom_alt_count": 251,
+  "min_distance": 5,
+  "avoid_regions": false,
+  "ref_meta": null,
+  "coord_note": "records are 0-based internally but VCF pos is 1-based.",
+  "num_indels": 120,
+  "indel_min_len": 1,
+  "indel_max_len": 5,
+  "indel_het_rate": 0.5,
+  "indel_het_count": 60,
+  "indel_hom_alt_count": 60
+}

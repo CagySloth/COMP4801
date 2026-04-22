@@ -399,6 +399,7 @@ def main(args=None):
             "phased_vcf": out_vcf,
             "eval_json": out_eval,
             "summary_json": out_prefix + ".summary.json",
+            "summary": _load_json(out_prefix + ".summary.json"),
             "eval": _load_json(out_eval),
         }
 

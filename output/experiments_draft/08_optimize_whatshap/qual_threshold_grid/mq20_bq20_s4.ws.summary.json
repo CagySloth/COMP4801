@@ -1,0 +1,19 @@
+{
+  "algorithm": "diploid_whats_bam",
+  "solver": "whatshap",
+  "vcf_input": "/home/cagysloth/Dev/github/COMP4801/output/experiments_draft/08_optimize_whatshap/qual_threshold_grid/mq20_bq20_s4.called.snps.vcf.gz",
+  "bam_input": "/home/cagysloth/Dev/github/COMP4801/output/experiments_draft/08_optimize_whatshap/qual_threshold_grid/mq20_bq20_s4.bam",
+  "vcf_output": "/home/cagysloth/Dev/github/COMP4801/output/experiments_draft/08_optimize_whatshap/qual_threshold_grid/mq20_bq20_s4.ws.phased.vcf",
+  "max_coverage": 15,
+  "min_mapq": 20,
+  "min_baseq": 20,
+  "variants_total": 731,
+  "het_variants": 275,
+  "num_reads_total": 191,
+  "selected_reads": 186,
+  "num_phase_sets": 9,
+  "time_total_sec": 0.3577491380274296,
+  "whatshap_module": "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/__init__.py",
+  "whatshap_core_module": "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/core.cpython-311-x86_64-linux-gnu.so",
+  "whatshap_readselect_module": "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/readselect.cpython-311-x86_64-linux-gnu.so"
+}

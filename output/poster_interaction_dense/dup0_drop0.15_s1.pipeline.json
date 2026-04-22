@@ -1,0 +1,292 @@
+{
+  "prefix": "output/poster_interaction_dense/dup0_drop0.15_s1",
+  "seed": 1,
+  "vcf_source": "both",
+  "steps": {
+    "ref_fasta": "output/poster_interaction_dense/dup0_drop0.15_s1.ref.fasta",
+    "truth_vcf_gz": "output/poster_interaction_dense/dup0_drop0.15_s1.truth.vcf.gz",
+    "truth_eval_vcf_gz": "output/poster_interaction_dense/dup0_drop0.15_s1.truth.vcf.gz",
+    "oracle_vcf_gz": "output/poster_interaction_dense/dup0_drop0.15_s1.oracle.vcf.gz",
+    "reads_fastq": "output/poster_interaction_dense/dup0_drop0.15_s1.reads.fastq",
+    "bam": "output/poster_interaction_dense/dup0_drop0.15_s1.bam",
+    "called_vcf_gz": "output/poster_interaction_dense/dup0_drop0.15_s1.called.vcf.gz"
+  },
+  "callset": {
+    "truth_snps": 800,
+    "truth_het_snps": 642,
+    "called_snps": 345,
+    "shared_snps": 345,
+    "precision": 1.0,
+    "recall": 0.43125,
+    "notes": "Precision/recall only computed when --vcf-source includes called."
+  },
+  "phasing_runs": {
+    "called": {
+      "vcf_input": "output/poster_interaction_dense/dup0_drop0.15_s1.called.vcf.gz",
+      "vcf_input_for_phasing": "output/poster_interaction_dense/dup0_drop0.15_s1.called.vcf.gz",
+      "phased_vcf": "output/poster_interaction_dense/dup0_drop0.15_s1.ws.phased.vcf",
+      "eval_json": "output/poster_interaction_dense/dup0_drop0.15_s1.ws.eval.json",
+      "summary_json": "output/poster_interaction_dense/dup0_drop0.15_s1.ws.summary.json",
+      "summary": {
+        "algorithm": "diploid_whats_bam",
+        "solver": "whatshap",
+        "vcf_input": "/home/cagysloth/Dev/github/COMP4801/output/poster_interaction_dense/dup0_drop0.15_s1.called.vcf.gz",
+        "bam_input": "/home/cagysloth/Dev/github/COMP4801/output/poster_interaction_dense/dup0_drop0.15_s1.bam",
+        "vcf_output": "/home/cagysloth/Dev/github/COMP4801/output/poster_interaction_dense/dup0_drop0.15_s1.ws.phased.vcf",
+        "max_coverage": 15,
+        "min_mapq": 20,
+        "min_baseq": 20,
+        "variants_total": 345,
+        "het_variants": 115,
+        "num_reads_total": 118,
+        "selected_reads": 104,
+        "num_phase_sets": 6,
+        "time_vcf_parse_sec": 0.0007805089990142733,
+        "time_build_readset_sec": 0.13453373099764576,
+        "time_readselection_sec": 0.001059057998645585,
+        "time_solve_sec": 0.032502589994692244,
+        "time_ps_sec": 0.0003053399996133521,
+        "time_write_sec": 0.0014931939949747175,
+        "time_total_sec": 0.17090613499749452,
+        "whatshap_module": "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/__init__.py",
+        "whatshap_core_module": "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/core.cpython-311-x86_64-linux-gnu.so",
+        "whatshap_readselect_module": "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/readselect.cpython-311-x86_64-linux-gnu.so"
+      },
+      "eval": {
+        "shared_total_records": 345,
+        "shared_snp_records": 345,
+        "shared_het_records": 227,
+        "pred_phased_het_records": 88,
+        "pred_unphased_het_records": 139,
+        "num_phase_sets": 6,
+        "phase_accuracy_blockflip": 0.7840909090909091,
+        "switches": 17,
+        "switch_den": 82,
+        "switch_error_rate": 0.2073170731707317,
+        "phase_sets": {
+          "5096": {
+            "size": 38,
+            "best_flip": true,
+            "match_no_flip": 0,
+            "match_flip": 38,
+            "best_match": 38
+          },
+          "28729": {
+            "size": 2,
+            "best_flip": true,
+            "match_no_flip": 0,
+            "match_flip": 2,
+            "best_match": 2
+          },
+          "45137": {
+            "size": 15,
+            "best_flip": false,
+            "match_no_flip": 8,
+            "match_flip": 7,
+            "best_match": 8
+          },
+          "53725": {
+            "size": 20,
+            "best_flip": true,
+            "match_no_flip": 8,
+            "match_flip": 12,
+            "best_match": 12
+          },
+          "70369": {
+            "size": 12,
+            "best_flip": false,
+            "match_no_flip": 8,
+            "match_flip": 4,
+            "best_match": 8
+          },
+          "78489": {
+            "size": 1,
+            "best_flip": true,
+            "match_no_flip": 0,
+            "match_flip": 1,
+            "best_match": 1
+          }
+        },
+        "truth_snp_records": 800,
+        "pred_snp_records": 345,
+        "shared_exact_records": 345,
+        "notes": ""
+      },
+      "derived": {
+        "truth_het_snps": 642,
+        "shared_het_snps": 227,
+        "phased_het_snps": 88,
+        "correct_phased_het_snps_bestflip": 69,
+        "phasing_rate_on_shared_het": 0.3876651982378855,
+        "effective_phased_recall": 0.10747663551401869,
+        "shared_het_recall": 0.35358255451713394
+      }
+    },
+    "oracle": {
+      "vcf_input": "output/poster_interaction_dense/dup0_drop0.15_s1.oracle.vcf.gz",
+      "vcf_input_for_phasing": "output/poster_interaction_dense/dup0_drop0.15_s1.oracle.vcf.gz",
+      "phased_vcf": "output/poster_interaction_dense/dup0_drop0.15_s1.ws_oracle.phased.vcf",
+      "eval_json": "output/poster_interaction_dense/dup0_drop0.15_s1.ws_oracle.eval.json",
+      "summary_json": "output/poster_interaction_dense/dup0_drop0.15_s1.ws_oracle.summary.json",
+      "summary": {
+        "algorithm": "diploid_whats_bam",
+        "solver": "whatshap",
+        "vcf_input": "/home/cagysloth/Dev/github/COMP4801/output/poster_interaction_dense/dup0_drop0.15_s1.oracle.vcf.gz",
+        "bam_input": "/home/cagysloth/Dev/github/COMP4801/output/poster_interaction_dense/dup0_drop0.15_s1.bam",
+        "vcf_output": "/home/cagysloth/Dev/github/COMP4801/output/poster_interaction_dense/dup0_drop0.15_s1.ws_oracle.phased.vcf",
+        "max_coverage": 15,
+        "min_mapq": 20,
+        "min_baseq": 20,
+        "variants_total": 800,
+        "het_variants": 642,
+        "num_reads_total": 200,
+        "selected_reads": 168,
+        "num_phase_sets": 8,
+        "time_vcf_parse_sec": 0.0015587219968438148,
+        "time_build_readset_sec": 0.533968902003835,
+        "time_readselection_sec": 0.0020437420025700703,
+        "time_solve_sec": 0.10045037300005788,
+        "time_ps_sec": 0.000781920003646519,
+        "time_write_sec": 0.0019306190006318502,
+        "time_total_sec": 0.6412066349948873,
+        "whatshap_module": "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/__init__.py",
+        "whatshap_core_module": "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/core.cpython-311-x86_64-linux-gnu.so",
+        "whatshap_readselect_module": "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/readselect.cpython-311-x86_64-linux-gnu.so"
+      },
+      "eval": {
+        "shared_total_records": 800,
+        "shared_snp_records": 800,
+        "shared_het_records": 642,
+        "pred_phased_het_records": 386,
+        "pred_unphased_het_records": 256,
+        "num_phase_sets": 8,
+        "phase_accuracy_blockflip": 0.9974093264248705,
+        "switches": 2,
+        "switch_den": 378,
+        "switch_error_rate": 0.005291005291005291,
+        "phase_sets": {
+          "3703": {
+            "size": 4,
+            "best_flip": true,
+            "match_no_flip": 0,
+            "match_flip": 4,
+            "best_match": 4
+          },
+          "5096": {
+            "size": 93,
+            "best_flip": true,
+            "match_no_flip": 0,
+            "match_flip": 93,
+            "best_match": 93
+          },
+          "25721": {
+            "size": 43,
+            "best_flip": false,
+            "match_no_flip": 42,
+            "match_flip": 1,
+            "best_match": 42
+          },
+          "37100": {
+            "size": 15,
+            "best_flip": true,
+            "match_no_flip": 0,
+            "match_flip": 15,
+            "best_match": 15
+          },
+          "39336": {
+            "size": 15,
+            "best_flip": true,
+            "match_no_flip": 0,
+            "match_flip": 15,
+            "best_match": 15
+          },
+          "42315": {
+            "size": 127,
+            "best_flip": false,
+            "match_no_flip": 127,
+            "match_flip": 0,
+            "best_match": 127
+          },
+          "62047": {
+            "size": 9,
+            "best_flip": false,
+            "match_no_flip": 9,
+            "match_flip": 0,
+            "best_match": 9
+          },
+          "70086": {
+            "size": 80,
+            "best_flip": false,
+            "match_no_flip": 80,
+            "match_flip": 0,
+            "best_match": 80
+          }
+        },
+        "truth_snp_records": 800,
+        "pred_snp_records": 800,
+        "shared_exact_records": 800,
+        "notes": ""
+      },
+      "derived": {
+        "truth_het_snps": 642,
+        "shared_het_snps": 642,
+        "phased_het_snps": 386,
+        "correct_phased_het_snps_bestflip": 385,
+        "phasing_rate_on_shared_het": 0.6012461059190031,
+        "effective_phased_recall": 0.5996884735202492,
+        "shared_het_recall": 1.0
+      }
+    }
+  },
+  "counts_raw": {
+    "truth_records": 800,
+    "called_records": 346,
+    "oracle_records": 800,
+    "phasing": {
+      "called": {
+        "phased_records": 346
+      },
+      "oracle": {
+        "phased_records": 800
+      }
+    }
+  },
+  "params": {
+    "ref_preset": "plain",
+    "ref_length": 80000,
+    "num_snps": 800,
+    "het_rate": 0.8,
+    "avoid_regions": false,
+    "num_reads": 200,
+    "min_len": 2000,
+    "max_len": 6000,
+    "platform": "ont",
+    "ont_profile": "q20",
+    "map_preset": "map-ont",
+    "call_min_mapq": 20,
+    "call_min_baseq": 15,
+    "max_coverage": 15,
+    "min_mapq": 20,
+    "min_baseq": 20,
+    "dup_segments": 0,
+    "dup_len": 3000,
+    "dup_min_gap": 500,
+    "num_indels": 0,
+    "indel_min_len": 1,
+    "indel_max_len": 5,
+    "indel_het_rate": 0.5,
+    "len_model": "uniform",
+    "ln_mean": null,
+    "ln_sigma": null,
+    "start_model": "dropout",
+    "dropout_fraction": 0.15,
+    "dropout_block_len": 1000,
+    "burst_prob": 0.0,
+    "burst_count": 1,
+    "burst_len": 200,
+    "burst_mult": 5.0,
+    "phase_snps_only": false,
+    "eval_snps_only": false
+  },
+  "time_total_sec": 2.499001184005465
+}

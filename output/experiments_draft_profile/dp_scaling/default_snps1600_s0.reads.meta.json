@@ -1,0 +1,111 @@
+{
+  "seed": 0,
+  "platform": "ont",
+  "ont_profile": "q20",
+  "num_reads": 300,
+  "len_model": "uniform",
+  "min_len": 2000,
+  "max_len": 6000,
+  "ln_mean": null,
+  "ln_sigma": null,
+  "start_model": "dropout",
+  "dropout_fraction": 0.1,
+  "dropout_block_len": 1000,
+  "dropout_intervals_hap1": [
+    {
+      "start0": 1966,
+      "end0": 2966
+    },
+    {
+      "start0": 4873,
+      "end0": 5873
+    },
+    {
+      "start0": 8950,
+      "end0": 9950
+    },
+    {
+      "start0": 20848,
+      "end0": 21848
+    },
+    {
+      "start0": 32091,
+      "end0": 33091
+    },
+    {
+      "start0": 36617,
+      "end0": 37617
+    },
+    {
+      "start0": 60801,
+      "end0": 61801
+    },
+    {
+      "start0": 75768,
+      "end0": 76768
+    },
+    {
+      "start0": 77249,
+      "end0": 78249
+    },
+    {
+      "start0": 96740,
+      "end0": 97740
+    },
+    {
+      "start0": 101184,
+      "end0": 102184
+    }
+  ],
+  "dropout_intervals_hap2": [
+    {
+      "start0": 32994,
+      "end0": 33994
+    },
+    {
+      "start0": 59914,
+      "end0": 60914
+    },
+    {
+      "start0": 64672,
+      "end0": 65672
+    },
+    {
+      "start0": 66611,
+      "end0": 67611
+    },
+    {
+      "start0": 72169,
+      "end0": 73169
+    },
+    {
+      "start0": 75218,
+      "end0": 76218
+    },
+    {
+      "start0": 86785,
+      "end0": 87785
+    },
+    {
+      "start0": 97058,
+      "end0": 98058
+    },
+    {
+      "start0": 108586,
+      "end0": 109586
+    },
+    {
+      "start0": 111241,
+      "end0": 112241
+    },
+    {
+      "start0": 115485,
+      "end0": 116485
+    }
+  ],
+  "coord_note": "All intervals are 0-based half-open [start0,end0).",
+  "burst_prob": 0.6,
+  "burst_count": 2,
+  "burst_len": 300,
+  "burst_mult": 8.0
+}

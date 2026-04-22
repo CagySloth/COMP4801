@@ -21,7 +21,7 @@ Reality check:
 
 This driver calls:
   - python -m benchmark.longread_pipeline_runner
-  - python -m benchmark.aggregate_pipeline_reports_full
+  - python -m benchmark.aggregate_pipeline_reports
 and generates plots (matplotlib) under each experiment directory.
 
 Notes:
@@ -108,6 +108,64 @@ def _plots_basic(exp_dir: Path, df: pd.DataFrame, xcol: str, metrics: List[Tuple
         if metric not in df.columns:
             continue
         _plot_errorbar(df, xcol, metric, pdir / f"{metric}.png", ylabel=ylabel)
+
+
+def _plot_heatmap(df: pd.DataFrame, xcol: str, ycol: str, metric: str, out_png: Path, title: Optional[str] = None) -> None:
+    if metric not in df.columns or xcol not in df.columns or ycol not in df.columns:
+        return
+    xs = sorted(df[xcol].unique())
+    ys = sorted(df[ycol].unique())
+    piv = df.groupby([ycol, xcol])[metric].mean().unstack(xcol).reindex(index=ys, columns=xs)
+
+    plt.figure(figsize=(5.5, 4.2))
+    im = plt.imshow(piv.values, aspect="auto", origin="lower")
+    plt.xticks(range(len(xs)), xs)
+    plt.yticks(range(len(ys)), ys)
+    plt.xlabel(xcol)
+    plt.ylabel(ycol)
+    plt.title(title or metric)
+    plt.colorbar(im, label=metric)
+
+    for yi, y in enumerate(ys):
+        for xi, x in enumerate(xs):
+            val = piv.loc[y, x]
+            if pd.notna(val):
+                plt.text(xi, yi, f"{val:.3f}", ha="center", va="center", fontsize=8)
+
+    plt.savefig(out_png, dpi=200, bbox_inches="tight")
+    plt.close()
+
+
+def _plots_heatmap(exp_dir: Path, df: pd.DataFrame, xcol: str, ycol: str, metrics: List[Tuple[str, str]]) -> None:
+    pdir = exp_dir / "plots"
+    _ensure_dir(pdir)
+    for metric, title in metrics:
+        _plot_heatmap(df, xcol, ycol, metric, pdir / f"{metric}_heatmap.png", title=title)
+
+
+def _hard_optimize_args(base: Dict[str, Any]) -> Dict[str, Any]:
+    hard = dict(base)
+    hard.update({
+        "ref_length": 120000,
+        "num_snps": 1200,
+        "num_reads": 300,
+        "dup_segments": 5,
+        "dup_len": 3000,
+        "dup_min_gap": 500,
+        "start_model": "dropout",
+        "dropout_fraction": 0.1,
+        "dropout_block_len": 1000,
+        "burst_prob": 0.6,
+        "burst_count": 2,
+        "burst_len": 300,
+        "burst_mult": 8.0,
+        "num_indels": 120,
+        "indel_min_len": 1,
+        "indel_max_len": 5,
+        "indel_het_rate": 0.5,
+    })
+    _auto_indel_phase_flags(hard)
+    return hard
 
 
 def _bottleneck_decomposition(df: pd.DataFrame, tag: str, out_csv: Path) -> pd.DataFrame:
@@ -496,74 +554,409 @@ def run_interaction(outdir: Path, seeds: List[int], force: bool, base: Dict[str,
     ])
 
 
-def run_optimize(outdir: Path, seeds: List[int], force: bool, base: Dict[str, Any]) -> None:
+def run_optimize(outdir: Path, seeds: List[int], force: bool, base: Dict[str, Any], sweeps: Optional[List[str]] = None) -> None:
     """
     WhatsHap optimization sweeps on a fixed "hard" scenario.
-    We keep the scenario hard but still manageable.
+
+    Available sweeps:
+      - cov: existing max_coverage sweep
+      - qual: existing phasing min_mapq x min_baseq grid
+      - calling: caller-side call_min_mapq x call_min_baseq grid
+      - runtime: lower max_coverage sweep to hunt for runtime savings
+      - bqfine: fine-grained phasing min_baseq sweep
+      - local: local joint search around the current best caller/phasing base-quality settings
+      - frontier: representative accuracy/runtime frontier comparison
+      - transfer: robustness/transferability of selected configs across scenarios
+      - callmq: caller-side call_min_mapq rule-out sweep under the balanced setting
+      - confirm: default-vs-optimized confirmation comparison
     """
     exp = outdir / "08_optimize_whatshap"
     _ensure_dir(exp)
 
-    hard = dict(base)
-    hard.update({
-        "ref_length": 120000,
-        "num_snps": 1200,
-        "num_reads": 300,
-        "dup_segments": 5,
-        "dup_len": 3000,
-        "dup_min_gap": 500,
-        "start_model": "dropout",
-        "dropout_fraction": 0.1,
-        "dropout_block_len": 1000,
-        "burst_prob": 0.6,
-        "burst_count": 2,
-        "burst_len": 300,
-        "burst_mult": 8.0,
-        "num_indels": 120,
-        "indel_min_len": 1,
-        "indel_max_len": 5,
-        "indel_het_rate": 0.5,
-    })
-    _auto_indel_phase_flags(hard)
+    hard = _hard_optimize_args(base)
+    selected = set(sweeps or ["cov", "qual", "calling", "runtime", "bqfine"])
 
     # 8A) max_coverage sweep
-    cov_dir = exp / "cov_sweep"
-    _ensure_dir(cov_dir)
-    for mc in [10, 15, 25, 40]:
-        for s in seeds:
-            args = dict(hard)
-            args["seed"] = s
-            args["max_coverage"] = mc
-            prefix = cov_dir / f"mc{mc}_s{s}"
-            _call_pipeline(prefix, args, force=force)
-    csvp = _aggregate(cov_dir)
-    df = pd.read_csv(csvp)
-    _plots_basic(cov_dir, df, "max_coverage", [
-        ("called_effective_phased_recall", "Called effective phased recall"),
-        ("called_switch_error", "Called switch error rate"),
-        ("called_num_phase_sets", "Called num phase sets"),
-        ("call_recall", "Calling recall"),
-    ])
-
-    # 8B) min_mapq x min_baseq grid (small)
-    qb_dir = exp / "qual_threshold_grid"
-    _ensure_dir(qb_dir)
-    for mq in [0, 10, 20]:
-        for bq in [0, 10, 20]:
+    if "cov" in selected:
+        cov_dir = exp / "cov_sweep"
+        _ensure_dir(cov_dir)
+        for mc in [10, 15, 25, 40]:
             for s in seeds:
                 args = dict(hard)
                 args["seed"] = s
-                args["min_mapq"] = mq
-                args["min_baseq"] = bq
-                prefix = qb_dir / f"mq{mq}_bq{bq}_s{s}"
+                args["max_coverage"] = mc
+                prefix = cov_dir / f"mc{mc}_s{s}"
                 _call_pipeline(prefix, args, force=force)
-    csvp2 = _aggregate(qb_dir)
-    df2 = pd.read_csv(csvp2)
-    # heatmap-like scatter plots via x=mq, y=bq can be added later; keep simple for now
-    _plots_basic(qb_dir, df2, "min_mapq", [
-        ("called_effective_phased_recall", "Called effective phased recall (vs min_mapq)"),
-        ("called_switch_error", "Called switch error (vs min_mapq)"),
-    ])
+        csvp = _aggregate(cov_dir)
+        df = pd.read_csv(csvp)
+        _plots_basic(cov_dir, df, "max_coverage", [
+            ("called_effective_phased_recall", "Called effective phased recall"),
+            ("called_switch_error", "Called switch error rate"),
+            ("called_num_phase_sets", "Called num phase sets"),
+            ("call_recall", "Calling recall"),
+            ("time_total_sec", "Total runtime (s)"),
+        ])
+        _bottleneck_decomposition(df, "called", cov_dir / "decomposition_called.csv")
+
+    # 8B) phasing min_mapq x min_baseq grid
+    if "qual" in selected:
+        qb_dir = exp / "qual_threshold_grid"
+        _ensure_dir(qb_dir)
+        for mq in [0, 10, 20]:
+            for bq in [0, 10, 20]:
+                for s in seeds:
+                    args = dict(hard)
+                    args["seed"] = s
+                    args["min_mapq"] = mq
+                    args["min_baseq"] = bq
+                    prefix = qb_dir / f"mq{mq}_bq{bq}_s{s}"
+                    _call_pipeline(prefix, args, force=force)
+        csvp2 = _aggregate(qb_dir)
+        df2 = pd.read_csv(csvp2)
+        _plots_heatmap(qb_dir, df2, "min_mapq", "min_baseq", [
+            ("called_effective_phased_recall", "Called effective phased recall"),
+            ("called_switch_error", "Called switch error"),
+            ("called_num_phase_sets", "Called num phase sets"),
+            ("oracle_effective_phased_recall", "Oracle effective phased recall"),
+        ])
+        _bottleneck_decomposition(df2, "called", qb_dir / "decomposition_called.csv")
+
+    # 8C) NEW: caller-side call_min_mapq x call_min_baseq grid
+    if "calling" in selected:
+        call_dir = exp / "calling_threshold_grid"
+        _ensure_dir(call_dir)
+        for cmq in [0, 10, 20]:
+            for cbq in [5, 10, 15, 20]:
+                for s in seeds:
+                    args = dict(hard)
+                    args["seed"] = s
+                    args["call_min_mapq"] = cmq
+                    args["call_min_baseq"] = cbq
+                    # Use the best phasing-side settings found so far.
+                    args["max_coverage"] = 10
+                    args["min_mapq"] = 20
+                    args["min_baseq"] = 10
+                    prefix = call_dir / f"cmq{cmq}_cbq{cbq}_s{s}"
+                    _call_pipeline(prefix, args, force=force)
+        csvp3 = _aggregate(call_dir)
+        df3 = pd.read_csv(csvp3)
+        _plots_heatmap(call_dir, df3, "call_min_mapq", "call_min_baseq", [
+            ("call_recall", "Calling recall"),
+            ("call_precision", "Calling precision"),
+            ("called_shared_het_recall", "Called shared het recall"),
+            ("called_effective_phased_recall", "Called effective phased recall"),
+        ])
+        _bottleneck_decomposition(df3, "called", call_dir / "decomposition_called.csv")
+
+    # 8D) NEW: runtime-oriented lower max_coverage sweep
+    if "runtime" in selected:
+        rt_dir = exp / "maxcov_runtime_sweep"
+        _ensure_dir(rt_dir)
+        for mc in [4, 6, 8, 10, 15]:
+            for s in seeds:
+                args = dict(hard)
+                args["seed"] = s
+                args["call_min_mapq"] = 20
+                args["call_min_baseq"] = 15
+                args["min_mapq"] = 20
+                args["min_baseq"] = 10
+                args["max_coverage"] = mc
+                prefix = rt_dir / f"mc{mc}_s{s}"
+                _call_pipeline(prefix, args, force=force)
+        csvp4 = _aggregate(rt_dir)
+        df4 = pd.read_csv(csvp4)
+        _plots_basic(rt_dir, df4, "max_coverage", [
+            ("called_effective_phased_recall", "Called effective phased recall"),
+            ("called_num_phase_sets", "Called num phase sets"),
+            ("called_switch_error", "Called switch error rate"),
+            ("time_total_sec", "Total runtime (s)"),
+        ])
+        _bottleneck_decomposition(df4, "called", rt_dir / "decomposition_called.csv")
+
+    # 8E) NEW: fine-grained phasing min_baseq sweep
+    if "bqfine" in selected:
+        bq_dir = exp / "minbaseq_fine_sweep"
+        _ensure_dir(bq_dir)
+        for bq in [0, 5, 10, 15, 20]:
+            for s in seeds:
+                args = dict(hard)
+                args["seed"] = s
+                args["call_min_mapq"] = 20
+                args["call_min_baseq"] = 15
+                args["max_coverage"] = 10
+                args["min_mapq"] = 20
+                args["min_baseq"] = bq
+                prefix = bq_dir / f"bq{bq}_s{s}"
+                _call_pipeline(prefix, args, force=force)
+        csvp5 = _aggregate(bq_dir)
+        df5 = pd.read_csv(csvp5)
+        _plots_basic(bq_dir, df5, "min_baseq", [
+            ("oracle_effective_phased_recall", "Oracle effective phased recall"),
+            ("called_effective_phased_recall", "Called effective phased recall"),
+            ("called_num_phase_sets", "Called num phase sets"),
+            ("called_switch_error", "Called switch error rate"),
+        ])
+        _bottleneck_decomposition(df5, "called", bq_dir / "decomposition_called.csv")
+
+
+    # 8F) NEW: local joint caller/phasing base-quality search
+    if "local" in selected:
+        local_dir = exp / "local_joint_bq_search"
+        _ensure_dir(local_dir)
+        for cbq in [5, 10, 15]:
+            for pbq in [5, 10, 15]:
+                for s in seeds:
+                    args = dict(hard)
+                    args["seed"] = s
+                    args["call_min_mapq"] = 20
+                    args["call_min_baseq"] = cbq
+                    args["max_coverage"] = 8
+                    args["min_mapq"] = 20
+                    args["min_baseq"] = pbq
+                    prefix = local_dir / f"cbq{cbq}_pbq{pbq}_s{s}"
+                    _call_pipeline(prefix, args, force=force)
+        csvp_local = _aggregate(local_dir)
+        df_local = pd.read_csv(csvp_local)
+        _plots_heatmap(local_dir, df_local, "call_min_baseq", "min_baseq", [
+            ("call_recall", "Calling recall"),
+            ("called_shared_het_recall", "Called shared het recall"),
+            ("called_effective_phased_recall", "Called effective phased recall"),
+            ("time_total_sec", "Total runtime (s)"),
+        ])
+        _bottleneck_decomposition(df_local, "called", local_dir / "decomposition_called.csv")
+
+
+    # 8G) NEW: representative accuracy/runtime frontier comparison
+    if "frontier" in selected:
+        fr_dir = exp / "frontier_config_comparison"
+        _ensure_dir(fr_dir)
+        configs = [
+            ("default", {
+                "call_min_mapq": 20,
+                "call_min_baseq": 15,
+                "max_coverage": 15,
+                "min_mapq": 20,
+                "min_baseq": 20,
+            }),
+            ("caller_only", {
+                "call_min_mapq": 20,
+                "call_min_baseq": 10,
+                "max_coverage": 15,
+                "min_mapq": 20,
+                "min_baseq": 20,
+            }),
+            ("phasing_only", {
+                "call_min_mapq": 20,
+                "call_min_baseq": 15,
+                "max_coverage": 8,
+                "min_mapq": 20,
+                "min_baseq": 10,
+            }),
+            ("balanced", {
+                "call_min_mapq": 20,
+                "call_min_baseq": 10,
+                "max_coverage": 8,
+                "min_mapq": 20,
+                "min_baseq": 10,
+            }),
+            ("runtime", {
+                "call_min_mapq": 20,
+                "call_min_baseq": 10,
+                "max_coverage": 6,
+                "min_mapq": 20,
+                "min_baseq": 10,
+            }),
+        ]
+        for label, overrides in configs:
+            for s in seeds:
+                args = dict(hard)
+                args["seed"] = s
+                args.update(overrides)
+                prefix = fr_dir / f"{label}_s{s}"
+                _call_pipeline(prefix, args, force=force)
+        csvp_fr = _aggregate(fr_dir)
+        df_fr = pd.read_csv(csvp_fr)
+        if "pipeline_json" in df_fr.columns:
+            df_fr["config_label"] = df_fr["pipeline_json"].astype(str).str.extract(r"/(default|caller_only|phasing_only|balanced|runtime)_s\d+\.pipeline\.json$")[0]
+        elif "prefix" in df_fr.columns:
+            df_fr["config_label"] = df_fr["prefix"].astype(str).str.extract(r"/(default|caller_only|phasing_only|balanced|runtime)_s\d+$")[0]
+        else:
+            df_fr["config_label"] = None
+        if df_fr["config_label"].isna().all():
+            df_fr["config_label"] = [
+                "caller_only" if "caller_only" in str(x) else
+                "phasing_only" if "phasing_only" in str(x) else
+                "balanced" if "balanced" in str(x) else
+                "runtime" if "runtime" in str(x) else
+                "default"
+                for x in df_fr.get("pipeline_json", df_fr.index)
+            ]
+        df_fr.to_csv(csvp_fr, index=False)
+        _plots_basic(fr_dir, df_fr, "config_label", [
+            ("called_effective_phased_recall", "Called effective phased recall"),
+            ("called_shared_het_recall", "Called shared het recall"),
+            ("called_num_phase_sets", "Called num phase sets"),
+            ("time_total_sec", "Total runtime (s)"),
+        ])
+        _bottleneck_decomposition(df_fr, "called", fr_dir / "decomposition_called.csv")
+
+
+    # 8H) NEW: robustness / transferability comparison across representative scenarios
+    if "transfer" in selected:
+        tr_dir = exp / "transferability_across_scenarios"
+        _ensure_dir(tr_dir)
+        scenarios = [
+            ("baseline", dict(base)),
+            ("dropout", {**dict(base), "start_model": "dropout", "dropout_fraction": 0.1, "dropout_block_len": 1000, "dup_segments": 0, "burst_prob": 0.0, "num_indels": 0}),
+            ("interaction", {**dict(base), "dup_segments": 5, "dup_len": 3000, "dup_min_gap": 500, "start_model": "dropout", "dropout_fraction": 0.1, "dropout_block_len": 1000, "burst_prob": 0.0, "num_indels": 0}),
+            ("hard", _hard_optimize_args(base)),
+        ]
+        configs = [
+            ("default", {
+                "call_min_mapq": 20,
+                "call_min_baseq": 15,
+                "max_coverage": 15,
+                "min_mapq": 20,
+                "min_baseq": 20,
+            }),
+            ("balanced", {
+                "call_min_mapq": 20,
+                "call_min_baseq": 10,
+                "max_coverage": 8,
+                "min_mapq": 20,
+                "min_baseq": 10,
+            }),
+            ("runtime", {
+                "call_min_mapq": 20,
+                "call_min_baseq": 10,
+                "max_coverage": 6,
+                "min_mapq": 20,
+                "min_baseq": 10,
+            }),
+        ]
+        for scen_label, scen_args in scenarios:
+            scen_args = dict(scen_args)
+            if scen_label != "hard":
+                scen_args["phase_snps_only"] = False
+                scen_args["eval_snps_only"] = False
+            for cfg_label, overrides in configs:
+                for s in seeds:
+                    args = dict(scen_args)
+                    args["seed"] = s
+                    args.update(overrides)
+                    prefix = tr_dir / f"{scen_label}__{cfg_label}_s{s}"
+                    _call_pipeline(prefix, args, force=force)
+        csvp_tr = _aggregate(tr_dir)
+        df_tr = pd.read_csv(csvp_tr)
+        if "pipeline_json" in df_tr.columns:
+            ext = df_tr["pipeline_json"].astype(str).str.extract(r"/(baseline|dropout|interaction|hard)__([a-z_]+)_s\d+\.pipeline\.json$")
+            df_tr["scenario_label"] = ext[0]
+            df_tr["config_label"] = ext[1]
+        elif "prefix" in df_tr.columns:
+            ext = df_tr["prefix"].astype(str).str.extract(r"/(baseline|dropout|interaction|hard)__([a-z_]+)_s\d+$")
+            df_tr["scenario_label"] = ext[0]
+            df_tr["config_label"] = ext[1]
+        else:
+            df_tr["scenario_label"] = None
+            df_tr["config_label"] = None
+        if df_tr["scenario_label"].isna().all() or df_tr["config_label"].isna().all():
+            labels = df_tr.get("pipeline_json", df_tr.index).astype(str) if hasattr(df_tr.get("pipeline_json", None), 'astype') else pd.Series(df_tr.index.astype(str))
+            df_tr["scenario_label"] = [
+                "interaction" if "interaction__" in str(x) else
+                "dropout" if "dropout__" in str(x) else
+                "hard" if "hard__" in str(x) else
+                "baseline"
+                for x in labels
+            ]
+            df_tr["config_label"] = [
+                "runtime" if "__runtime_" in str(x) else
+                "balanced" if "__balanced_" in str(x) else
+                "default"
+                for x in labels
+            ]
+        df_tr.to_csv(csvp_tr, index=False)
+        _plots_heatmap(tr_dir, df_tr, "config_label", "scenario_label", [
+            ("called_effective_phased_recall", "Called effective phased recall"),
+            ("called_shared_het_recall", "Called shared het recall"),
+            ("called_num_phase_sets", "Called num phase sets"),
+            ("time_total_sec", "Total runtime (s)"),
+        ])
+        _bottleneck_decomposition(df_tr, "called", tr_dir / "decomposition_called.csv")
+
+    # 8I) NEW: caller-side mapping-quality rule-out sweep under the balanced setting
+    if "callmq" in selected:
+        cmq_dir = exp / "callmapq_ruleout_sweep"
+        _ensure_dir(cmq_dir)
+        for cmq in [0, 10, 20]:
+            for s in seeds:
+                args = dict(hard)
+                args["seed"] = s
+                args["call_min_mapq"] = cmq
+                args["call_min_baseq"] = 10
+                args["max_coverage"] = 8
+                args["min_mapq"] = 20
+                args["min_baseq"] = 10
+                prefix = cmq_dir / f"cmq{cmq}_s{s}"
+                _call_pipeline(prefix, args, force=force)
+        csvp_cmq = _aggregate(cmq_dir)
+        df_cmq = pd.read_csv(csvp_cmq)
+        _plots_basic(cmq_dir, df_cmq, "call_min_mapq", [
+            ("call_precision", "Call precision"),
+            ("call_recall", "Calling recall"),
+            ("called_shared_het_recall", "Called shared het recall"),
+            ("called_effective_phased_recall", "Called effective phased recall"),
+            ("time_total_sec", "Total runtime (s)"),
+        ])
+
+
+
+    # 8H) NEW: default-vs-optimized confirmation comparison
+    if "confirm" in selected:
+        cf_dir = exp / "confirm_default_vs_optimized"
+        _ensure_dir(cf_dir)
+        configs = [
+            ("default", {
+                "call_min_mapq": 20,
+                "call_min_baseq": 15,
+                "max_coverage": 15,
+                "min_mapq": 20,
+                "min_baseq": 20,
+            }),
+            ("optimized", {
+                "call_min_mapq": 20,
+                "call_min_baseq": 10,
+                "max_coverage": 8,
+                "min_mapq": 20,
+                "min_baseq": 10,
+            }),
+        ]
+        for label, overrides in configs:
+            for s in seeds:
+                args = dict(hard)
+                args["seed"] = s
+                args.update(overrides)
+                prefix = cf_dir / f"{label}_s{s}"
+                _call_pipeline(prefix, args, force=force)
+        csvp6 = _aggregate(cf_dir)
+        df6 = pd.read_csv(csvp6)
+        # Derive a stable categorical column from the output path/prefix naming.
+        if "pipeline_json" in df6.columns:
+            df6["config_label"] = df6["pipeline_json"].astype(str).str.extract(r"/(default|optimized)_s\d+\.pipeline\.json$")[0]
+        elif "prefix" in df6.columns:
+            df6["config_label"] = df6["prefix"].astype(str).str.extract(r"/(default|optimized)_s\d+$")[0]
+        else:
+            df6["config_label"] = None
+        if df6["config_label"].isna().all():
+            # Fallback in case paths are formatted differently.
+            df6["config_label"] = ["optimized" if "optimized" in str(x) else "default" for x in df6.get("pipeline_json", df6.index)]
+        df6.to_csv(csvp6, index=False)
+        _plots_basic(cf_dir, df6, "config_label", [
+            ("called_effective_phased_recall", "Called effective phased recall"),
+            ("called_shared_het_recall", "Called shared het recall"),
+            ("call_recall", "Calling recall"),
+            ("time_total_sec", "Total runtime (s)"),
+        ])
+        _bottleneck_decomposition(df6, "called", cf_dir / "decomposition_called.csv")
 
 
 def run_reality_check(outdir: Path, real_fastq: Optional[str], real_bam: Optional[str]) -> None:
@@ -639,6 +1032,11 @@ def main():
         help="Comma-separated sections to run. Options: depth,dropout,dup,bursts,indels,lenmodel,interaction,optimize,reality. "
              "If empty, runs all (excluding smoke)."
     )
+    ap.add_argument(
+        "--optimize-sweeps",
+        default="cov,qual,calling,runtime,bqfine",
+        help="Comma-separated optimize sub-sweeps: cov,qual,calling,runtime,bqfine,local,frontier,transfer,callmq,confirm. Used when optimize is selected."
+    )
     ap.add_argument("--real-fastq", default=None, help="Optional real FASTQ(.gz) for reality check")
     ap.add_argument("--real-bam", default=None, help="Optional real BAM for reality check")
 
@@ -668,8 +1066,10 @@ def main():
         run_lenmodel(outdir, seeds, args.force, base)
     if run_all or "interaction" in only:
         run_interaction(outdir, seeds, args.force, base)
+    optimize_sweeps = [x.strip() for x in args.optimize_sweeps.split(",") if x.strip()]
+
     if run_all or "optimize" in only:
-        run_optimize(outdir, seeds, args.force, base)
+        run_optimize(outdir, seeds, args.force, base, sweeps=optimize_sweeps)
     if run_all or "reality" in only:
         run_reality_check(outdir, args.real_fastq, args.real_bam)
 

@@ -1,55 +1,58 @@
-## CLIs — Running the repo reproducibly
+# CLI guide
 
-Recommended style: run everything as Python modules.
+The repository is designed to be run through Python module entrypoints.
 
-Matrix track:
+## Matrix-track entrypoints
+
 - `python -m dataset.simulate`
 - `python -m algorithms.cli.phase`
 - `python -m benchmark.benchmark_runner`
 - `python -m benchmark.benchmark_accuracy`
 
-Long-read track:
+## Long-read entrypoints
+
 - `python -m dataset.longread.reference`
 - `python -m dataset.longread.truth`
 - `python -m dataset.longread.readsim`
 - `python -m benchmark.longread_pipeline_runner`
 - `python -m benchmark.vcf_phase_eval`
+- `python -m benchmark.aggregate_pipeline_reports`
+- `python -m benchmark.experiment_driver`
 
----
+## Inspect available phasing backends
 
-## `python -m algorithms.cli.phase`
+```bash
+python -m algorithms.cli.phase --help
+```
 
-Run one phasing algorithm.
+Current subcommands include:
 
-Diploid subcommands:
+### Diploid
 - `diploid-em`
 - `diploid-mst`
 - `diploid-whats`
 - `diploid-whats-bam`
 
-Example (long-read phasing on BAM+VCF):
+### Polyploid
+- `polyploid-em`
+- `polyploid-spectral`
+
+## Recommended style
+
+Prefer commands such as:
+
 ```bash
-python -m algorithms.cli.phase diploid-whats-bam \
-  --bam output/demo.bam \
-  --vcf output/demo.called.vcf.gz \
-  --output-prefix output/demo.ws \
-  --output-vcf output/demo.ws.phased.vcf
+python -m benchmark.longread_pipeline_runner --prefix output/demo ...
 ```
 
----
+rather than ad-hoc scripts. This keeps runs reproducible and easier to document.
 
-## `python -m benchmark.longread_pipeline_runner`
+## Help and self-documentation
 
-End-to-end automation (Steps 1–7).
+All major entrypoints expose `--help`, for example:
 
-Key options:
-- `--vcf-source {called,oracle,both}`
-- `--ref-preset {plain,toy,realistic}`
-- `--dup-segments/--dup-len/--dup-min-gap`
-- `--len-model {uniform,lognormal}`
-- `--start-model {uniform,dropout}`
-- `--burst-*`
-- `--num-indels ...`
-- `--phase-snps-only` (recommended when indels are enabled)
-
-Run `--help` to see the full list.
+```bash
+python -m benchmark.longread_pipeline_runner --help
+python -m dataset.longread.readsim --help
+python -m algorithms.cli.phase diploid-whats-bam --help
+```

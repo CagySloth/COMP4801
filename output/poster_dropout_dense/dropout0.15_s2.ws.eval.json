@@ -1,0 +1,60 @@
+{
+  "shared_total_records": 422,
+  "shared_snp_records": 422,
+  "shared_het_records": 307,
+  "pred_phased_het_records": 125,
+  "pred_unphased_het_records": 182,
+  "num_phase_sets": 6,
+  "phase_accuracy_blockflip": 1.0,
+  "switches": 0,
+  "switch_den": 119,
+  "switch_error_rate": 0.0,
+  "phase_sets": {
+    "1666": {
+      "size": 4,
+      "best_flip": false,
+      "match_no_flip": 4,
+      "match_flip": 0,
+      "best_match": 4
+    },
+    "29936": {
+      "size": 7,
+      "best_flip": true,
+      "match_no_flip": 0,
+      "match_flip": 7,
+      "best_match": 7
+    },
+    "37597": {
+      "size": 48,
+      "best_flip": false,
+      "match_no_flip": 48,
+      "match_flip": 0,
+      "best_match": 48
+    },
+    "49915": {
+      "size": 22,
+      "best_flip": true,
+      "match_no_flip": 0,
+      "match_flip": 22,
+      "best_match": 22
+    },
+    "61038": {
+      "size": 8,
+      "best_flip": true,
+      "match_no_flip": 0,
+      "match_flip": 8,
+      "best_match": 8
+    },
+    "72075": {
+      "size": 36,
+      "best_flip": true,
+      "match_no_flip": 0,
+      "match_flip": 36,
+      "best_match": 36
+    }
+  },
+  "truth_snp_records": 800,
+  "pred_snp_records": 422,
+  "shared_exact_records": 422,
+  "notes": ""
+}

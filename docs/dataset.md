@@ -1,90 +1,112 @@
-## 📂 `dataset` — Synthetic Data Generators
+# Dataset generation
 
-This repo provides two dataset generators:
+This repository provides two dataset-generation tracks:
 
-1) **Matrix generator** (`dataset.simulate`)  
-   Outputs the variant-level representation used by most algorithms in this repo: truth haplotypes TSV + reads in NPZ/TSV.
-
-2) **Long-read generator** (`dataset.longread.*`)  
-   Outputs a WhatsHap-like workflow: reference FASTA → truth VCF + haplotypes FASTA → reads FASTQ.
+1. **Legacy matrix-track generation**
+2. **Long-read generation for the end-to-end pipeline**
 
 ---
 
-# 1) Matrix generator: `python -m dataset.simulate`
+## 1. Matrix-track generator
 
-Generate a synthetic dataset (diploid or polyploid) and write it to disk.
+Run:
 
-Common parameters:
-- `-p, --ploidy`: number of haplotypes (2=diploid)
-- `-n, --num-variants`: number of variant sites
-- `-r, --num-reads`: number of reads/fragments
-- `-l, --read-length`: mean length (in variants, not bp)
-- `-e, --error-rate`: allele flips
-- `-m, --missing-rate`: missing alleles
-- `--seed`: reproducibility
-- `-o, --output-prefix`: output prefix
+```bash
+python -m dataset.simulate \
+  -p 2 -n 200 -r 200 -l 60 \
+  -e 0.01 -m 0.0 \
+  --seed 0 \
+  -o output/demo
+```
 
-Outputs:
-- `<prefix>.haplotypes.tsv` (truth)
-- `<prefix>.reads.npz` (dense reads×variants allele matrix)
-- `<prefix>.reads.sparse.tsv` (sparse fragments)
+### Main parameters
+- `-p, --ploidy` — number of haplotypes
+- `-n, --num-variants` — number of variant sites
+- `-r, --num-reads` — number of reads / fragments
+- `-l, --read-length` — mean fragment length (in variant units)
+- `-e, --error-rate` — allele-flip noise
+- `-m, --missing-rate` — missing observations
+- `--seed` — reproducibility
+- `-o, --output-prefix` — output prefix
 
-Diploid-only extra:
-- `<prefix>.vcf` (unphased GT; used for VCF-mode phasing tests)
+### Outputs
+- `<prefix>.haplotypes.tsv`
+- `<prefix>.reads.npz`
+- `<prefix>.reads.sparse.tsv`
+- `<prefix>.vcf` (diploid compatibility aid)
 
 ---
 
-# 2) Long-read generator (Steps 1–3)
+## 2. Long-read generation
 
-## Step 1: `dataset.longread.reference`
+The long-read track is split into three explicit generation stages.
+
+### Step 1: synthetic reference
 
 ```bash
 python -m dataset.longread.reference \
   -o output/demo \
   --length 80000 \
   --seed 0 \
-  --preset plain \
-  --dup-segments 0
+  --preset plain
 ```
 
-Key options:
+#### Main parameters
+- `--length`
+- `--contig`
+- `--seed`
 - `--preset {plain,toy,realistic}`
-- `--dup-segments/--dup-len/--dup-min-gap` (repeat-like duplications)
+- `--dup-segments`, `--dup-len`, `--dup-min-gap`
 
-Outputs:
+#### Additional fine-grained realism controls
+The reference generator also supports optional:
+- homopolymer insertion
+- STR insertion
+- GC-window bias construction
+
+These are available as direct CLI parameters and recorded in the output metadata.
+
+#### Outputs
 - `<prefix>.ref.fasta`
-- `<prefix>.ref.meta.json` (regions + duplications)
+- `<prefix>.ref.meta.json`
 
-## Step 2: `dataset.longread.truth`
+---
 
-```bash
-python -m dataset.longread.truth \
-  --ref output/demo.ref.fasta \
-  -o output/demo \
-  --seed 0 \
-  --num-snps 800 --het-rate 0.8 \
-  --phased-truth --random-phase
-```
+### Step 2: truth generation
 
-Indels:
 ```bash
 python -m dataset.longread.truth \
   --ref output/demo.ref.fasta \
   -o output/demo \
   --seed 0 \
   --num-snps 800 \
-  --num-indels 80 --indel-min-len 1 --indel-max-len 5 --indel-het-rate 0.5 \
-  --phased-truth --random-phase
+  --het-rate 0.8 \
+  --phased-truth \
+  --random-phase
 ```
 
-Region-avoidance:
-- `--avoid-regions --ref-meta <prefix>.ref.meta.json`
+#### Main parameters
+- `--num-snps`
+- `--het-rate`
+- `--min-distance`
+- `--ref-meta`
+- `--avoid-regions`
+- `--num-indels`
+- `--indel-min-len`
+- `--indel-max-len`
+- `--indel-het-rate`
+- `--sample`
 
-Outputs:
-- `<prefix>.truth.vcf` (+ `.truth.meta.json`)
-- `<prefix>.hap1.fasta`, `<prefix>.hap2.fasta`
+#### Outputs
+- `<prefix>.truth.vcf` (and compressed/indexed versions in the pipeline)
+- `<prefix>.oracle.vcf` (created by the pipeline runner from truth)
+- `<prefix>.hap1.fasta`
+- `<prefix>.hap2.fasta`
+- `<prefix>.truth.meta.json`
 
-## Step 3: `dataset.longread.readsim`
+---
+
+### Step 3: ONT-like read simulation
 
 ```bash
 python -m dataset.longread.readsim \
@@ -93,18 +115,42 @@ python -m dataset.longread.readsim \
   -o output/demo \
   --seed 0 \
   --num-reads 200 \
-  --min-len 2000 --max-len 6000 \
-  --platform ont --ont-profile q20
+  --min-len 2000 \
+  --max-len 6000 \
+  --platform ont \
+  --ont-profile q20
 ```
 
-Realism knobs:
-- length: `--len-model lognormal --ln-mean 8.3 --ln-sigma 0.6`
-- dropout: `--start-model dropout --dropout-fraction 0.1 --dropout-block-len 1000`
-- bursts: `--burst-prob 0.6 --burst-count 2 --burst-len 300 --burst-mult 8`
+#### Main parameters
+- `--num-reads`
+- `--min-len`, `--max-len`
+- `--platform {perfect,ont}`
+- `--ont-profile {classic,q20}`
+- `--len-model {uniform,lognormal}`
+- `--ln-mean`, `--ln-sigma`
+- `--start-model {uniform,dropout}`
+- `--dropout-fraction`, `--dropout-block-len`
+- `--burst-prob`, `--burst-count`, `--burst-len`, `--burst-mult`
 
-Outputs:
+#### Additional direct controls
+If you run the simulator directly, you can also set:
+- explicit substitution / insertion / deletion rates
+- quality-model parameters
+- homopolymer error amplification
+- `--hap1-frac`
+
+#### Outputs
 - `<prefix>.reads.fastq`
 - `<prefix>.reads.truth.tsv`
 - `<prefix>.reads.meta.json`
 
-See `docs/realism_knobs.md` for expected effects.
+---
+
+## Why the generation is split into stages
+
+The long-read generation path is intentionally stage-local:
+- reference-level realism belongs in `reference.py`
+- truth-level realism belongs in `truth.py`
+- read-level realism belongs in `readsim.py`
+
+This makes the pipeline easier to debug, easier to document, and easier to sweep in controlled experiments.

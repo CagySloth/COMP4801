@@ -1,0 +1,19 @@
+{
+  "algorithm": "diploid_whats_bam",
+  "solver": "whatshap",
+  "vcf_input": "/home/cagysloth/Dev/github/COMP4801/output/dup_sweep/ds5_s0.oracle.vcf.gz",
+  "bam_input": "/home/cagysloth/Dev/github/COMP4801/output/dup_sweep/ds5_s0.bam",
+  "vcf_output": "/home/cagysloth/Dev/github/COMP4801/output/dup_sweep/ds5_s0.ws_oracle.phased.vcf",
+  "max_coverage": 15,
+  "min_mapq": 20,
+  "min_baseq": 20,
+  "variants_total": 800,
+  "het_variants": 638,
+  "num_reads_total": 195,
+  "selected_reads": 190,
+  "num_phase_sets": 2,
+  "time_total_sec": 0.58385852300853,
+  "whatshap_module": "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/__init__.py",
+  "whatshap_core_module": "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/core.cpython-311-x86_64-linux-gnu.so",
+  "whatshap_readselect_module": "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/readselect.cpython-311-x86_64-linux-gnu.so"
+}

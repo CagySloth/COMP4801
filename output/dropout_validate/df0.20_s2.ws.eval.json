@@ -1,0 +1,71 @@
+{
+  "shared_total_records": 328,
+  "shared_snp_records": 328,
+  "shared_het_records": 248,
+  "pred_phased_het_records": 218,
+  "pred_unphased_het_records": 30,
+  "num_phase_sets": 8,
+  "phase_accuracy_blockflip": 0.8990825688073395,
+  "switches": 25,
+  "switch_den": 210,
+  "switch_error_rate": 0.11904761904761904,
+  "phase_sets": {
+    "2308": {
+      "size": 7,
+      "best_flip": false,
+      "match_no_flip": 7,
+      "match_flip": 0,
+      "best_match": 7
+    },
+    "11092": {
+      "size": 10,
+      "best_flip": true,
+      "match_no_flip": 0,
+      "match_flip": 10,
+      "best_match": 10
+    },
+    "16823": {
+      "size": 7,
+      "best_flip": false,
+      "match_no_flip": 7,
+      "match_flip": 0,
+      "best_match": 7
+    },
+    "27908": {
+      "size": 22,
+      "best_flip": false,
+      "match_no_flip": 22,
+      "match_flip": 0,
+      "best_match": 22
+    },
+    "37745": {
+      "size": 46,
+      "best_flip": true,
+      "match_no_flip": 0,
+      "match_flip": 46,
+      "best_match": 46
+    },
+    "49108": {
+      "size": 68,
+      "best_flip": true,
+      "match_no_flip": 0,
+      "match_flip": 68,
+      "best_match": 68
+    },
+    "59602": {
+      "size": 29,
+      "best_flip": false,
+      "match_no_flip": 16,
+      "match_flip": 13,
+      "best_match": 16
+    },
+    "71248": {
+      "size": 29,
+      "best_flip": false,
+      "match_no_flip": 20,
+      "match_flip": 9,
+      "best_match": 20
+    }
+  },
+  "notes": "Evaluation assumes biallelic SNPs. Indels/multiallelic not handled yet."
+}

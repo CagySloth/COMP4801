@@ -1,0 +1,19 @@
+{
+  "algorithm": "diploid_whats_bam",
+  "solver": "whatshap",
+  "vcf_input": "/Users/cagysloth/Library/CloudStorage/OneDrive-TheUniversityofHongKong-Connect/HKU Studies/Year 5/COMP4801 - CodeSpace/output/experiments_draft/02_ablation_dropout/df0.1_s3.oracle.vcf.gz",
+  "bam_input": "/Users/cagysloth/Library/CloudStorage/OneDrive-TheUniversityofHongKong-Connect/HKU Studies/Year 5/COMP4801 - CodeSpace/output/experiments_draft/02_ablation_dropout/df0.1_s3.bam",
+  "vcf_output": "/Users/cagysloth/Library/CloudStorage/OneDrive-TheUniversityofHongKong-Connect/HKU Studies/Year 5/COMP4801 - CodeSpace/output/experiments_draft/02_ablation_dropout/df0.1_s3.ws_oracle.phased.vcf",
+  "max_coverage": 15,
+  "min_mapq": 20,
+  "min_baseq": 20,
+  "variants_total": 800,
+  "het_variants": 660,
+  "num_reads_total": 198,
+  "selected_reads": 193,
+  "num_phase_sets": 4,
+  "time_total_sec": 0.5837785839103162,
+  "whatshap_module": "/Users/cagysloth/Library/CloudStorage/OneDrive-TheUniversityofHongKong-Connect/HKU Studies/Year 5/COMP4801 - CodeSpace/vendor/whatshap_core/whatshap/__init__.py",
+  "whatshap_core_module": "/Users/cagysloth/Library/CloudStorage/OneDrive-TheUniversityofHongKong-Connect/HKU Studies/Year 5/COMP4801 - CodeSpace/vendor/whatshap_core/whatshap/core.cpython-312-darwin.so",
+  "whatshap_readselect_module": "/Users/cagysloth/Library/CloudStorage/OneDrive-TheUniversityofHongKong-Connect/HKU Studies/Year 5/COMP4801 - CodeSpace/vendor/whatshap_core/whatshap/readselect.cpython-312-darwin.so"
+}

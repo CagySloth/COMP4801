@@ -297,11 +297,14 @@ def main(args=None):
 
     out_vcf = args.output_vcf or f"{args.output_prefix}.phased.vcf"
 
+    time_vcf_parse_t0 = time.perf_counter()
     # 1) Parse VCF, keep het SNPs
     records = _read_vcf_minimal(args.vcf, sample=args.sample)
     het_variants = [(c, p0, r, a) for (c, p0, r, a, gt, A, B, is_het) in records if is_het and A is not None and B is not None]
     gt_by_pos = {p0: (A, B) for (c, p0, r, a, gt, A, B, is_het) in records if (A is not None and B is not None)}
+    time_vcf_parse_sec = float(time.perf_counter() - time_vcf_parse_t0)
 
+    time_build_readset_t0 = time.perf_counter()
     # 2) Build ReadSet from BAM+VCF het sites
     readset = _build_readset_from_bam_vcf(
         args.bam,
@@ -309,19 +312,25 @@ def main(args=None):
         min_mapq=int(args.min_mapq),
         min_baseq=int(args.min_baseq),
     )
+    time_build_readset_sec = float(time.perf_counter() - time_build_readset_t0)
 
     # If not enough data, still emit outputs but unphased
     selected_indices = []
     selected_readset = None
     phase_source = None
+    time_readselection_sec = 0.0
+    time_solve_sec = 0.0
 
     if len(readset) > 0 and len(het_variants) >= 2:
         # 3) read selection
+        time_readselection_t0 = time.perf_counter()
         sel = readselect.readselection(readset, int(args.max_coverage), None)
         selected_readset = readset.subset(sel)
         selected_indices = list(sel)
+        time_readselection_sec = float(time.perf_counter() - time_readselection_t0)
 
         # 4) Solve
+        time_solve_t0 = time.perf_counter()
         if args.solver == "whatshap":
             positions = sorted(selected_readset.get_positions())
             genotypes = [core.Genotype([int(gt_by_pos[p][0]), int(gt_by_pos[p][1])]) for p in positions]
@@ -345,6 +354,7 @@ def main(args=None):
             hc = core.HapChatCore(selected_readset)
             blocks, _ = hc.get_super_reads()
             phase_source = ("blocks", blocks)
+        time_solve_sec = float(time.perf_counter() - time_solve_t0)
 
     # 5) Extract hap alleles for phased het sites
     hap1_by_pos = {}
@@ -369,11 +379,13 @@ def main(args=None):
                     hap2_by_pos[int(v.position)] = int(v.allele)
 
     # 6) Compute PS from connectivity on selected reads
+    time_ps_t0 = time.perf_counter()
     ps_by_pos = {}
     if selected_readset is not None:
         pos_list = sorted(selected_readset.get_positions())
         leftmost = _component_leftmost(pos_list, selected_readset)
         ps_by_pos = {p: int(leftmost[p]) + 1 for p in pos_list}  # PS is 1-based coordinate
+    time_ps_sec = float(time.perf_counter() - time_ps_t0)
 
     # 7) Build phased GT + PS per VCF record order + write outputs
     phased_gt = []
@@ -412,6 +424,7 @@ def main(args=None):
             H1[i] = 0
             H2[i] = 1
 
+    time_write_t0 = time.perf_counter()
     _write_phased_vcf(args.vcf, out_vcf, phased_gt, ps_out, sample=args.sample)
 
     H = np.stack([H1, H2], axis=0)
@@ -419,6 +432,7 @@ def main(args=None):
 
     assignments = np.zeros(len(selected_indices), dtype=np.int32)
     write_assignments_tsv(f"{args.output_prefix}.assignments.tsv", assignments)
+    time_write_sec = float(time.perf_counter() - time_write_t0)
 
     summary = {
         "algorithm": "diploid_whats_bam",
@@ -437,6 +451,12 @@ def main(args=None):
         "selected_reads": int(len(selected_indices)),
         "num_phase_sets": int(len(set(ps_by_pos.values()))) if ps_by_pos else 0,
 
+        "time_vcf_parse_sec": time_vcf_parse_sec,
+        "time_build_readset_sec": time_build_readset_sec,
+        "time_readselection_sec": time_readselection_sec,
+        "time_solve_sec": time_solve_sec,
+        "time_ps_sec": time_ps_sec,
+        "time_write_sec": time_write_sec,
         "time_total_sec": float(time.perf_counter() - t0),
 
         "whatshap_module": os.path.realpath(wh.__file__),

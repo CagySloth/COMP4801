@@ -1,0 +1,14 @@
+{
+  "ref": "output/exp_baseline_q20/ont_q20_r50_mc10_s0/ont_q20_r50_mc10_s0.ref.fasta",
+  "contig": "chr1",
+  "length": 20000,
+  "seed": 0,
+  "num_snps": 200,
+  "het_rate": 0.8,
+  "het_count": 162,
+  "hom_alt_count": 38,
+  "min_distance": 5,
+  "avoid_regions": false,
+  "ref_meta": null,
+  "coord_note": "records are 0-based internally but VCF pos is 1-based."
+}

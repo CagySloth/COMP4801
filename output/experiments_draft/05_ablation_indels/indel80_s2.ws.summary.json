@@ -1,0 +1,19 @@
+{
+  "algorithm": "diploid_whats_bam",
+  "solver": "whatshap",
+  "vcf_input": "/home/cagysloth/Dev/github/COMP4801/output/experiments_draft/05_ablation_indels/indel80_s2.called.snps.vcf.gz",
+  "bam_input": "/home/cagysloth/Dev/github/COMP4801/output/experiments_draft/05_ablation_indels/indel80_s2.bam",
+  "vcf_output": "/home/cagysloth/Dev/github/COMP4801/output/experiments_draft/05_ablation_indels/indel80_s2.ws.phased.vcf",
+  "max_coverage": 15,
+  "min_mapq": 20,
+  "min_baseq": 20,
+  "variants_total": 539,
+  "het_variants": 343,
+  "num_reads_total": 190,
+  "selected_reads": 190,
+  "num_phase_sets": 3,
+  "time_total_sec": 0.31770422705449164,
+  "whatshap_module": "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/__init__.py",
+  "whatshap_core_module": "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/core.cpython-311-x86_64-linux-gnu.so",
+  "whatshap_readselect_module": "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/readselect.cpython-311-x86_64-linux-gnu.so"
+}

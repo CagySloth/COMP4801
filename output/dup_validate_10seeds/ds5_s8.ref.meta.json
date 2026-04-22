@@ -1,0 +1,55 @@
+{
+  "contig": "chr1",
+  "length": 80000,
+  "seed": 8,
+  "preset": "plain",
+  "regions": [],
+  "duplications": [
+    {
+      "type": "duplication",
+      "src_start0": 68154,
+      "src_end0": 71154,
+      "dst_start0": 51409,
+      "dst_end0": 54409,
+      "length": 3000,
+      "min_gap": 500
+    },
+    {
+      "type": "duplication",
+      "src_start0": 41211,
+      "src_end0": 44211,
+      "dst_start0": 58539,
+      "dst_end0": 61539,
+      "length": 3000,
+      "min_gap": 500
+    },
+    {
+      "type": "duplication",
+      "src_start0": 28431,
+      "src_end0": 31431,
+      "dst_start0": 901,
+      "dst_end0": 3901,
+      "length": 3000,
+      "min_gap": 500
+    },
+    {
+      "type": "duplication",
+      "src_start0": 14201,
+      "src_end0": 17201,
+      "dst_start0": 5373,
+      "dst_end0": 8373,
+      "length": 3000,
+      "min_gap": 500
+    },
+    {
+      "type": "duplication",
+      "src_start0": 76466,
+      "src_end0": 79466,
+      "dst_start0": 20960,
+      "dst_end0": 23960,
+      "length": 3000,
+      "min_gap": 500
+    }
+  ],
+  "coord_note": "All region coordinates are 0-based half-open [start0, end0)."
+}

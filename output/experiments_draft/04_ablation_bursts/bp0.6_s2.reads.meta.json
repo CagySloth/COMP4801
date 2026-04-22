@@ -1,0 +1,21 @@
+{
+  "seed": 2,
+  "platform": "ont",
+  "ont_profile": "q20",
+  "num_reads": 200,
+  "len_model": "uniform",
+  "min_len": 2000,
+  "max_len": 6000,
+  "ln_mean": null,
+  "ln_sigma": null,
+  "start_model": "uniform",
+  "dropout_fraction": 0.0,
+  "dropout_block_len": null,
+  "dropout_intervals_hap1": [],
+  "dropout_intervals_hap2": [],
+  "coord_note": "All intervals are 0-based half-open [start0,end0).",
+  "burst_prob": 0.6,
+  "burst_count": 2,
+  "burst_len": 300,
+  "burst_mult": 8.0
+}

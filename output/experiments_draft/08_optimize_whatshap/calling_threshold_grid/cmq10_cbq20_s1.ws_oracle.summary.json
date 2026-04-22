@@ -1,0 +1,19 @@
+{
+  "algorithm": "diploid_whats_bam",
+  "solver": "whatshap",
+  "vcf_input": "/home/cagysloth/Dev/github/COMP4801/output/experiments_draft/08_optimize_whatshap/calling_threshold_grid/cmq10_cbq20_s1.oracle.snps.vcf.gz",
+  "bam_input": "/home/cagysloth/Dev/github/COMP4801/output/experiments_draft/08_optimize_whatshap/calling_threshold_grid/cmq10_cbq20_s1.bam",
+  "vcf_output": "/home/cagysloth/Dev/github/COMP4801/output/experiments_draft/08_optimize_whatshap/calling_threshold_grid/cmq10_cbq20_s1.ws_oracle.phased.vcf",
+  "max_coverage": 10,
+  "min_mapq": 20,
+  "min_baseq": 10,
+  "variants_total": 1200,
+  "het_variants": 965,
+  "num_reads_total": 298,
+  "selected_reads": 189,
+  "num_phase_sets": 6,
+  "time_total_sec": 0.8894372580107301,
+  "whatshap_module": "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/__init__.py",
+  "whatshap_core_module": "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/core.cpython-311-x86_64-linux-gnu.so",
+  "whatshap_readselect_module": "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/readselect.cpython-311-x86_64-linux-gnu.so"
+}

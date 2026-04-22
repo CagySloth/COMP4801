@@ -1,6 +1,6 @@
-## 📂 `algorithms` — Phasing Algorithms
+# Algorithms and phasing backends
 
-Run algorithms via:
+All phasing algorithms are exposed through:
 
 ```bash
 python -m algorithms.cli.phase <subcommand> ...
@@ -8,11 +8,10 @@ python -m algorithms.cli.phase <subcommand> ...
 
 ---
 
-## Diploid algorithms
+## Diploid backends
 
 ### `diploid-em`
-Input: `.reads.npz`  
-Output: `<prefix>.haplotypes.tsv` + summary
+Diploid phasing on matrix-track inputs using a hard-EM style approach.
 
 ```bash
 python -m algorithms.cli.phase diploid-em \
@@ -21,7 +20,7 @@ python -m algorithms.cli.phase diploid-em \
 ```
 
 ### `diploid-mst`
-Graph-based heuristic.
+Graph-based diploid phasing on matrix-track inputs.
 
 ```bash
 python -m algorithms.cli.phase diploid-mst \
@@ -29,12 +28,8 @@ python -m algorithms.cli.phase diploid-mst \
   --output-prefix output/dip_mst
 ```
 
-### `diploid-whats` (matrix / VCF-mode adapter)
-Uses **vendored WhatsHap core** on NPZ matrices.
-
-Modes:
-- Matrix-only: phase all sites (mostly for compatibility testing)
-- VCF-mode: if `--vcf` is provided, phase **heterozygous sites only** (WhatsHap-like)
+### `diploid-whats`
+Vendored WhatsHap adapter for matrix / VCF-mode phasing.
 
 ```bash
 python -m algorithms.cli.phase diploid-whats \
@@ -44,24 +39,13 @@ python -m algorithms.cli.phase diploid-whats \
   --solver whatshap
 ```
 
-Solvers:
-- `--solver whatshap`: DP-style (PedigreeDPTable)
-- `--solver hapchat`: MEC-style (HapChatCore)
+#### Notes
+- If `--vcf` is provided, only heterozygous sites are phased and homozygous sites are fixed by genotype.
+- Supports `--solver {whatshap,hapchat}`.
+- Can write `<prefix>.phased.vcf`.
 
-Outputs:
-- `<prefix>.haplotypes.tsv` (dense; for TSV scorer)
-- `<prefix>.phased.vcf` (authoritative phasing output for VCF-mode)
-- `<prefix>.summary.json`
-
-### `diploid-whats-bam` (BAM + VCF → phased VCF)
-This is the **WhatsHap-like long-read phasing** path.
-
-Input:
-- BAM (aligned reads)
-- VCF (variants + genotypes)
-
-Output:
-- phased VCF + summary JSON
+### `diploid-whats-bam`
+The main long-read phasing path in this project.
 
 ```bash
 python -m algorithms.cli.phase diploid-whats-bam \
@@ -69,19 +53,60 @@ python -m algorithms.cli.phase diploid-whats-bam \
   --vcf input.vcf.gz \
   --output-prefix output/ws \
   --output-vcf output/ws.phased.vcf \
-  --max-coverage 15 --min-mapq 20 --min-baseq 20
+  --max-coverage 15 \
+  --min-mapq 20 \
+  --min-baseq 20
 ```
 
-Notes:
-- Only het genotypes are phased
-- PS is assigned by connectivity across selected reads
-- In indel experiments, prefer SNP-only VCF inputs (`--phase-snps-only` in the pipeline runner)
+#### Inputs
+- sorted, indexed BAM
+- called or oracle VCF/VCF.GZ
+
+#### Outputs
+- phased VCF
+- summary JSON
+
+#### Main parameters
+- `--max-coverage`
+- `--min-mapq`
+- `--min-baseq`
+- `--solver`
+- `--recomb-rate`
+- `--sample`
+
+This backend uses the vendored WhatsHap core under `vendor/whatshap_core`.
 
 ---
 
-## Polyploid algorithms
+## Polyploid backends
 
-### `polyploid-em`, `polyploid-spectral`
-These operate on `.reads.npz` and output polyploid haplotypes TSV.
+### `polyploid-em`
+Polyploid phasing on matrix-track inputs.
 
-See `python -m algorithms.cli.phase --help` for details.
+### `polyploid-spectral`
+Polyploid spectral-clustering baseline on matrix-track inputs.
+
+These are legacy / supporting parts of the repository and are not the main focus of the long-read benchmarking work.
+
+---
+
+## Supporting components
+
+### `algorithms.diploid.whatshap_adapter`
+Adapter that converts the project’s internal read representation into a WhatsHap-compatible `ReadSet` for the matrix / VCF-mode path.
+
+### `algorithms.diploid.whatshap_bam_driver`
+Long-read BAM + VCF driver used by the end-to-end pipeline.
+
+### `algorithms.vendor.whatshap_vendor`
+Helpers for importing the vendored WhatsHap implementation consistently.
+
+---
+
+## Practical recommendation
+
+For the final-year project’s main experiments, the most relevant phasing backend is:
+
+- `diploid-whats-bam`
+
+The matrix-track backends remain useful for debugging, algorithm tests, and compatibility checks.

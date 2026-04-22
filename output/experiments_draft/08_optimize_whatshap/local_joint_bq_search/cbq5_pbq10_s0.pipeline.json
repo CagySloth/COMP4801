@@ -1,0 +1,214 @@
+{
+  "prefix": "output/experiments_draft/08_optimize_whatshap/local_joint_bq_search/cbq5_pbq10_s0",
+  "seed": 0,
+  "vcf_source": "both",
+  "steps": {
+    "ref_fasta": "output/experiments_draft/08_optimize_whatshap/local_joint_bq_search/cbq5_pbq10_s0.ref.fasta",
+    "truth_vcf_gz": "output/experiments_draft/08_optimize_whatshap/local_joint_bq_search/cbq5_pbq10_s0.truth.vcf.gz",
+    "truth_eval_vcf_gz": "output/experiments_draft/08_optimize_whatshap/local_joint_bq_search/cbq5_pbq10_s0.truth.snps.vcf.gz",
+    "oracle_vcf_gz": "output/experiments_draft/08_optimize_whatshap/local_joint_bq_search/cbq5_pbq10_s0.oracle.vcf.gz",
+    "reads_fastq": "output/experiments_draft/08_optimize_whatshap/local_joint_bq_search/cbq5_pbq10_s0.reads.fastq",
+    "bam": "output/experiments_draft/08_optimize_whatshap/local_joint_bq_search/cbq5_pbq10_s0.bam",
+    "called_vcf_gz": "output/experiments_draft/08_optimize_whatshap/local_joint_bq_search/cbq5_pbq10_s0.called.vcf.gz"
+  },
+  "callset": {
+    "truth_snps": 1200,
+    "truth_het_snps": 964,
+    "called_snps": 681,
+    "shared_snps": 681,
+    "precision": 1.0,
+    "recall": 0.5675,
+    "notes": "Precision/recall only computed when --vcf-source includes called."
+  },
+  "phasing_runs": {
+    "called": {
+      "vcf_input": "output/experiments_draft/08_optimize_whatshap/local_joint_bq_search/cbq5_pbq10_s0.called.vcf.gz",
+      "vcf_input_for_phasing": "output/experiments_draft/08_optimize_whatshap/local_joint_bq_search/cbq5_pbq10_s0.called.snps.vcf.gz",
+      "phased_vcf": "output/experiments_draft/08_optimize_whatshap/local_joint_bq_search/cbq5_pbq10_s0.ws.phased.vcf",
+      "eval_json": "output/experiments_draft/08_optimize_whatshap/local_joint_bq_search/cbq5_pbq10_s0.ws.eval.json",
+      "summary_json": "output/experiments_draft/08_optimize_whatshap/local_joint_bq_search/cbq5_pbq10_s0.ws.summary.json",
+      "eval": {
+        "shared_total_records": 681,
+        "shared_snp_records": 681,
+        "shared_het_records": 473,
+        "pred_phased_het_records": 290,
+        "pred_unphased_het_records": 183,
+        "num_phase_sets": 5,
+        "phase_accuracy_blockflip": 1.0,
+        "switches": 0,
+        "switch_den": 285,
+        "switch_error_rate": 0.0,
+        "phase_sets": {
+          "11324": {
+            "size": 52,
+            "best_flip": true,
+            "match_no_flip": 0,
+            "match_flip": 52,
+            "best_match": 52
+          },
+          "22573": {
+            "size": 43,
+            "best_flip": true,
+            "match_no_flip": 0,
+            "match_flip": 43,
+            "best_match": 43
+          },
+          "38345": {
+            "size": 142,
+            "best_flip": false,
+            "match_no_flip": 142,
+            "match_flip": 0,
+            "best_match": 142
+          },
+          "81596": {
+            "size": 45,
+            "best_flip": false,
+            "match_no_flip": 45,
+            "match_flip": 0,
+            "best_match": 45
+          },
+          "98985": {
+            "size": 8,
+            "best_flip": true,
+            "match_no_flip": 0,
+            "match_flip": 8,
+            "best_match": 8
+          }
+        },
+        "truth_snp_records": 1200,
+        "pred_snp_records": 681,
+        "shared_exact_records": 681,
+        "notes": ""
+      },
+      "derived": {
+        "truth_het_snps": 964,
+        "shared_het_snps": 473,
+        "phased_het_snps": 290,
+        "correct_phased_het_snps_bestflip": 290,
+        "phasing_rate_on_shared_het": 0.6131078224101479,
+        "effective_phased_recall": 0.3008298755186722,
+        "shared_het_recall": 0.49066390041493774
+      }
+    },
+    "oracle": {
+      "vcf_input": "output/experiments_draft/08_optimize_whatshap/local_joint_bq_search/cbq5_pbq10_s0.oracle.vcf.gz",
+      "vcf_input_for_phasing": "output/experiments_draft/08_optimize_whatshap/local_joint_bq_search/cbq5_pbq10_s0.oracle.snps.vcf.gz",
+      "phased_vcf": "output/experiments_draft/08_optimize_whatshap/local_joint_bq_search/cbq5_pbq10_s0.ws_oracle.phased.vcf",
+      "eval_json": "output/experiments_draft/08_optimize_whatshap/local_joint_bq_search/cbq5_pbq10_s0.ws_oracle.eval.json",
+      "summary_json": "output/experiments_draft/08_optimize_whatshap/local_joint_bq_search/cbq5_pbq10_s0.ws_oracle.summary.json",
+      "eval": {
+        "shared_total_records": 1200,
+        "shared_snp_records": 1200,
+        "shared_het_records": 964,
+        "pred_phased_het_records": 870,
+        "pred_unphased_het_records": 94,
+        "num_phase_sets": 5,
+        "phase_accuracy_blockflip": 0.9977011494252873,
+        "switches": 4,
+        "switch_den": 865,
+        "switch_error_rate": 0.004624277456647399,
+        "phase_sets": {
+          "1602": {
+            "size": 263,
+            "best_flip": true,
+            "match_no_flip": 1,
+            "match_flip": 262,
+            "best_match": 262
+          },
+          "35287": {
+            "size": 182,
+            "best_flip": false,
+            "match_no_flip": 182,
+            "match_flip": 0,
+            "best_match": 182
+          },
+          "62526": {
+            "size": 111,
+            "best_flip": false,
+            "match_no_flip": 111,
+            "match_flip": 0,
+            "best_match": 111
+          },
+          "78707": {
+            "size": 135,
+            "best_flip": false,
+            "match_no_flip": 134,
+            "match_flip": 1,
+            "best_match": 134
+          },
+          "97982": {
+            "size": 179,
+            "best_flip": false,
+            "match_no_flip": 179,
+            "match_flip": 0,
+            "best_match": 179
+          }
+        },
+        "truth_snp_records": 1200,
+        "pred_snp_records": 1200,
+        "shared_exact_records": 1200,
+        "notes": ""
+      },
+      "derived": {
+        "truth_het_snps": 964,
+        "shared_het_snps": 964,
+        "phased_het_snps": 870,
+        "correct_phased_het_snps_bestflip": 868,
+        "phasing_rate_on_shared_het": 0.9024896265560166,
+        "effective_phased_recall": 0.9004149377593361,
+        "shared_het_recall": 1.0
+      }
+    }
+  },
+  "counts_raw": {
+    "truth_records": 1320,
+    "called_records": 774,
+    "oracle_records": 1320,
+    "phasing": {
+      "called": {
+        "phased_records": 681
+      },
+      "oracle": {
+        "phased_records": 1200
+      }
+    }
+  },
+  "params": {
+    "ref_preset": "plain",
+    "ref_length": 120000,
+    "num_snps": 1200,
+    "het_rate": 0.8,
+    "avoid_regions": false,
+    "num_reads": 300,
+    "min_len": 2000,
+    "max_len": 6000,
+    "platform": "ont",
+    "ont_profile": "q20",
+    "map_preset": "map-ont",
+    "call_min_mapq": 20,
+    "call_min_baseq": 5,
+    "max_coverage": 8,
+    "min_mapq": 20,
+    "min_baseq": 10,
+    "dup_segments": 5,
+    "dup_len": 3000,
+    "dup_min_gap": 500,
+    "num_indels": 120,
+    "indel_min_len": 1,
+    "indel_max_len": 5,
+    "indel_het_rate": 0.5,
+    "len_model": "uniform",
+    "ln_mean": null,
+    "ln_sigma": null,
+    "start_model": "dropout",
+    "dropout_fraction": 0.1,
+    "dropout_block_len": 1000,
+    "burst_prob": 0.6,
+    "burst_count": 2,
+    "burst_len": 300,
+    "burst_mult": 8.0,
+    "phase_snps_only": true,
+    "eval_snps_only": true
+  },
+  "time_total_sec": 3.6861976720392704
+}

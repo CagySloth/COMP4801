@@ -1,0 +1,8 @@
+{
+  "contig": "chr1",
+  "length": 20000,
+  "seed": 2,
+  "preset": "plain",
+  "regions": [],
+  "coord_note": "All region coordinates are 0-based half-open [start0, end0)."
+}

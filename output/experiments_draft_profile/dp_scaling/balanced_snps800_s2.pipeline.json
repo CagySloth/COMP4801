@@ -1,0 +1,264 @@
+{
+  "prefix": "output/experiments_draft_profile/dp_scaling/balanced_snps800_s2",
+  "seed": 2,
+  "vcf_source": "both",
+  "steps": {
+    "ref_fasta": "output/experiments_draft_profile/dp_scaling/balanced_snps800_s2.ref.fasta",
+    "truth_vcf_gz": "output/experiments_draft_profile/dp_scaling/balanced_snps800_s2.truth.vcf.gz",
+    "truth_eval_vcf_gz": "output/experiments_draft_profile/dp_scaling/balanced_snps800_s2.truth.snps.vcf.gz",
+    "oracle_vcf_gz": "output/experiments_draft_profile/dp_scaling/balanced_snps800_s2.oracle.vcf.gz",
+    "reads_fastq": "output/experiments_draft_profile/dp_scaling/balanced_snps800_s2.reads.fastq",
+    "bam": "output/experiments_draft_profile/dp_scaling/balanced_snps800_s2.bam",
+    "called_vcf_gz": "output/experiments_draft_profile/dp_scaling/balanced_snps800_s2.called.vcf.gz"
+  },
+  "callset": {
+    "truth_snps": 800,
+    "truth_het_snps": 646,
+    "called_snps": 463,
+    "shared_snps": 463,
+    "precision": 1.0,
+    "recall": 0.57875,
+    "notes": "Precision/recall only computed when --vcf-source includes called."
+  },
+  "phasing_runs": {
+    "called": {
+      "vcf_input": "output/experiments_draft_profile/dp_scaling/balanced_snps800_s2.called.vcf.gz",
+      "vcf_input_for_phasing": "output/experiments_draft_profile/dp_scaling/balanced_snps800_s2.called.snps.vcf.gz",
+      "phased_vcf": "output/experiments_draft_profile/dp_scaling/balanced_snps800_s2.ws.phased.vcf",
+      "eval_json": "output/experiments_draft_profile/dp_scaling/balanced_snps800_s2.ws.eval.json",
+      "summary_json": "output/experiments_draft_profile/dp_scaling/balanced_snps800_s2.ws.summary.json",
+      "summary": {
+        "algorithm": "diploid_whats_bam",
+        "solver": "whatshap",
+        "vcf_input": "/home/cagysloth/Dev/github/COMP4801/output/experiments_draft_profile/dp_scaling/balanced_snps800_s2.called.snps.vcf.gz",
+        "bam_input": "/home/cagysloth/Dev/github/COMP4801/output/experiments_draft_profile/dp_scaling/balanced_snps800_s2.bam",
+        "vcf_output": "/home/cagysloth/Dev/github/COMP4801/output/experiments_draft_profile/dp_scaling/balanced_snps800_s2.ws.phased.vcf",
+        "max_coverage": 8,
+        "min_mapq": 20,
+        "min_baseq": 10,
+        "variants_total": 463,
+        "het_variants": 208,
+        "num_reads_total": 235,
+        "selected_reads": 130,
+        "num_phase_sets": 6,
+        "time_vcf_parse_sec": 0.000865246998728253,
+        "time_build_readset_sec": 0.21436052399803884,
+        "time_readselection_sec": 0.0039140129993029404,
+        "time_solve_sec": 0.005126611999003217,
+        "time_ps_sec": 0.0006745259997842368,
+        "time_write_sec": 0.0018337149995204527,
+        "time_total_sec": 0.22711358899687184,
+        "whatshap_module": "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/__init__.py",
+        "whatshap_core_module": "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/core.cpython-311-x86_64-linux-gnu.so",
+        "whatshap_readselect_module": "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/readselect.cpython-311-x86_64-linux-gnu.so"
+      },
+      "eval": {
+        "shared_total_records": 463,
+        "shared_snp_records": 463,
+        "shared_het_records": 330,
+        "pred_phased_het_records": 207,
+        "pred_unphased_het_records": 123,
+        "num_phase_sets": 6,
+        "phase_accuracy_blockflip": 1.0,
+        "switches": 0,
+        "switch_den": 201,
+        "switch_error_rate": 0.0,
+        "phase_sets": {
+          "1093": {
+            "size": 25,
+            "best_flip": true,
+            "match_no_flip": 0,
+            "match_flip": 25,
+            "best_match": 25
+          },
+          "15050": {
+            "size": 12,
+            "best_flip": true,
+            "match_no_flip": 0,
+            "match_flip": 12,
+            "best_match": 12
+          },
+          "25601": {
+            "size": 18,
+            "best_flip": true,
+            "match_no_flip": 0,
+            "match_flip": 18,
+            "best_match": 18
+          },
+          "45732": {
+            "size": 10,
+            "best_flip": true,
+            "match_no_flip": 0,
+            "match_flip": 10,
+            "best_match": 10
+          },
+          "55168": {
+            "size": 84,
+            "best_flip": true,
+            "match_no_flip": 0,
+            "match_flip": 84,
+            "best_match": 84
+          },
+          "93295": {
+            "size": 58,
+            "best_flip": false,
+            "match_no_flip": 58,
+            "match_flip": 0,
+            "best_match": 58
+          }
+        },
+        "truth_snp_records": 800,
+        "pred_snp_records": 463,
+        "shared_exact_records": 463,
+        "notes": ""
+      },
+      "derived": {
+        "truth_het_snps": 646,
+        "shared_het_snps": 330,
+        "phased_het_snps": 207,
+        "correct_phased_het_snps_bestflip": 207,
+        "phasing_rate_on_shared_het": 0.6272727272727273,
+        "effective_phased_recall": 0.3204334365325077,
+        "shared_het_recall": 0.5108359133126935
+      }
+    },
+    "oracle": {
+      "vcf_input": "output/experiments_draft_profile/dp_scaling/balanced_snps800_s2.oracle.vcf.gz",
+      "vcf_input_for_phasing": "output/experiments_draft_profile/dp_scaling/balanced_snps800_s2.oracle.snps.vcf.gz",
+      "phased_vcf": "output/experiments_draft_profile/dp_scaling/balanced_snps800_s2.ws_oracle.phased.vcf",
+      "eval_json": "output/experiments_draft_profile/dp_scaling/balanced_snps800_s2.ws_oracle.eval.json",
+      "summary_json": "output/experiments_draft_profile/dp_scaling/balanced_snps800_s2.ws_oracle.summary.json",
+      "summary": {
+        "algorithm": "diploid_whats_bam",
+        "solver": "whatshap",
+        "vcf_input": "/home/cagysloth/Dev/github/COMP4801/output/experiments_draft_profile/dp_scaling/balanced_snps800_s2.oracle.snps.vcf.gz",
+        "bam_input": "/home/cagysloth/Dev/github/COMP4801/output/experiments_draft_profile/dp_scaling/balanced_snps800_s2.bam",
+        "vcf_output": "/home/cagysloth/Dev/github/COMP4801/output/experiments_draft_profile/dp_scaling/balanced_snps800_s2.ws_oracle.phased.vcf",
+        "max_coverage": 8,
+        "min_mapq": 20,
+        "min_baseq": 10,
+        "variants_total": 800,
+        "het_variants": 646,
+        "num_reads_total": 296,
+        "selected_reads": 167,
+        "num_phase_sets": 4,
+        "time_vcf_parse_sec": 0.001403861999278888,
+        "time_build_readset_sec": 0.5323260810000647,
+        "time_readselection_sec": 0.0068998079987068195,
+        "time_solve_sec": 0.006523943000502186,
+        "time_ps_sec": 0.001681374000327196,
+        "time_write_sec": 0.0026153419967158698,
+        "time_total_sec": 0.5520466750022024,
+        "whatshap_module": "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/__init__.py",
+        "whatshap_core_module": "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/core.cpython-311-x86_64-linux-gnu.so",
+        "whatshap_readselect_module": "/home/cagysloth/Dev/github/COMP4801/vendor/whatshap_core/whatshap/readselect.cpython-311-x86_64-linux-gnu.so"
+      },
+      "eval": {
+        "shared_total_records": 800,
+        "shared_snp_records": 800,
+        "shared_het_records": 646,
+        "pred_phased_het_records": 623,
+        "pred_unphased_het_records": 23,
+        "num_phase_sets": 4,
+        "phase_accuracy_blockflip": 1.0,
+        "switches": 0,
+        "switch_den": 619,
+        "switch_error_rate": 0.0,
+        "phase_sets": {
+          "134": {
+            "size": 161,
+            "best_flip": true,
+            "match_no_flip": 0,
+            "match_flip": 161,
+            "best_match": 161
+          },
+          "32925": {
+            "size": 13,
+            "best_flip": false,
+            "match_no_flip": 13,
+            "match_flip": 0,
+            "best_match": 13
+          },
+          "36714": {
+            "size": 79,
+            "best_flip": true,
+            "match_no_flip": 0,
+            "match_flip": 79,
+            "best_match": 79
+          },
+          "53008": {
+            "size": 370,
+            "best_flip": true,
+            "match_no_flip": 0,
+            "match_flip": 370,
+            "best_match": 370
+          }
+        },
+        "truth_snp_records": 800,
+        "pred_snp_records": 800,
+        "shared_exact_records": 800,
+        "notes": ""
+      },
+      "derived": {
+        "truth_het_snps": 646,
+        "shared_het_snps": 646,
+        "phased_het_snps": 623,
+        "correct_phased_het_snps_bestflip": 623,
+        "phasing_rate_on_shared_het": 0.9643962848297214,
+        "effective_phased_recall": 0.9643962848297214,
+        "shared_het_recall": 1.0
+      }
+    }
+  },
+  "counts_raw": {
+    "truth_records": 920,
+    "called_records": 566,
+    "oracle_records": 920,
+    "phasing": {
+      "called": {
+        "phased_records": 463
+      },
+      "oracle": {
+        "phased_records": 800
+      }
+    }
+  },
+  "params": {
+    "ref_preset": "plain",
+    "ref_length": 120000,
+    "num_snps": 800,
+    "het_rate": 0.8,
+    "avoid_regions": false,
+    "num_reads": 300,
+    "min_len": 2000,
+    "max_len": 6000,
+    "platform": "ont",
+    "ont_profile": "q20",
+    "map_preset": "map-ont",
+    "call_min_mapq": 20,
+    "call_min_baseq": 10,
+    "max_coverage": 8,
+    "min_mapq": 20,
+    "min_baseq": 10,
+    "dup_segments": 5,
+    "dup_len": 3000,
+    "dup_min_gap": 500,
+    "num_indels": 120,
+    "indel_min_len": 1,
+    "indel_max_len": 5,
+    "indel_het_rate": 0.5,
+    "len_model": "uniform",
+    "ln_mean": null,
+    "ln_sigma": null,
+    "start_model": "dropout",
+    "dropout_fraction": 0.1,
+    "dropout_block_len": 1000,
+    "burst_prob": 0.6,
+    "burst_count": 2,
+    "burst_len": 300,
+    "burst_mult": 8.0,
+    "phase_snps_only": true,
+    "eval_snps_only": true
+  },
+  "time_total_sec": 3.2681739939980616
+}

@@ -1,0 +1,102 @@
+{
+  "shared_total_records": 800,
+  "shared_snp_records": 800,
+  "shared_het_records": 650,
+  "pred_phased_het_records": 300,
+  "pred_unphased_het_records": 350,
+  "num_phase_sets": 12,
+  "phase_accuracy_blockflip": 0.9966666666666667,
+  "switches": 2,
+  "switch_den": 288,
+  "switch_error_rate": 0.006944444444444444,
+  "phase_sets": {
+    "2203": {
+      "size": 9,
+      "best_flip": true,
+      "match_no_flip": 0,
+      "match_flip": 9,
+      "best_match": 9
+    },
+    "5206": {
+      "size": 9,
+      "best_flip": false,
+      "match_no_flip": 9,
+      "match_flip": 0,
+      "best_match": 9
+    },
+    "7441": {
+      "size": 4,
+      "best_flip": true,
+      "match_no_flip": 0,
+      "match_flip": 4,
+      "best_match": 4
+    },
+    "9925": {
+      "size": 19,
+      "best_flip": false,
+      "match_no_flip": 19,
+      "match_flip": 0,
+      "best_match": 19
+    },
+    "13550": {
+      "size": 15,
+      "best_flip": true,
+      "match_no_flip": 0,
+      "match_flip": 15,
+      "best_match": 15
+    },
+    "21555": {
+      "size": 32,
+      "best_flip": false,
+      "match_no_flip": 32,
+      "match_flip": 0,
+      "best_match": 32
+    },
+    "34301": {
+      "size": 5,
+      "best_flip": true,
+      "match_no_flip": 0,
+      "match_flip": 5,
+      "best_match": 5
+    },
+    "35290": {
+      "size": 8,
+      "best_flip": false,
+      "match_no_flip": 8,
+      "match_flip": 0,
+      "best_match": 8
+    },
+    "39836": {
+      "size": 86,
+      "best_flip": true,
+      "match_no_flip": 0,
+      "match_flip": 86,
+      "best_match": 86
+    },
+    "55189": {
+      "size": 100,
+      "best_flip": false,
+      "match_no_flip": 99,
+      "match_flip": 0,
+      "best_match": 99
+    },
+    "71248": {
+      "size": 5,
+      "best_flip": true,
+      "match_no_flip": 0,
+      "match_flip": 5,
+      "best_match": 5
+    },
+    "74076": {
+      "size": 8,
+      "best_flip": true,
+      "match_no_flip": 0,
+      "match_flip": 8,
+      "best_match": 8
+    }
+  },
+  "truth_snp_records": 800,
+  "pred_snp_records": 800,
+  "shared_exact_records": 800,
+  "notes": ""
+}
