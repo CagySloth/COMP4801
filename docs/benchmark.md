@@ -1,68 +1,134 @@
-## 📂 `benchmark` — Benchmarking and evaluation
+# Benchmarking, evaluation, and experiment orchestration
 
-This folder contains:
-
-1) **Matrix-track benchmarking**
-   - `benchmark.benchmark_runner`: parameter sweeps (simulate → phase → score)
-   - `benchmark.benchmark_accuracy`: TSV haplotype accuracy
-
-2) **VCF-track evaluation**
-   - `benchmark.vcf_phase_eval`: phased VCF vs phased truth VCF (block-flip aware)
-     - Matches variants by **(CHROM,POS,REF,ALT)**
-     - Focuses on **biallelic SNPs** by default
-
-3) **Long-read end-to-end automation**
-   - `benchmark.longread_pipeline_runner`: runs Steps 1–7 and writes `<prefix>.pipeline.json`
-
-4) **Aggregation + plotting**
-   - `benchmark.aggregate_pipeline_reports`: gather many pipeline JSONs into a single CSV
-   - `benchmark.longread_baseline_grid`: run baseline read-depth curves
-   - `benchmark.plot_baseline_results`, `benchmark.plot_refpreset_compare`: plotting helpers
+The `benchmark/` package contains the runnable benchmarking logic for both tracks, with the long-read end-to-end pipeline as the main research workflow.
 
 ---
 
-# Long-read pipeline report (`.pipeline.json`)
+## Main components
 
-The pipeline report includes:
+### `benchmark.longread_pipeline_runner`
+Canonical single-run long-read workflow.
 
-- `callset`: truth vs called SNP set comparison (precision/recall)
-- `phasing_runs.called` and/or `phasing_runs.oracle`
-  - `eval`: phase accuracy, switch error, num phase sets
-  - `derived`: effective phased recall, phasing rate, shared het recall, etc.
+Responsibilities:
+- generate reference and truth
+- simulate reads
+- align reads with `minimap2` + `samtools`
+- call variants with `bcftools`
+- phase oracle and/or called VCFs
+- evaluate phased output
+- write `<prefix>.pipeline.json`
 
-Recommended headline metric for end-to-end performance:
-- **called_effective_phased_recall**
+This is the main entrypoint for reproducible long-read runs.
+
+### `benchmark.vcf_phase_eval`
+Evaluates phased VCF output against phased truth.
+
+Key properties:
+- block-flip aware
+- matches records by `(CHROM, POS, REF, ALT)`
+- focused on diploid SNP phasing
+- used by both oracle and called workflows
+
+### `benchmark.aggregate_pipeline_reports`
+Collects many `*.pipeline.json` files under a root directory and writes a single `aggregate.csv`.
+
+This CSV is the standard interface for:
+- experiment summaries
+- plots
+- report tables
+
+### `benchmark.experiment_driver`
+Runs complete experiment suites by repeatedly calling the single-run pipeline and then aggregating the results.
+
+Supported experiment families include:
+- smoke
+- depth
+- dropout
+- duplication
+- bursts
+- indels
+- read-length model
+- duplication × dropout interaction
+- optimization
+- reality check
+
+### Legacy / supporting utilities
+- `benchmark.benchmark_runner`
+- `benchmark.benchmark_accuracy`
+- `benchmark.longread_baseline_grid`
+- plotting helpers such as `plot_baseline_results.py`
 
 ---
 
-# Aggregating experiments
+## Core long-read report structure
 
-After running multiple prefixes under a folder:
+Each long-read run writes `<prefix>.pipeline.json`.
+
+Typical contents include:
+- input parameters
+- output artifact paths
+- callset comparison metrics
+- phasing results for `oracle` and/or `called`
+- derived metrics used in experiment plots
+
+This file is the **source of truth** for downstream aggregation.
+
+---
+
+## Headline metrics in long-read experiments
+
+The most important metrics for the long-read research are:
+
+- `call_recall`
+- `call_precision`
+- `oracle_effective_phased_recall`
+- `called_effective_phased_recall`
+- `oracle_num_phase_sets`
+- `called_num_phase_sets`
+- `oracle_switch_error`
+- `called_switch_error`
+
+The most important attribution idea is:
+
+- **oracle** = phaser-limited behavior
+- **called** = end-to-end behavior
+
+The gap between oracle and called effective phased recall is therefore a key signal for where performance is being lost.
+
+---
+
+## Typical workflow
+
+### 1. Run many prefixes
+
+```bash
+python -m benchmark.experiment_driver \
+  --outdir output/experiments \
+  --seeds 0 1 2
+```
+
+### 2. Aggregate run-level JSON files
 
 ```bash
 python -m benchmark.aggregate_pipeline_reports \
-  --root output/exp_folder \
-  --out  output/exp_folder/aggregate.csv
+  --root output/experiments/01_depth \
+  --out  output/experiments/01_depth/aggregate.csv
 ```
 
-Then plot mean ± std vs your sweep variable.
+### 3. Plot or inspect aggregate results
+
+Use the generated `aggregate.csv` files directly in report or poster plotting scripts.
 
 ---
 
-# Baseline grid (example)
+## Why the design matters
 
-```bash
-python -m benchmark.longread_baseline_grid \
-  --outdir output/exp_baseline_q20 \
-  --ont-profile q20
-python -m benchmark.plot_baseline_results \
-  --csv output/exp_baseline_q20/aggregate.csv \
-  --outdir output/exp_baseline_q20/plots
-```
+The benchmark package is built around a simple rule:
 
----
+- **one canonical runner for a single run**
+- **one canonical aggregator for many runs**
 
-# Realism comparison script
-
-`benchmark/realism_comparison.sh` runs a preset comparison and writes an aggregate CSV.  
-Use it as an example of “batch + aggregate + plot” workflow.
+This makes the project:
+- easier to reproduce
+- easier to validate
+- easier to trace from final figure back to raw outputs

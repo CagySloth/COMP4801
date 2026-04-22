@@ -1,114 +1,109 @@
-## I/O formats (quick reference)
+# I/O and artifact contracts
 
-This repo uses a mix of text and binary formats.
+The project relies heavily on stable, prefix-based output contracts.
+
+This is especially important in the long-read pipeline because every experiment is traced through explicit files rather than only logs.
 
 ---
 
-# Matrix track
+## Matrix-track artifacts
 
-## Truth haplotypes TSV
+### Truth haplotypes TSV
 `<prefix>.haplotypes.tsv`
 
-- Each line: `hap_id<TAB>{0/1 string}`
-- Used for TSV-based accuracy scoring
+Plain-text truth haplotypes used by TSV-based scoring.
 
-## Reads NPZ
+### Dense read matrix NPZ
 `<prefix>.reads.npz`
 
-Dense allele matrix representation used by algorithms:
-- `alleles`: shape (R, N), values in {-1,0,1}
-- `positions`: optional site indices
+Typical contents:
+- allele matrix
+- optional position metadata
 
-## Reads sparse TSV
+### Sparse read TSV
 `<prefix>.reads.sparse.tsv`
-Sparse fragment list representation.
+
+Sparse fragment-style representation.
+
+### Compatibility VCF
+`<prefix>.vcf`
+
+Unphased diploid VCF used by the matrix / VCF-mode WhatsHap adapter.
 
 ---
 
-# Long-read track
+## Long-read pipeline artifacts
 
-## Reference FASTA
-`<prefix>.ref.fasta`
+### Reference
+- `<prefix>.ref.fasta`
+- `<prefix>.ref.meta.json`
 
-Single contig.
+The metadata records information such as duplication events and region annotations.
 
-## Reference meta JSON
-`<prefix>.ref.meta.json`
+### Truth and oracle
+- `<prefix>.truth.vcf(.gz)`
+- `<prefix>.truth.meta.json`
+- `<prefix>.oracle.vcf(.gz)`
+- `<prefix>.hap1.fasta`
+- `<prefix>.hap2.fasta`
 
-Contains:
-- `regions`: list of complex intervals (start0,end0,type)
-- `duplications`: list of duplication events
+### Reads
+- `<prefix>.reads.fastq`
+- `<prefix>.reads.truth.tsv`
+- `<prefix>.reads.meta.json`
 
-## Truth VCF
-`<prefix>.truth.vcf` (+ `.gz/.tbi`)
+### Alignment
+- `<prefix>.bam`
+- `<prefix>.bam.bai`
 
-Phased GT recommended (`0|1`, `1|0`).
+### Variant calling
+- `<prefix>.called.vcf.gz`
+- `<prefix>.called.vcf.gz.tbi`
 
-If indels are enabled, the truth VCF includes indels; use SNP-only filters for phasing/eval.
+### Phasing
+- `<prefix>.ws*.phased.vcf`
+- `<prefix>.ws*.summary.json`
+- `<prefix>.ws*.eval.json`
 
-## Oracle VCF
-`<prefix>.oracle.vcf.gz`
+### Run summary
+- `<prefix>.pipeline.json`
 
-Derived from truth:
-- same sites
-- GT bars replaced with slashes (`|` → `/`)
-- PS removed
-
-Used to isolate phasing from calling.
-
-## Reads FASTQ
-`<prefix>.reads.fastq`
-
-Simulated long reads.
-
-## Reads truth TSV
-`<prefix>.reads.truth.tsv`
-
-Per-read labels:
-- hap (1/2)
-- start0, ref length, observed length
-- edit counts (subs/ins/dels)
-- contig
-
-## Reads meta JSON
-`<prefix>.reads.meta.json`
-
-Stores simulation parameters and summary stats.
-
-## BAM
-`<prefix>.bam` (+ `.bai`)
-
-Alignment from minimap2/samtools.
-
-## Called VCF
-`<prefix>.called.vcf.gz` (+ `.tbi`)
-
-bcftools mpileup/call output.
-
-## Phased VCF
-`<prefix>.ws*.phased.vcf`
-
-Output of `diploid-whats-bam`.  
-Includes `GT` and `PS` for phased het sites.
-
-## Pipeline report JSON
-`<prefix>.pipeline.json`
-
-Single file capturing:
-- inputs/outputs
-- callset metrics
-- phasing metrics (called/oracle)
-- derived metrics (effective phased recall, etc.)
+This is the most important run-level artifact for downstream aggregation.
 
 ---
 
-# SNP-only filtering
+## Aggregated experiment artifacts
 
-When working with indels, filter to biallelic SNPs using:
+Within experiment directories, the standard high-level outputs are:
+- `aggregate.csv`
+- `plots/`
+
+This is the interface used for report figures and result summaries.
+
+---
+
+## Why prefix-based naming matters
+
+The project intentionally groups all outputs from one run under one prefix.
+
+Benefits:
+- easy traceability
+- easy cleanup
+- easier aggregation
+- simpler debugging
+- clear linkage between final plots and raw run outputs
+
+---
+
+## SNP-only filtering
+
+When indels are enabled, the runner can create SNP-only phasing/evaluation inputs.
+
+Equivalent manual filter:
 
 ```bash
 bcftools view -v snps -m2 -M2 -Oz -o out.snps.vcf.gz in.vcf.gz
 bcftools index -t out.snps.vcf.gz
 ```
 
-The pipeline runner’s `--phase-snps-only` automates this.
+This is the recommended way to preserve meaningful SNP phasing evaluation when indels are acting only as realism stressors.

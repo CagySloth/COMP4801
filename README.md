@@ -1,39 +1,55 @@
-# 🧬 COMP4801: Haplotype Phasing Benchmark Suite (COMP4801 FYP)
+# COMP4801: WhatsHap Benchmarking Suite
 
-A research/engineering benchmark suite for **haplotype phasing** on **synthetic data**, with two tracks:
+A final-year project codebase for **controlled benchmarking of WhatsHap-style phasing** under both idealized and practical long-read conditions.
 
-1) **Legacy: Matrix track (fast + controlled)**  
-   Simulate variant-level read matrices (`.reads.npz`) → phase → evaluate TSV accuracy → run sweeps.
+The repository has two tracks:
 
-2) **Primary pipeline: Long-read end-to-end track (WhatsHap-like)**  
-   Generate reference + diploid truth → simulate long reads (FASTQ) → align (BAM) → call variants (VCF) → phase (phased VCF) → evaluate.
+1. **Legacy matrix track**
+   - Simulate read/variant matrices (`.reads.npz`)
+   - Run diploid/polyploid phasing algorithms
+   - Score against truth haplotypes in TSV form
 
-This repo is designed so you can **benchmark WhatsHap under controlled “realism knobs”** (duplications, dropout, error bursts, indels, …) and then sweep WhatsHap parameters.
+2. **Primary long-read end-to-end track**
+   - Generate a synthetic reference and diploid truth
+   - Simulate ONT-like reads (FASTQ)
+   - Align reads (BAM)
+   - Call variants (VCF)
+   - Phase with the vendored WhatsHap core
+   - Evaluate and aggregate results
+
+The long-read track is the main research contribution of the project. It is designed to support:
+
+- **oracle vs called attribution**
+- **realism stressors** such as duplication, coverage dropout, burst errors, and indels
+- **seed-controlled reproducibility**
+- **traceable experiment outputs** through prefix-based artifact naming and machine-readable reports
 
 ---
 
-## What’s included
+## What is in this repository?
 
-- **Matrix simulator**: `python -m dataset.simulate`
-  - Writes truth haplotypes TSV + reads NPZ/TSV (and a minimal diploid VCF for VCF-mode phasing).
+### Data generation
+- `dataset.simulate` — legacy matrix-track simulator
+- `dataset.longread.reference` — synthetic reference FASTA + metadata
+- `dataset.longread.truth` — truth VCF + haplotype FASTAs + oracle VCF
+- `dataset.longread.readsim` — ONT-like FASTQ simulation + read metadata
 
-- **Long-read generators**: `dataset.longread.*`
-  - `dataset.longread.reference` → reference FASTA + meta JSON (regions/duplications)
-  - `dataset.longread.truth` → truth phased VCF + haplotype FASTAs (+ optional indels)
-  - `dataset.longread.readsim` → simulated reads FASTQ + per-read truth TSV (+ meta JSON)
+### Phasing
+- `algorithms.cli.phase` — unified CLI for all phasing backends
+- `algorithms.diploid.whatshap_driver` — matrix / VCF-mode vendored WhatsHap adapter
+- `algorithms.diploid.whatshap_bam_driver` — BAM + VCF long-read phasing path
+- `vendor/whatshap_core` — vendored WhatsHap core used by the project
 
-- **Phasing algorithms**: `python -m algorithms.cli.phase ...`
-  - Diploid: `diploid-em`, `diploid-mst`, `diploid-whats`, `diploid-whats-bam`
-  - Polyploid: `polyploid-em`, `polyploid-spectral`
+### Benchmarking and experiments
+- `benchmark.longread_pipeline_runner` — canonical single-run long-read pipeline
+- `benchmark.vcf_phase_eval` — phased-VCF evaluation against truth
+- `benchmark.aggregate_pipeline_reports` — aggregate many `*.pipeline.json` files into CSV
+- `benchmark.experiment_driver` — run full experiment suites and generate plots
 
-- **Vendored WhatsHap core**: `vendor/whatshap_core`
-  - Used by `diploid-whats` and `diploid-whats-bam` (do **not** rely on PyPI `whatshap`).
-
-- **Benchmarking & evaluation**: `benchmark/*`
-  - `benchmark.longread_pipeline_runner` (end-to-end automation)
-  - `benchmark.vcf_phase_eval` (block-flip-aware phased VCF eval; SNP-focused)
-  - `benchmark.aggregate_pipeline_reports` (collect many `.pipeline.json` into CSV)
-  - `benchmark.longread_baseline_grid` + plotting scripts (baseline curves)
+### Documentation and validation
+- `docs/` — repository documentation
+- `tests/` — unit and integration tests for the core project logic
+- `report/` — final project report source and generated PDF
 
 ---
 
@@ -41,18 +57,19 @@ This repo is designed so you can **benchmark WhatsHap under controlled “realis
 
 ### Prerequisites
 
-- Python **3.11 or 3.12** (tested with Python 3.12.12)
-- System tools for the long-read track:
-  - `minimap2`, `samtools`, `bcftools`
+- Python **3.11 or 3.12**
+- `minimap2`
+- `samtools`
+- `bcftools`
 
-Ubuntu/Debian:
+Example installation on Ubuntu / Debian:
 
 ```bash
 sudo apt-get update
 sudo apt-get install -y minimap2 samtools bcftools
 ```
 
-Check:
+Check that the external tools are available:
 
 ```bash
 minimap2 --version
@@ -63,95 +80,144 @@ bcftools --version
 ### Python environment
 
 ```bash
-python3.11 -m venv .venv
+python3.12 -m venv .venv
 source .venv/bin/activate
-python -m pip install -U pip
+python -m pip install --upgrade pip
 pip install -e .
-```
-
-### Install vendored WhatsHap core
-
-```bash
 pip install -e vendor/whatshap_core
 ```
 
-Quick import check (paths should point under `vendor/whatshap_core`):
+Verify that the vendored WhatsHap package is the one being imported:
 
 ```bash
 python - <<'PY'
 import whatshap as wh
 from whatshap import core, readselect
-print("whatshap:", wh.__file__)
-print("core:", core.__file__)
-print("readselect:", readselect.__file__)
+print('whatshap:', wh.__file__)
+print('core:', core.__file__)
+print('readselect:', readselect.__file__)
 PY
 ```
 
 ---
 
-## Quick start: Matrix track
+## Quick start
 
-### Simulate
+### 1. Legacy matrix track
+
+Generate a small matrix-track dataset:
+
 ```bash
-python -m dataset.simulate   -p 2 -n 200 -r 200 -l 60   -e 0.01 -m 0.0   --seed 0   -o output/demo
+python -m dataset.simulate \
+  -p 2 -n 200 -r 200 -l 60 \
+  -e 0.01 -m 0.0 \
+  --seed 0 \
+  -o output/demo
 ```
 
-Outputs:
-- `output/demo.haplotypes.tsv` (truth)
-- `output/demo.reads.npz` (dense matrix)
-- `output/demo.reads.sparse.tsv` (sparse fragments)
-- `output/demo.vcf` (diploid only; unphased GT derived from truth)
+Phase with the vendored WhatsHap adapter:
 
-### Phase (diploid-whats, VCF-mode)
 ```bash
-python -m algorithms.cli.phase diploid-whats   -i output/demo.reads.npz   --vcf output/demo.vcf   --output-prefix output/demo_phased   --solver whatshap
+python -m algorithms.cli.phase diploid-whats \
+  -i output/demo.reads.npz \
+  --vcf output/demo.vcf \
+  --output-prefix output/demo_phased \
+  --solver whatshap
 ```
 
-### Score (TSV accuracy)
+Score TSV haplotypes:
+
 ```bash
-python -m benchmark.benchmark_accuracy   --truth output/demo.haplotypes.tsv   --pred  output/demo_phased.haplotypes.tsv   --output output/demo_phased.accuracy.json
+python -m benchmark.benchmark_accuracy \
+  --truth output/demo.haplotypes.tsv \
+  --pred  output/demo_phased.haplotypes.tsv \
+  --output output/demo_phased.accuracy.json
+```
+
+### 2. Long-read end-to-end track
+
+Run the full long-read pipeline:
+
+```bash
+python -m benchmark.longread_pipeline_runner \
+  --prefix output/lr_demo \
+  --seed 0 \
+  --ref-length 20000 \
+  --num-snps 200 \
+  --het-rate 0.8 \
+  --num-reads 200 \
+  --min-len 2000 \
+  --max-len 6000 \
+  --platform ont \
+  --ont-profile q20 \
+  --vcf-source both
+```
+
+This produces a family of prefix-based artifacts such as:
+
+- `output/lr_demo.ref.fasta`
+- `output/lr_demo.truth.vcf.gz`
+- `output/lr_demo.oracle.vcf.gz`
+- `output/lr_demo.reads.fastq`
+- `output/lr_demo.bam`
+- `output/lr_demo.called.vcf.gz`
+- `output/lr_demo.ws*.phased.vcf`
+- `output/lr_demo.ws*.eval.json`
+- `output/lr_demo.pipeline.json`
+
+### 3. Indel-enabled mode
+
+If truth indels are enabled, restrict phasing and evaluation to SNPs:
+
+```bash
+python -m benchmark.longread_pipeline_runner \
+  --prefix output/lr_indels \
+  --seed 0 \
+  --ref-length 80000 \
+  --num-snps 800 \
+  --num-indels 80 \
+  --indel-min-len 1 \
+  --indel-max-len 5 \
+  --indel-het-rate 0.5 \
+  --num-reads 200 \
+  --min-len 2000 \
+  --max-len 6000 \
+  --platform ont \
+  --ont-profile q20 \
+  --vcf-source both \
+  --phase-snps-only \
+  --eval-snps-only
 ```
 
 ---
 
-## Quick start: Long-read end-to-end track
+## Why the pipeline is structured this way
 
-### Run Steps 1–7 automatically
-```bash
-python -m benchmark.longread_pipeline_runner   --prefix output/lr_demo   --seed 0   --ref-length 20000   --num-snps 200   --het-rate 0.8   --num-reads 200   --min-len 2000   --max-len 6000   --platform ont --ont-profile q20   --vcf-source both
-```
+The long-read pipeline is intentionally:
 
-Key outputs (under the chosen prefix):
-- `.ref.fasta`, `.ref.meta.json`
-- `.truth.vcf.gz` (+ `.tbi`), `.oracle.vcf.gz` (+ `.tbi`)
-- `.hap1.fasta`, `.hap2.fasta`
-- `.reads.fastq`, `.reads.truth.tsv`, `.reads.meta.json`
-- `.bam` (+ `.bai`)
-- `.called.vcf.gz` (+ `.tbi`)
-- `.ws*.phased.vcf` + `.ws*.summary.json`
-- `.ws*.eval.json` (evaluation)
-- `.pipeline.json` (end-to-end report)
+- **modular** — each stage has a single responsibility
+- **reproducible** — every run is seed-controlled
+- **traceable** — all artifacts share a prefix and are summarized in `*.pipeline.json`
+- **experiment-ready** — the experiment driver repeatedly calls the canonical runner and aggregates outputs into `aggregate.csv`
 
-### Indels mode (important)
-If you enable indels in truth (`--num-indels > 0`), use **SNP-only phasing/evaluation**:
-
-```bash
-python -m benchmark.longread_pipeline_runner   --prefix output/lr_indels   --seed 0   --ref-length 80000 --num-snps 800   --num-indels 80 --indel-min-len 1 --indel-max-len 5 --indel-het-rate 0.5   --num-reads 200 --min-len 2000 --max-len 6000   --platform ont --ont-profile q20   --vcf-source both   --phase-snps-only
-```
-
-This filters phasing input and truth evaluation to **biallelic SNPs only**, while still letting indels stress alignment/calling realism.
+This design supports both software-engineering goals (maintainability, testing, debugging) and research goals (controlled attribution, realism sweeps, parameter tuning).
 
 ---
 
-## Documentation
+## Documentation map
 
-Start here: `docs/index.md`
+Start with `docs/index.md`.
 
 Recommended reading order:
-- `docs/longread_pipeline.md` (end-to-end track + realism knobs)
-- `docs/realism_knobs.md` (what each knob does + expected effects)
-- `docs/validation.md` (acceptance suite + sanity checks)
-- `docs/experiments.md` (how to plan sweeps and WhatsHap optimization)
+
+1. `docs/longread_pipeline.md`
+2. `docs/realism_knobs.md`
+3. `docs/benchmark.md`
+4. `docs/experiments.md`
+5. `docs/validation.md`
+6. `docs/io.md`
+
+The remaining docs cover the dataset generators, algorithms, CLIs, and example commands.
 
 ---
 
@@ -159,10 +225,20 @@ Recommended reading order:
 
 ```text
 COMP4801/
-├── algorithms/          # Diploid & polyploid algorithms + CLI
-├── dataset/             # Dataset generators (matrix + longread)
-├── benchmark/           # Benchmark runners + evaluators
-├── docs/                # Documentation (this folder)
-├── vendor/              # Vendored WhatsHap core
-└── tests/               # Regression tests
+├── algorithms/          # Diploid & polyploid phasing algorithms + CLI
+├── benchmark/           # Runners, evaluators, aggregation, experiments
+├── dataset/             # Matrix and long-read data generation
+├── docs/                # Repository documentation
+├── examples/            # Helper scripts used during report / plot generation
+├── report/              # Final report source and generated PDF
+├── tests/               # Tests for core logic and adapters
+└── vendor/              # Vendored WhatsHap core
 ```
+
+---
+
+## Notes
+
+- The long-read research track is the current primary focus of the repository.
+- The matrix track is still useful for fast debugging and algorithm checks.
+- Structural variants are not currently a full first-class phasing target in the evaluation workflow; indels mainly act as realism stressors and are handled through SNP-only phasing/evaluation when needed.
